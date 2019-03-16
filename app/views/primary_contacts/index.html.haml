@@ -1,0 +1,46 @@
+:javascript
+	$(function(){
+		$('.table th:last').remove();
+		$('.table th:last').get(0).colSpan=2;
+		$('.table th:last').css('text-align','center');
+		$('.fixed-table-loading').hide();
+	});
+.col-md-offset-1.col-md-10
+	- if request.url.index("admin")==nil
+		%h1 Listing primary_contacts
+	- else
+		%h1 Primary Contacts
+		%table.table.table-hover{"data-sort-name" => "name", "data-sort-order" => "asc", "data-toggle" => "table"}
+			%thead
+				%tr
+					%th{"data-field" => "name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Name
+					%th{"data-field" => "lovedone_name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Loved One Name
+					%th{"data-field" => "dob", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Loved One DOB
+					%th{"data-field" => "state", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Loved One State
+					%th{"data-field" => "datetime", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Date/TIme Stamp
+					%th{"data-field" => "actions", "data-width"=>"70"} Actions
+					%th{"data-field" => "actions1", "data-width"=>"70"} Actions
+			%tbody
+				- @primary_contacts.each do |primary_contact|
+					%tr
+						%td
+							- if primary_contact.user
+								= primary_contact.user.name
+						%td
+							= "#{primary_contact.lovedone.name}"
+						%td
+							= (localize(primary_contact.lovedone.date_of_birth, :format => "%d-%m-%Y") unless primary_contact.lovedone.date_of_birth==nil)
+						%td
+							= primary_contact.lovedone.state
+						%td
+							= primary_contact.lovedone.created_at.strftime("%m/%d/%Y %H:%M")
+						%td
+							- if request.url.index("admin")==nil
+								= link_to 'Edit', edit_lovedone_primary_contact_path(primary_contact.lovedone, primary_contact)
+							- else
+								- unless primary_contact.user.nil?
+									= link_to 'Edit', user_edit_path(primary_contact.user), class: 'btn btn-default btn-sm'
+
+						%td= link_to 'Delete', lovedone_primary_contact_path(primary_contact.lovedone, primary_contact), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm'
+		%br/
+		= link_to 'New Primary contact', new_primary_contact_path if request.url.index("admin")==nil

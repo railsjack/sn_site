@@ -1,0 +1,567 @@
+:javascript
+	specificCalendar = function(emp, lo, view, current_day){
+		var employee = emp
+		var lovedone = lo
+		var url = ''
+		if(employee != '-1'){
+			url= '/schedulers/scheduler_calendar.json?employee_id='+employee+''
+			editable_option = true
+		}
+		else if(lovedone != '-1'){
+			url= '/schedulers/scheduler_calendar.json?lovedone_id='+lovedone+''
+			editable_option = true
+		}
+		else if((employee == '-1')&&(lovedone == '-1')){
+			url= '/schedulers/scheduler_calendar.json'
+			editable_option = false
+		}
+
+
+		if(view != ''){
+			default_view = view
+			default_day = moment(current_day).format('MM/DD/YYYY HH:mm')
+			right_header = 'month,agendaWeek,agendaDay'
+		}
+		else{
+			right_header = 'month,agendaWeek,agendaDay'
+			default_view = 'agendaWeek'
+			default_day = moment(current_day).format('MM/DD/YYYY HH:mm')
+			if(editable_option == false){
+				right_header = 'month,basicWeek,basicDay'
+				default_view = 'basicWeek'
+			}
+		}
+
+		var offset = new Date().getTimezoneOffset();
+		var today = moment(new Date()).zone(offset).format('MM/DD/YYYY HH:mm');
+
+		$('#calendar').fullCalendar({
+			slotEventOverlap: false,
+			theme: true,
+			height: 678,
+			scrollTime: '07:00:00',
+			defaultView: default_view,
+			slotDuration: '00:15:00',
+			eventLimit: true,
+			defaultDate: default_day,
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: right_header
+			},
+			eventMouseover: function(event, jsEvent, view){
+				var check = moment(event.start).format('MM/DD/YYYY HH:mm');
+				if(check > today){
+					$(this).css('background-color', '#003300');
+					$(this).css('cursor', 'pointer');
+					if (view.name !== 'agendaDay') {
+						$(jsEvent.target).attr('title', event.title);
+					}
+				}
+			},
+			eventMouseout: function(event, jsEvent, view){
+				var check = moment(event.start).format('MM/DD/YYYY HH:mm');
+				if(check > today){
+					$(this).css('background-color', 'green');
+					$(this).css('cursor', 'crosshair');
+				}
+			},
+			editable: editable_option,
+			eventDrop: function(event, delta){
+				var check = moment(event.start).format('MM/DD/YYYY HH:mm');
+				//.format('MM/DD/YYYY HH:mm')
+				if(check < today){
+					$('#createExistingModal #existingContent').html('<h4>You cannot change an appointment for past date or time.</h4>')
+					$('#createExistingModal').modal({ backdrop: 'static', keyboard: false, show: true });
+					$('#calendar').fullCalendar('refetchEvents');
+				}
+				else{
+					console.log(delta['_milliseconds']/60000);
+					$.ajax({
+						url: '/schedulers/edit_schedule',
+						dataType: 'script',
+						type: 'GET',
+						data: {
+							id: event.id,
+							duration: delta['_milliseconds']/60000,
+							type: 'drag'
+						}
+					});
+				}
+			},
+			eventResize: function(event, delta){
+				var check = moment(event.start).format('MM/DD/YYYY HH:mm');
+
+				if(check < today){
+					$('#createExistingModal #existingContent').html('<h4>You cannot change an appointment for past date or time.</h4>')
+					$('#createExistingModal').modal({ backdrop: 'static', keyboard: false, show: true });
+					$('#calendar').fullCalendar('refetchEvents');
+				}
+				else{
+					console.log(delta['_milliseconds']/60000);
+					$.ajax({
+						url: '/schedulers/edit_schedule',
+						dataType: 'script',
+						type: 'GET',
+						data: {
+							id: event.id,
+							duration: delta['_milliseconds']/60000,
+							type: 'resize'
+						}
+					});
+				}
+			},
+			selectable: editable_option,
+			select: function(start, end, allDay) {
+				var endtime, starttime;
+				var check = moment(start).format('MM/DD/YYYY HH:mm');
+				if(check < today)
+				{
+					$('#createExistingModal #existingContent').html('<h4>You cannot add an appointment to a past date or time.</h4>')
+					$('#createExistingModal').modal({ backdrop: 'static', keyboard: false, show: true });
+				}
+				else
+				{
+					starttime = moment(start).format('MM/DD/YYYY HH:mm');
+					endtime = moment(end).format('MM/DD/YYYY HH:mm');
+					$('.three-quarters-loader').addClass('hidden');
+					if(employee != -1){
+						$('#createEmployeeModal #apptStartTime').val(starttime);
+						$('#createEmployeeModal #apptEndTime').val(endtime);
+						$('#createEmployeeModal #selectEmployeeName').select2('val', ' ');
+						$('#createEmployeeModal #selectLovedoneName').select2('val', ' ');
+						$('#createEmployeeModal #selectFrequency').select2('val', ' ');
+						$('#createEmployeeModal').modal({ backdrop: 'static', keyboard: false, show: true });
+					}
+					else if(lovedone != -1){
+						$('#createLovedoneModal #apptStartTime').val(starttime);
+						$('#createLovedoneModal #apptEndTime').val(endtime);
+						$('#createLovedoneModal #selectEmployeeName').select2('val', ' ');
+						$('#createLovedoneModal #selectLovedoneName').select2('val', ' ');
+						$('#createLovedoneModal #selectFrequency').select2('val', ' ');
+						$('#createLovedoneModal').modal({ backdrop: 'static', keyboard: false, show: true });
+					}
+				}
+			},
+			eventSources: [
+				{
+				url: url,
+				type: 'GET'
+				}
+			],
+			eventClick: function(calEvent, jsEvent, view) {
+				var check = moment(calEvent.start).format('MM/DD/YYYY HH:mm');
+				if(editable_option == true){
+					if(check < today){
+						$('#createExistingModal #existingContent').html('<h4>You cannot delete an appointment for past date or time.</h4>')
+						$('#createExistingModal').modal({ backdrop: 'static', keyboard: false, show: true });
+					}
+					else{
+						$('#createDeletingModal').modal({ backdrop: 'static', keyboard: false, show: true });
+						$('#createDeletingModal #appointmentId').val(calEvent.id);
+					}
+				}
+				else {
+					if(check > today){
+						$.ajax({
+							url: '/schedulers/scheduler_calendar',
+							dataType: 'script',
+							type: 'GET',
+							data: {
+							  employee_id: calEvent.employee_id,
+							  current_day: '' + calEvent.start,
+							  view: 'agendaDay'
+
+							}
+						});
+						$('#employee_scheduler').trigger('click');
+						$('#employee_calendar').select2('val', calEvent.employee_id);
+						$('#scheduler_calendar').removeClass('hidden');
+						$('.reloading_events_button').removeClass('hidden');
+					}
+				}
+			}
+		});
+
+	}
+
+	doSubmit = function() {
+
+		employee = $('#employeeId').val()
+		lovedone = $('#lovedoneId').val()
+
+		start_time= $('#apptStartTime').val()
+		end_time= $('#apptEndTime').val()
+		frequency= $('#selectFrequency').val()
+
+		if(employee){
+			id = $('#employeeId').val()
+			selected_id = $('#selectLovedoneName').val()
+			type = 'employee'
+		}
+
+		if(lovedone){
+			id = $('#lovedoneId').val()
+			selected_id = $('#selectEmployeeName').val()
+			type = 'lovedone'
+		}
+
+		if(start_time == ''){
+			alert('Please Add Start Time');
+			return false;
+		}
+		if(end_time == ''){
+			alert('Please Add End Time');
+			return false;
+		}
+
+		if(selected_id == null && type == 'employee') {
+			alert('Please Select Loved One');
+			return false;
+		}
+		else if(frequency == null && type == 'employee'){
+			alert('Please Select Frequency');
+			return false;
+		}
+
+		if(frequency == null && type == 'lovedone'){
+			alert('Please Select Frequency');
+			return false;
+		}
+		else if(selected_id == null && type == 'lovedone' ){
+			alert('Please Select Loved One');
+			return false;
+		}
+
+		$('.three-quarters-loader').removeClass('hidden');
+
+		$.ajax({
+			url: '/schedulers/new_schedule',
+			dataType: 'script',
+			type: 'GET',
+			data: {
+				start_time: start_time,
+				end_time: end_time,
+				frequency: frequency,
+				selected_id: selected_id,
+				id: id,
+				type: type,
+				loop: 0,
+				key: ''
+			}
+		});
+	};
+
+	$('#deletingOption1').bind('click', function(){
+		if(confirm("Are you sure you want to do this?")) {
+			$.ajax({
+				url: '/schedulers/delete_schedule',
+				dataType: 'script',
+				type: 'GET',
+				data: {
+					schedule_id: $('#createDeletingModal #appointmentId').val(),
+					type: 1
+				},
+				success: function (data) {
+					$('#calendar').fullCalendar('refetchEvents');
+					$('.three-quarters-loader').addClass('hidden');
+					$('#createDeletingModal').modal('hide');
+				}
+			});
+		}
+	});
+
+	$('#deletingOption2').bind('click', function(){
+		if(confirm("Are you sure you want to do this?")) {
+			$.ajax({
+				url: '/schedulers/delete_schedule',
+				dataType: 'script',
+				type: 'GET',
+				data: {
+					schedule_id: $('#createDeletingModal #appointmentId').val(),
+					type: 2
+				},
+				success: function (data) {
+					$('#calendar').fullCalendar('refetchEvents');
+					$('.three-quarters-loader').addClass('hidden');
+					$('#createDeletingModal').modal('hide');
+				}
+			});
+		}
+	});
+
+	$('#customYes').on('click', function() {
+		document.getElementById("apptStartTime").disabled = false;
+		document.getElementById("apptEndTime").disabled = false;
+	});
+
+	$('#customNo').on('click', function() {
+			document.getElementById("apptStartTime").disabled = true;
+			document.getElementById("apptEndTime").disabled = true;
+	});
+
+	$('#createEmployeeModal #submitButton').on('click', function(e) {
+		e.preventDefault();
+		doSubmit();
+	});
+
+	$('#createLovedoneModal #submitButton').on('click', function(e) {
+		e.preventDefault();
+		doSubmit();
+	});
+
+	$('#existingSubmitButton').on('click', function(e) {
+		$('#createExistingModal').modal('hide');
+		$("#createExistingModal #existingContent").html('');
+	});
+
+	$(document).ready(function() {
+		specificCalendar(#{employee}, #{lovedone}, "#{view}", "#{current_day}");
+		$('#selectLovedoneName').select2();
+		$('#selectEmployeeName').select2();
+		$('#selectFrequency').select2();
+		$('.scheduler_datetime').datetimepicker({
+			format:'m/d/Y H:i',
+			defaultTime: '7:00',
+			step: 15
+		});
+	});
+#calendar
+
+#createEmployeeModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel1", role: "dialog", tabindex: "-1"}
+	.form-modal-dialog
+		.modal-content
+			.modal-header
+				%button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} x
+				%center
+					%h3#myModalLabel1 Create Appointment
+					.three-quarters-loader.hidden
+			.modal-body
+				#createAppointmentForm
+					- if employee != -1
+						.row
+							.col-md-6
+								.form-group
+									- local_employee = Employee.find(employee)
+									%b.panel-title Employee Name
+									%input#employeeId{type: 'hidden', value: "#{local_employee.id}"}
+									%input#employeeName.form-control{name: 'employeeName',type: 'text', value: "#{local_employee.full_name}", readonly: true, style: 'margin-top:10px;'}
+								.form-group
+									%b.panel-title Loved One
+									%select#selectLovedoneName{name: 'lovedoneName', class: 'form-control', style: 'margin-top:10px;'}
+										%option
+										- lovedones = EmployeeLovedone.where(employee_id: employee)
+										- if lovedones.count.zero?
+											- lovedones = Lovedone.where(company_id: current_user.company.id)
+											- lovedones.each do |lo|
+												%option{value: "#{lo.id}"}= lo.name
+										- else
+											- lovedones.each do |array|
+												- if array.lovedone.present?
+													%option{value: "#{array.lovedone.id}"}= array.lovedone.name
+								.form-group
+									%b.panel-title Frequency
+									%select#selectFrequency{name: 'frequency', class: 'form-control', style: 'margin-top:10px;'}
+										%option
+										%option{value: 1} One Time
+										%option{value: 2} Weekly (Business Days)
+										%option{value: 3} Weekly (Calendar Days)
+										%option{value: 4} M – W – F
+										%option{value: 5} Tu – Th
+										%option{value: 6} Monthly (Business Days)
+										%option{value: 7} Monthly (Calendar Days)
+							.col-md-6
+								.panel.panel-default.well
+									.panel-heading
+										%b.panel-title Time
+									.panel-body
+										.form-group
+											%label Custom
+											%br
+											%input#customYes{type: 'radio', value: false, name: 'customTimeOption', style: 'margin-left: 10px; margin-right: 10px;'} Yes
+											%input#customNo{type: 'radio', value: false, name: 'customTimeOption', style: 'margin-left: 10px; margin-right: 10px;', checked: true} No
+										.form-group
+											%label{for: 'appStartTime'} Start
+											%input#apptStartTime.form-control{type: 'text', class: 'scheduler_datetime', disabled: true}
+										.form-group
+											%label{for: 'appEndTime'} End
+											%input#apptEndTime.form-control{type: 'text', class: 'scheduler_datetime', disabled: true}
+			.modal-footer
+				%button.btn.btn-danger{"aria-hidden" => "true", "data-dismiss" => "modal"} Cancel
+				%button#submitButton.btn.btn-success{type: "submit"} Save
+
+#createLovedoneModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel1", role: "dialog", tabindex: "-1"}
+	.form-modal-dialog
+		.modal-content
+			.modal-header
+				%button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} x
+				%h3#myModalLabel1 Create Appointment
+				%center
+					.three-quarters-loader.hidden
+			.modal-body
+				#createAppointmentForm
+					- if lovedone != -1
+						.row
+							.col-md-6
+								.form-group
+									- local_lovedone = Lovedone.find(lovedone)
+									%label{for: 'lovedoneName'} Loved One Name
+									%input#lovedoneId{type: 'hidden', value: "#{local_lovedone.id}"}
+									%input#lovedoneName.form-control{name: 'lovedoneName',type: 'text', value: "#{local_lovedone.full_name}", readonly: true}
+								.form-group
+									%label{for: 'selectEmployeeName'} Employee
+									%select#selectEmployeeName{name: 'employeeName', class: 'form-control'}
+										%option
+										- employees = Employee.where(company_id: current_user.company.id).order('last_name ASC')
+										- employees.each do |emp|
+											%option{value: "#{emp.id}"}= emp.name
+								.form-group
+									%label{for: 'selectFrequency'} Frequency
+									%select#selectFrequency{name: 'frequency', class: 'form-control'}
+										%option
+										%option{value: 1} One Time
+										%option{value: 2} Weekly (Business Days)
+										%option{value: 3} Weekly (Calendar Days)
+										%option{value: 4} M – W – F
+										%option{value: 5} Tu – Th
+										%option{value: 6} Monthly (Business Days)
+										%option{value: 7} Monthly (Calendar Days)
+							.col-md-6
+								.panel.panel-default.well
+									.panel-heading
+										%b.panel-title Time
+									.panel-body
+										.form-group
+											%label Custom
+											%br
+											%input#customYes{type: 'radio', value: false, name: 'customTimeOption', style: 'margin-left: 10px; margin-right: 10px;'} Yes
+											%input#customNo{type: 'radio', value: false, name: 'customTimeOption', style: 'margin-left: 10px; margin-right: 10px;', checked: true} No
+										.form-group
+											%label{for: 'appStartTime'} Start
+											%input#apptStartTime.form-control{type: 'text', class: 'scheduler_datetime', disabled: true}
+										.form-group
+											%label{for: 'appEndTime'} End
+											%input#apptEndTime.form-control{type: 'text', class: 'scheduler_datetime', disabled: true}
+			.modal-footer
+				%button.btn.btn-danger{"aria-hidden" => "true", "data-dismiss" => "modal"} Cancel
+				%button#submitButton.btn.btn-success{type: "submit"} Save
+
+
+
+
+#createPrecedingApptModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel1", role: "dialog", tabindex: "-1"}
+	.existing-modal-dialog
+		.modal-content
+			.modal-header
+				%button.scheduler-close-button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} x
+				%h4#precedingHeader
+			.modal-body
+				%p
+					%b Option 1:
+					Disregard the notice and schedule this appointment
+				%p
+					%b Option 2:
+					Automatically move this appointment to later to allow for travel time
+				%p#precedingContent3
+					%b Option 3:
+					Schedule with another employee
+
+			.modal-footer
+				%button.scheduler-cancel-button.pull-right.btn.btn-danger{"aria-hidden" => "true", "data-dismiss" => "modal"} Cancel
+				%button#precedingOption1.pull-left.btn.btn-success{type: "submit"} Option 1
+				%button#precedingOption2.pull-left.btn.btn-success{type: "submit"} Option 2
+				%button#precedingOption3.pull-left.btn.btn-success{type: "submit"} Option 3
+
+#createFollowingApptModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel1", role: "dialog", tabindex: "-1"}
+	.existing-modal-dialog
+		.modal-content
+			.modal-header
+				%button.scheduler-close-button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} x
+				%h4#followingHeader
+			.modal-body
+				%p
+					%b Option 1:
+					Disregard the notice and schedule this appointment
+				%p
+					%b Option 2:
+					Automatically move this appointment up to allow for travel time
+				-#%p
+				-#	%b Option 3:
+				-#	Move the next to appointment to later in the day to allow for travel time
+				%p#followingContent3
+					%b Option 3:
+					Schedule with another employee
+
+			.modal-footer
+				%button.scheduler-cancel-button.pull-right.btn.btn-danger{"aria-hidden" => "true", "data-dismiss" => "modal"} Cancel
+				%button#followingOption1.pull-left.btn.btn-success{type: "submit"} Option 1
+				%button#followingOption2.pull-left.btn.btn-success{type: "submit"} Option 2
+				%button#followingOption3.pull-left.btn.btn-success{type: "submit"} Option 3
+
+#createPrecedingFollowingApptModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel1", role: "dialog", tabindex: "-1"}
+	.existing-modal-dialog
+		.modal-content
+			.modal-header
+				%button.scheduler-close-button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} x
+				%h4#precedingFollowingHeader
+			.modal-body
+				#precedingFollowingContent
+				%p
+					%b Option 1:
+					Disregard the notice and schedule this appointment with the original duration
+				%p
+					%b Option 2:
+					Schedule this appointment with the abbreviated duration to allow for travel time
+				%p#pfContent3
+					%b Option 3:
+					Schedule with another employee
+
+			.modal-footer
+				%button.scheduler-cancel-button.pull-right.btn.btn-danger{"aria-hidden" => "true", "data-dismiss" => "modal"} Cancel
+				%button#precedingFollowingOption1.pull-left.btn.btn-success{type: "submit"} Option 1
+				%button#precedingFollowingOption2.pull-left.btn.btn-success{type: "submit"} Option 2
+				%button#precedingFollowingOption3.pull-left.btn.btn-success{type: "submit"} Option 3
+
+#createExistingModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel1", role: "dialog", tabindex: "-1"}
+	.existing-modal-dialog
+		.modal-content
+			.modal-header
+				%button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} x
+				%h4{style: 'color:red'} ALERT
+			.modal-body
+				%p#existingContent
+			.modal-footer
+				%button#existingSubmitButton.btn.btn-success{type: "submit"} OK
+
+#createDeletingModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel1", role: "dialog", tabindex: "-1"}
+	.existing-modal-dialog
+		.modal-content
+			.modal-header
+				%button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} x
+				%h4{style: 'color:green'} Delete Appointment
+			.modal-body
+				#appointmentId.hidden
+				%p
+					%b Option 1:
+					Delete this appointment and all future appointments if created using a multi-frequency selection.
+				%p
+					%b Option 2:
+					Only delete this appointment.
+			.modal-footer
+				%button.pull-right.btn.btn-danger{"aria-hidden" => "true", "data-dismiss" => "modal"} Cancel
+				%button#deletingOption1.pull-left.btn.btn-success{type: "submit"} Option 1
+				%button#deletingOption2.pull-left.btn.btn-success{type: "submit"} Option 2
+
+#anotherEmployeeModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel1", role: "dialog", tabindex: "-1"}
+	.modal-dialog
+		.modal-content
+			.modal-header
+				%button.scheduler-close-button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} x
+				%h4{style: 'color:green'} Select Another Employee
+			.modal-body
+				.well
+					.form-group
+						#anotherEmployeeContent
+			.modal-footer
+				%button.scheduler-cancel-button.btn.btn-danger{"aria-hidden" => "true", "data-dismiss" => "modal"} Cancel
+				%button#anotherEmployeeSubmit.btn.btn-success{type: "submit"} Save

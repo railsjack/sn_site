@@ -1,0 +1,21 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>User:</strong>
+  <%= @follower.user.name %>
+</p>
+
+<p>
+  <strong>Loved One:</strong>
+  <%= @follower.lovedone.first_name if @follower.lovedone.first_name %>
+</p>
+
+<p>
+  <strong>Request status:</strong>
+  <%= @follower.request_status %>
+</p>
+
+<%#= link_to 'Edit', edit_follower_path(@follower) %> |
+<%= link_to 'Edit', edit_lovedone_follower_path(@follower.lovedone, @follower) %> |
+<%#= link_to 'Back', followers_path %>
+<%= link_to 'Back', lovedone_followers_path %>

@@ -1,0 +1,19 @@
+#browserModal.modal.fade{"aria-hidden" => "true"}
+	.modal-dialog
+		.modal-content
+			.modal-header
+				%button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} x
+				%h4{style: 'color:red'} Browser Update Notice
+			.modal-body
+				%p#browserContent
+			.modal-footer
+				%button#browserButton.pull-right.btn.btn-danger{"aria-hidden" => "true", "data-dismiss" => "modal"} OK
+
+:javascript
+	$('#browserButton').on('click', function(){
+		$.ajax({
+			url: '/browser_alert',
+			dataType: 'script',
+			type: 'GET'
+		});
+	});

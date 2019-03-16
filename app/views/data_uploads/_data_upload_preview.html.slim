@@ -1,0 +1,260 @@
+.text-center
+  - if @type == 'payroll'
+    h5
+      b Payroll Preview
+    button.btn.btn-success.data_upload_button Export
+  - elsif @type == 'billing'
+    h5
+      b Billing Preview
+    button.btn.btn-success.data_upload_button Export
+  hr
+- timesheet_array = []
+/.scroll style='max-height:450px;margin-left:0px;'
+table.table-bordered.table#data_upload_table
+  thead
+    tr.success
+      th.hidden
+      /th.hidden
+      /th.hidden
+      th.hidden
+      - if @bl_f2f
+        th Loved One
+      - else
+        th Employee
+      th Date
+      - if @pr_f2f or @bl_f2f
+        th Begin Time
+        th End Time
+        th Total Time (Min)
+        th Encounter Based
+      - if @pr_dtb
+        th Travel Time
+      - if @pr_dmb
+        th Mileage
+      - if @type == 'payroll'
+        th Loved One
+      - elsif @type == 'billing'
+        th Employee
+
+      - if @pr_f2f or @bl_f2f
+        th Upload Alert
+    tbody
+      /- @shifts.order('start_time ASC').each do |shift|
+      /- timesheets = Timesheet.where( "starttime >= ? and endtime <= ? and company_id = ?", @start_date, @end_date, @company)
+      - timesheets = Timesheet.where("DATE_FORMAT(starttime, '%Y-%m-%d') BETWEEN ? AND ?  and company_id = ?", @start_date, @end_date, @company)
+      - timesheets.order('starttime ASC').each do |timesheet|
+        - timesheet_array.push(timesheet.id)
+        - if timesheet.employee.present? and timesheet.lovedone.present?
+          tr
+            td.timesheet_id.hidden= timesheet.id
+            td.hidden= timesheet.starttime.strftime("%m/%d/%Y %H:%M")
+            /td.shift_id.hidden= shift.id
+            /td.shift_start_time.hidden= shift.start_time.strftime("%H:%M")
+            /td.shift_end_time.hidden= shift.end_time.strftime("%H:%M")
+            - if @bl_f2f
+              td.bl_lovedone_name= timesheet.lovedone.name
+            - else
+              td.pr_employee_name= timesheet.employee.name
+            td.data_upload_date= timesheet.starttime.strftime("%m/%d/%Y")
+            - if timesheet.endtime.present?
+              - @diff = ((timesheet.endtime - timesheet.starttime)/60).round(1)
+            - else
+              - @diff = nil
+            - if @pr_f2f or @bl_f2f
+              td.start_time= timesheet.starttime.strftime("%H:%M")
+              - if @diff.present?
+                td.end_time= timesheet.endtime.strftime("%H:%M")
+                td.total_time= @diff
+              - else
+                td --
+                td --
+              td.text-center= check_box_tag '', '', timesheet.encounter_based, class: 'du_encounter_based'
+
+            - if @pr_dtb
+              / Travel Time ***********************************************
+              - if @pr_base_first_last and timesheet.trip.base_to_first and timesheet.trip.lb_travel_time.present?
+                td= timesheet.try(:trip).try(:travel_time)
+                td= "#{timesheet.lovedone.full_name} (B-F)"
+                tr
+                  td.hidden= timesheet.id
+                  td.hidden= timesheet.starttime.strftime("%m/%d/%Y %H:%M")
+                  td= timesheet.employee.name
+                  td= timesheet.starttime.strftime("%m/%d/%Y")
+                  td= timesheet.trip.lb_travel_time
+                  td= "#{timesheet.lovedone.full_name} (L-B)"
+                - next
+              - if @pr_base_first_last and timesheet.trip.base_to_first
+                td= timesheet.try(:trip).try(:travel_time)
+                td= "#{timesheet.lovedone.full_name} (B-F)"
+                - next
+              - elsif @pr_base_first_last and timesheet.trip.lb_travel_time.present?
+                td= timesheet.try(:trip).try(:travel_time)
+                td= timesheet.lovedone.full_name
+                tr
+                  td.hidden= timesheet.id
+                  td.hidden= timesheet.starttime.strftime("%m/%d/%Y %H:%M")
+                  td= timesheet.employee.name
+                  td= timesheet.starttime.strftime("%m/%d/%Y")
+                  td= timesheet.trip.lb_travel_time
+                  td= "#{timesheet.lovedone.full_name} (L-B)"
+                  - next
+              - if timesheet.trip.base_to_first and !@pr_base_first_last
+                td ----
+                td= timesheet.lovedone.full_name
+                - next
+              - unless timesheet.trip.base_to_first and timesheet.trip.lb_travel_time.present? and @pr_base_first_last
+                td= "#{timesheet.trip.travel_time}"
+
+            - if @pr_dmb
+              / Travel Mileage ***********************************************
+              - if @pr_base_first_last and timesheet.trip.base_to_first and timesheet.trip.lb_travel_distance.present?
+                td= timesheet.try(:trip).try(:travel_distance)
+                td= "#{timesheet.lovedone.full_name} (B-F)"
+                tr
+                  td.hidden= timesheet.id
+                  td.hidden= timesheet.starttime.strftime("%m/%d/%Y %H:%M")
+                  td= timesheet.employee.name
+                  td= timesheet.starttime.strftime("%m/%d/%Y")
+                  td= timesheet.trip.lb_travel_distance
+                  td= "#{timesheet.lovedone.full_name} (L-B)"
+                - next
+              - if @pr_base_first_last and timesheet.trip.base_to_first
+                td= timesheet.try(:trip).try(:travel_distance)
+                td= "#{timesheet.lovedone.full_name} (B-F)"
+                - next
+              - elsif @pr_base_first_last and timesheet.trip.lb_travel_distance.present?
+                td= timesheet.try(:trip).try(:travel_distance)
+                td= timesheet.lovedone.full_name
+                tr
+                  td.hidden= timesheet.id
+                  td.hidden= timesheet.starttime.strftime("%m/%d/%Y %H:%M")
+                  td= timesheet.employee.name
+                  td= timesheet.starttime.strftime("%m/%d/%Y")
+                  td= timesheet.trip.lb_travel_distance
+                  td= "#{timesheet.lovedone.full_name} (L-B)"
+                  - next
+              - if timesheet.trip.base_to_first and !@pr_base_first_last
+                td ----
+                td= timesheet.lovedone.full_name
+                - next
+              - unless timesheet.trip.base_to_first and timesheet.trip.lb_travel_distance.present? and @pr_base_first_last
+                td= "#{timesheet.trip.travel_time}"
+
+            - if @type == 'payroll'
+              td.pr_lovedone_name= timesheet.lovedone.full_name
+            - elsif @type == 'billing'
+              td.bl_employee_name= timesheet.employee.full_name
+
+            - if @pr_f2f or @bl_f2f
+              - if timesheet.try(:trip).try(:recurring_notification).present?
+                td.hidden.distance_alert_time= timesheet.trip.recurring_notification.strftime("%H:%M")
+                td= link_to 'Departure Time', '#', style: 'color:red', class: 'end_encounter_alert'
+              - elsif @diff.present? and @diff <= current_user.company.abbreviated_time
+                td= link_to 'Abbreviated Time', '#', style: 'color:red', class: 'abbreviated_time_alert'
+              - elsif @diff.nil?
+                td= link_to 'Open Encounter', '#', style: 'color:red', class: 'open_encounter_alert'
+              - else
+                td
+
+.timesheet_ids_array data-timesheet_ids=timesheet_array
+
+#endEncounterModal.modal.fade aria-hidden="true" aria-labelledby="myModalLabel1" role="dialog" tabindex="-1"
+  .data-upload-modal-dialog
+    .modal-content
+      .modal-header
+        button.data-upload-close-button.close aria-hidden="true" data-dismiss="modal" type="button"  x
+        h4 style="color:green" End Encounter Alert
+      .modal-body
+        .well
+          .form-group
+            #endEncounterContent
+          #endEncounterOption2Content.hidden
+            .text-center
+              h4
+                b style="color:green" Modify Appointment Duration
+            hr
+            center
+              /.form-group.hidden
+                label class='control-label' Shift Start Time
+                input type="text" class="form-control" id="end_enc_shift_start_time"
+              /.form-group.hidden
+                label class='control-label' Shift End Time
+                input type="text" class="form-control" id="end_enc_shift_end_time"
+              .form-group
+                label class='control-label' Start Time
+                input type="text" class="form-control" id="end_enc_start_time" class="du_timepicker"
+              .form-group
+                label class='control-label' End Time
+                input type="text" class="form-control" id="end_enc_end_time" class="du_timepicker"
+            input type="hidden" id="end_enc_timesheet_id"
+            /input type="hidden" id="end_enc_shift_id"
+      .modal-footer
+        button.data-upload-cancel-button.btn.btn-danger aria-hidden="true" data-dismiss="modal"  Cancel
+        button#endEncounterOption1.btn.btn-success.pull-left type="submit"  Option 1
+        button#endEncounterOption2.btn.btn-success.pull-left type="submit"  Option 2
+        button#endEncounterSave.btn.btn-success.pull-left.hidden type="submit"  Save
+
+#abbrevTimeModal.modal.fade aria-hidden="true" aria-labelledby="myModalLabel1" role="dialog" tabindex="-1"
+  .data-upload-modal-dialog
+    .modal-content
+      .modal-header
+        button.data-upload-close-button.close aria-hidden="true" data-dismiss="modal" type="button"  x
+        h4 style="color:red"  Abbreviated Time Alert
+      .modal-body
+        .well
+          .form-group
+            #abbrevTimeContent
+          #abbrevTimeOption2Content.hidden
+            .text-center
+              h4
+                b style="color:green" Modify Appointment Duration
+            hr
+            center
+              /.form-group.hidden
+                label class='control-label' Shift Start Time
+                input type="text" class="form-control" id="abbrev_shift_start_time"
+              /.form-group.hidden
+                label class='control-label' Shift End Time
+                input type="text" class="form-control" id="abbrev_shift_end_time"
+              .form-group
+                label class='control-label' Start Time
+                input type="text" class="form-control" id="abbrev_start_time" class="du_timepicker"
+              .form-group
+                label class='control-label' End Time
+                input type="text" class="form-control" id="abbrev_end_time" class="du_timepicker"
+            input type="hidden" id="abbrev_timesheet_id"
+            /input type="hidden" id="abbrev_shift_id"
+      .modal-footer
+        button.data-upload-cancel-button.btn.btn-danger aria-hidden="true" data-dismiss="modal"  Cancel
+        button#abbrevTimeOption1.btn.btn-success.pull-left type="submit"  Option 1
+        button#abbrevTimeOption2.btn.btn-success.pull-left type="submit"  Option 2
+        button#abbrevTimeSave.btn.btn-success.pull-left.hidden type="submit"  Save
+
+#openEncounterModal.modal.fade aria-hidden="true" aria-labelledby="myModalLabel1" role="dialog" tabindex="-1"
+  .data-upload-modal-dialog
+    .modal-content
+      .modal-header
+        button.data-upload-close-button.close aria-hidden="true" data-dismiss="modal" type="button"  x
+        h4 style="color:red"  Open Encounter Alert
+      .modal-body
+        .well
+          .form-group
+            #openEncounterContent
+          #openEncounterOption1Content.hidden
+            .text-center
+              h4
+                b style="color:red" Modify Appointment Duration
+            hr
+            center
+              .form-group
+                label class='control-label' Start Time
+                input type="text" class="form-control" id="open_enc_start_time" class="du_timepicker"
+              .form-group
+                label class='control-label' End Time
+                input type="text" class="form-control" id="open_enc_end_time" class="du_timepicker"
+            input type="hidden" id="open_enc_timesheet_id"
+      /input type="hidden" id="abbrev_shift_id"
+      .modal-footer
+        button.data-upload-cancel-button.btn.btn-danger aria-hidden="true" data-dismiss="modal"  Cancel
+        button#openEncounterOption1.btn.btn-success.pull-left type="submit"  Option 1
+        button#openEncounterSave.btn.btn-success.pull-left.hidden type="submit"  Save

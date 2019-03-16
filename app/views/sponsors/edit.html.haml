@@ -1,0 +1,17 @@
+:javascript
+  $(document).ready(function(){
+    $('.tel')
+    .inputmask("(999) 999-9999")
+      .blur(function(e){
+        if($(e.target).val() == "(___) ___-____"){
+          $(e.target).val('');
+        }
+      });
+  });
+.row
+  .col-md-8.col-md-offset-2
+    .panel.panel-success
+      .panel-heading
+        %h3.panel-title Editing sponsor
+      .panel-body
+        = render 'form'

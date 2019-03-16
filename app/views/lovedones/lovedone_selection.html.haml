@@ -1,0 +1,15 @@
+.col-md-4.col-md-offset-4
+	.panel.panel-success
+		.panel-heading{style: 'line-height:33px;'}
+			Loved One Follower
+			= link_to 'Back', lovedones_path, class: 'btn btn-small btn-success pull-right'
+		.panel-body
+			.well
+				.form-group
+					%label Select Loved One:
+					%select.center-block{id: 'lovedone_selection', class: 'form-control'}
+						%option{value: 'none'}
+						- @lovedones.order('last_name ASC').each do |lovedone|
+							%option{value: lovedone.id}= lovedone.name
+				%br
+				%button.center-block.btn.btn-success.btn-small{id: 'lovedone_follower_btn'} Add Follower

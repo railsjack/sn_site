@@ -1,0 +1,16 @@
+<%= simple_form_for([@lovedone, @primary_contact]) do |f| %>
+  <%= f.error_notification %>
+
+  <div class="form-inputs">
+      <%= f.association :user, 
+        #:collection => @users_with_profile,
+        :collection => User.users_with_profile,
+        :label_method => :name,
+        :include_blank => false
+        %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit , class: 'btn btn-success btn-md'%>
+  </div>
+<% end %>

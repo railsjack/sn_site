@@ -1,0 +1,65 @@
+console.log("<%= @user.email %>");
+
+$('#editMemberModal #edit_member_first_name').val("<%= @user.profile.first_name %>");
+$('#editMemberModal #edit_member_last_name').val("<%= @user.profile.last_name %>");
+$('#editMemberModal #edit_member_email').val("<%= @user.email %>");
+$('#editMemberModal #edit_existing_password').val("<%= @user.existing_password %>");
+$('#editMemberModal #edit_member_password').val('');
+$('#editMemberModal #edit_member_password_confirm').val('');
+$('#editMemberModal #user_id').val("<%= @user.id %>");
+
+$('#edit_member_button').unbind('click');
+$('#edit_member_button').on('click', function() {
+    user= $('#user_id').val();
+    first_name = $('#edit_member_first_name').val();
+    last_name = $('#edit_member_last_name').val();
+    email = $('#edit_member_email').val();
+    password = $('#edit_member_password').val();
+    password_confirm = $('#edit_member_password_confirm').val();
+    final_password = '';
+    if(first_name == ''){
+        alert('Please Enter First Name');
+        return false;
+    }
+    else if(last_name == ''){
+        alert('Please Enter Last Name');
+        return false;
+    }
+    else if(email == ''){
+        alert('Please Enter Email');
+        return false;
+    }
+
+    if(password != ''){
+        if(password.length < 8){
+            alert('Please Enter Password with minimum 8 Characters');
+            return false;
+        }
+        else if(password_confirm == ''){
+            alert('Please Enter Password Confirmation');
+            return false;
+        }
+        else if(password != password_confirm){
+            alert('Your Password do not match, please Enter again');
+            return false;
+        }
+        else{
+            final_password = password;
+        }
+    }
+
+    $.ajax({
+        url: '/access_settings/update_member',
+        dataType: 'script',
+        type: 'POST',
+        data: {
+            user_id: user,
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            password: final_password
+        }
+    });
+});
+
+$('#editMemberModal').modal('show');

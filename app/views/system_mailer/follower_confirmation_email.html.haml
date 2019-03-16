@@ -1,0 +1,8 @@
+Hello!
+%br
+%p
+	- if @lovedone.company.notification_masking
+		This message is to inform you that #{@lovedone.company.business_name} has added you to the contact list for their interaction with #{@lovedone.first_name} #{@lovedone.last_name[0]}. You will be notified during their future encounters.
+	- else
+		This message is to inform you that #{@lovedone.company.business_name} has added you to the contact list for their interaction with #{@lovedone.first_name} #{@lovedone.last_name}. You will be notified during their future encounters.
+%p Thank you.

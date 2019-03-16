@@ -1,0 +1,36 @@
+:css
+  main > .alert-success{
+    display: none !important;
+  }
+
+
+.container
+  .panel.panel-success
+    .panel-heading
+      %h3.panel-title.pull-left{style: "line-height: 33px;"}
+        Send Notification to Employees
+
+      = link_to 'Message Archives', company_company_messages_path, class: "btn pull-right btn-default", style: "margin-right: 10px;"
+      = link_to 'Back', company_employees_path, class: "btn btn-success pull-right btn-default", style: "margin-right: 10px;"
+      .clearfix
+    .panel-body.padding.company-messages
+      #message_sent_modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "mySmallModalLabel", :role => "dialog", :tabindex => "-1"}
+        .modal-dialog.modal-sm
+          .modal-content
+            -#.modal-header
+            -#  %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+            -#    %span{"aria-hidden" => "true"} ×
+            -#  /%h4#mySmallModalLabel.modal-title Information
+            .modal-body
+              %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+                %span{"aria-hidden" => "true"} ×
+              - flash.each do |name, msg|
+                - if msg.is_a?(String)
+                  = content_tag :div, raw(msg), :id => "flash_#{name}"
+                  :javascript
+                    $(function(){
+                      $('#message_sent_modal').modal();
+                    });
+
+      .new
+        = render 'form'

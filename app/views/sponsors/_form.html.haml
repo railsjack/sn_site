@@ -1,0 +1,66 @@
+= simple_form_for(@sponsor, html: {class: 'form-horizontal'}) do |f|
+  = f.error_notification
+  .form-inputs
+    = f.input :name
+    = f.input :nation, label: 'Sponsor Type', collection: Sponsor::national_types
+    -#= f.input :address
+    -#= f.input :city
+    #spon_state.hidden= f.input :state, collection: us_states, disabled: Sponsor.where('state != ""').collect(&:state)
+    #spon_county.hidden= f.input :county, collection: [], input_html:{'data-selected-item'=> f.object.county}
+    #spon_zip.hidden= f.input :zip
+    #spon_specific.hidden= f.input :company_id, collection: Company.all.order('company_name ASC'), disabled: Sponsor.where('company_id != ""').collect(&:company_id), label: 'Providers'
+    = f.input :phone
+    = f.input :email
+    = f.input :website
+    = f.input :contact_last_name, label: 'Contact Last Name'
+    = f.input :contact_first_name, label: 'Contact First Name'
+    = f.input :start_date, as: :string, input_html: {value: @sponsor.start_date.try('strftime', '%m/%d/%Y')}
+    = f.input :end_date, as: :string, input_html: {value: @sponsor.end_date.try('strftime', '%m/%d/%Y')}
+
+    %td= f.button :submit , class: 'btn btn-success btn-md', id: 'sponsor_submit'
+    %td= link_to 'Back', sponsors_path, class: 'btn btn-success btn-md'
+    - unless @sponsor.new_record?
+      %td
+        %span.pull-right
+          = link_to 'Delete', @sponsor, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger btn-md'
+
+    %script{:src => "/js/jquery.ui.widget.js"}
+    %script{:src => "/js/jquery.iframe-transport.js"}
+
+- assigned_county = Sponsor.where("county != ''").pluck(:county)
+
+:javascript
+  var assigned_county = #{assigned_county}
+  $(function(){
+    var state_selector = '#sponsor_state';
+    var county_selector = '#sponsor_county';
+    fn_state_county(state_selector, county_selector);
+  });
+
+  window.fn_state_county = function(state_selector, county_selector) {
+  $(state_selector).change(function() {
+    var html, selected_item, text;
+    text = $("option:selected", this).text();
+    $(county_selector).empty();
+    if (states[text]) {
+      html = "";
+      selected_item = $(county_selector).attr("data-selected-item");
+      html += "<option> </option>";
+      states[text].map(function(o) {
+        var selected;
+        var custom;
+        selected = (selected_item === o ? "selected" : "");
+        if (_.contains(assigned_county, o)) {
+          custom = "style='color:red' disabled";
+        } else {
+          custom = "style='color:green'";
+        }
+        html += "<option value='" + o + "' " + selected + " " + custom + ">" + o + "</option>";
+      });
+      $(county_selector).append(html);
+    }
+  });
+  $(state_selector).trigger("change");
+  };
+
+

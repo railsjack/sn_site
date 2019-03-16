@@ -1,0 +1,36 @@
+:javascript
+	$(function(){
+		$('.fixed-table-loading').hide();
+	});
+.container
+	.row
+		.table-responsive
+			%h3.bg-warning.text-center Leads
+			%table.table.table-hover{"data-sort-name" => "bizname", "data-sort-order" => "asc", "data-toggle" => "table"}
+				%thead
+					%tr.bg-success
+						%th{"data-field" => "bizname", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Business Name
+						%th{"data-field" => "bizphone", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Business Phone
+						%th{"data-field" => "lovedone_name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Loved One Name
+						%th{"data-field" => "primary_contact", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Primary Contact
+						%th{"data-field" => "date_time", "data-sortable" => "true"} Date/Time
+						%th{"data-field" => "action2", :colspan => "1"} Actions
+				%tbody
+					- @leads.each do |lead|
+						%tr
+							%td= lead.name
+							%td= lead.phone_number.gsub(/\)/,') ')
+							%td
+								-if lead.profile.user.lovedones.count>0
+									- unless lead.profile.user.lovedones.first.last_name.blank?
+										= "#{lead.profile.user.lovedones.first.last_name}, #{lead.profile.user.lovedones.first.first_name}"
+								-else
+									&nbsp;
+							%td
+								- unless lead.profile.last_name.blank?
+									= "#{lead.profile.last_name}, #{lead.profile.first_name}"
+							%td= lead.created_at.strftime("%m/%d/%Y %H:%M")
+							%td= link_to 'Delete', profile_lead_url(lead.profile, lead), method: :delete, data: { confirm: 'Are you sure?' }
+			%br/
+			- unless current_user.admin?
+				= link_to 'New Lead', new_profile_lead_path(@profile), class: "btn btn-success	btn-md"

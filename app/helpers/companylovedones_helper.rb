@@ -1,0 +1,2 @@
+module CompanylovedonesHelper
+end

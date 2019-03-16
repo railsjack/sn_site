@@ -1,0 +1,43 @@
+.well
+  h4.text-center
+    - if current_user.employee?
+      label= "Transfer Appointments for #{current_user.employee.full_name}"
+    - else
+      label Transfer Appointments
+
+.well.col-md-6 style= 'min-height:328px;'
+  center
+    h4.text-center.green-color
+      b Criteria Input
+    hr
+    .form-group
+      label class= 'col-lg-4 control-label'
+        |Start Date:
+      .col-lg-6
+        input type= 'text' class= 'transfer-date form-control' id= 'transfer_start_date'
+    .form-group.transfer-end-padding
+      label class= 'col-lg-4 control-label'
+        |End Date:
+      .col-lg-6
+        input type= 'text' class= 'transfer-date form-control' id= 'transfer_end_date'
+    - unless current_user.employee?
+      .form-group.transfer-start-padding
+        label class= 'col-lg-4 control-label'
+          |Select Employee:
+        .col-lg-6#transfer_employees_dropdown
+          select id= 'transfer_employee' class= 'form-control'
+            option value= 'none'
+              |-- Select Start and End Date --
+    - else
+      #employee_user data-employee-id="#{current_user.employee.id}"
+
+    button class= 'btn btn-success transfer-generate-button' id= 'transfer_preview_button' Generate Results
+
+.well.col-md-6 style= 'min-height:328px;'
+  center
+    h4.text-center.green-color
+      b Results Preview
+    hr
+    #preview_appointments
+      h4.no-result
+        |* Please select employee and duration

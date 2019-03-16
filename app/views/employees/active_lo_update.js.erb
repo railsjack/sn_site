@@ -1,0 +1,2 @@
+$('#employees_table').html("<%= escape_javascript render(partial: 'employees/company_employees_info', locals: {employees: @employees_updated}) %>");
+$('.table').bootstrapTable();

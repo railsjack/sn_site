@@ -1,0 +1,136 @@
+:css
+  .btn{
+    color: #fff !important;
+  }
+  .fixed-table-loading, .no-records-found{
+      display: none !important;
+  }
+
+:javascript
+  $(function(){
+    $('.table th:last').remove();
+    $('.table th:last').get(0).colSpan = 2;
+    $('.table th:last').get(0).style.textAlign = 'center';
+  });
+
+  $(function(){
+    $('.fixed-table-loading').hide();
+    $('.suggestion-search').keyup(function(e){
+      var key = e.target.value.toLowerCase();
+      if(key==""){
+        $('.table tr').show();
+      }
+      $('.table tr:gt(0)').each(function(){
+        if($($(this).children().get(0)).find('a').text().toLowerCase().indexOf(key)==-1){
+          $(this).hide();
+        }
+      });
+    });
+  });
+
+.container
+  .row.relative
+    .table-responsive{style: "position: relative;"}
+    %div
+      %h3.text-center Loved Ones
+      .well
+        - if current_user.admin?
+          %div{style: "position: absolute; right: 0;"}
+            = link_to 'Import Loved Ones', import_lovedones_path, class: 'btn btn-primary btn-sm pull-right', style: "margin-right: 10px;"
+        - if current_user.serviceprovider?
+          %div{style: "position: absolute; right: 0;"}
+            = link_to 'New Loved One', new_lovedone_path+"?nohead=#{params[:nohead]}" , class: "btn btn-danger  btn-sm pull-right", style: "margin-right: 10px;"
+            = link_to 'Send Admin Message', messages_path+"?nohead=#{params[:nohead]}" , class: "btn btn-success  btn-sm pull-right", style: "margin-right: 10px;"
+            = link_to 'Followers',  lovedone_selection_lovedones_path , class: "btn btn-success  btn-sm pull-right", style: "margin-right: 10px;"
+        %div
+          -#- if current_user.admin?
+          Search:
+          %input.suggestion-search{:placeholder => "Search...", :type => "text"}/
+          &nbsp;&nbsp;&nbsp; Count of Loved Ones:
+          - if current_user.admin?
+            %span#lovedones=@lovedones_all.count
+          - else
+            %span#lovedones=@lovedones.count
+
+      %table.table.table-striped.table-bordered.table-hover{"data-sort-name" => "name", "data-sort-order" => "asc", "data-toggle" => "table"}
+        %thead
+          %tr.bg-success
+            %th{"data-field" => "name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Name
+            %th{"data-field" => "street", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Street
+            - unless current_user.admin?
+              %th{"data-field" => "apt_unit", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Apt./Unit#
+            %th{"data-field" => "city", "data-sortable" => "true", "data-sorter"=>"stringSorter"} City
+            %th{"data-field" => "county", "data-sortable" => "true", "data-sorter"=>"stringSorter"} County
+            %th{"data-field" => "state", "data-sortable" => "true", "data-sorter"=>"stringSorter"} State
+            - unless current_user.admin?
+              %th{"data-field" => "zip_code", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Zip Code
+            -#%th{"data-field" => "primary_contact", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Primary Contact
+            - if current_user.admin?
+              %th{"data-field" => "service_provider", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Service Provider
+            %th{"data-field" => "date_time", "data-sortable" => "true"} Date/Time Created
+            %th{"data-field" => "csv_imported", "data-sortable" => "true"} Imported
+            %th{"data-field" => "followers", "data-sortable" => "true"} Followers
+            %th{"data-field" => "edit-link"} Actions
+            %th{"data-field" => "delete-link"} Actions
+        %tbody
+          - if current_user.admin?
+            - @lovedones_all.order('last_name ASC').each do |lovedone|
+              %tr
+                %td.tt-name
+                  = link_to "#{lovedone.name}", edit_lovedone_path(lovedone)
+                  \
+                %td= lovedone.street
+                -#%td= lovedone.apt_unit
+                %td= lovedone.city
+                %td= lovedone.county
+                %td= lovedone.state
+                -#%td= lovedone.zip_code
+                %td= lovedone.company.try(:company_name)
+                %td= lovedone.created_at.strftime("%m/%d/%Y %H:%M")
+                - if lovedone.csv_imported
+                  %td Yes
+                - else
+                  %td No
+                - if lovedone.followers.count == 0
+                  %td
+                    .text-center= link_to lovedone.followers.count, lovedone_followers_path(lovedone), class: 'btn btn-danger btn-xs'
+                - else
+                  %td
+                    .text-center= link_to lovedone.followers.count, lovedone_followers_path(lovedone), class: 'btn btn-warning btn-xs'
+                %td
+                  = link_to edit_lovedone_path(lovedone), class: "btn btn-success	btn-xs" do
+                    %i.glyphicon.glyphicon-edit  Edit
+                %td
+                  = link_to "Delete", lovedone_path(lovedone), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-success btn-xs"
+          - else
+            - @lovedones.order('last_name ASC').each do |lovedone|
+              %tr
+                %td.tt-name
+                  = link_to lovedone.name, edit_lovedone_path(lovedone)
+                  \ 
+                %td= lovedone.street
+                %td= lovedone.apt_unit
+                %td= lovedone.city
+                %td= lovedone.county
+                %td= lovedone.state
+                %td= lovedone.zip_code
+                %td= lovedone.created_at.strftime("%m/%d/%Y %H:%M")
+                - if lovedone.csv_imported
+                  %td Yes
+                - else
+                  %td No
+
+                - if lovedone.followers.count == 0
+                  %td
+                    .text-center= link_to lovedone.followers.count, lovedone_followers_path(lovedone), class: 'btn btn-danger btn-xs'
+                - else
+                  %td
+                    .text-center= link_to lovedone.followers.count, lovedone_followers_path(lovedone), class: 'btn btn-warning btn-xs'
+                %td
+                  = link_to edit_lovedone_path(lovedone), class: "btn btn-success	btn-xs" do
+                    %i.glyphicon.glyphicon-edit  Edit
+                %td
+                  = link_to lovedone_path(lovedone), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-success	btn-xs" do
+                    %i.glyphicon.glyphicon-remove  Delete
+      %br/
+      -#= link_to 'New Loved One', new_lovedone_path , class: "btn btn-success btn-md hidden", style:"position: absolute;position: absolute; display: block;right: 0;top: 30px;"

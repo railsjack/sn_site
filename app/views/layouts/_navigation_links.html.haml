@@ -1,0 +1,69 @@
+:css
+  ul{list-style:none;}
+  ul.navigation.menu.fusion-navbar-nav a{
+    text-transform: uppercase;
+    font-weight: normal;
+    font-size: 13px;
+    font-family: 'HelveticaNeue' !important;
+  }
+  .sticky-menu li{
+    margin-left: 5px;
+  }
+
+- if user_signed_in?
+  - if current_user.admin?
+    = render partial: 'layouts/admin_links'
+
+  - if current_user.user?
+    %li= link_to 'Familiy Member', familymembers_path
+    %li= link_to 'Loved Ones', lovedones_path
+    - unless current_user.lovedones.first.employee.nil?
+      %li= link_to 'Track', controller: "employees", action: "track_employee", id: current_user.lovedones.first.employee
+    - if current_user.primary_contact?
+      %li= link_to 'Leads', profile_leads_path(current_user.profile)
+
+  / If user is Service Provider and has Company Profile
+  - if current_user.serviceprovider?
+    - if current_user.admin
+      = render partial: 'layouts/sp_admin_links'
+    - else
+      = render partial: 'layouts/sp_member_links'
+  - elsif current_user.employee?
+    %li= link_to 'Scheduler', schedulers_path
+
+- else
+  %ul.navigation.menu.fusion-navbar-nav
+    %li#menu-item-9798.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-9798
+      %a{"aria-haspopup" => "true", :style => "cursor: pointer;", :href=>"#{Rails.application.secrets.host_name}"}
+        Home
+        %span{:class => "#holes"}
+    %li#menu-item-9799.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-9799
+      %a{"aria-haspopup" => "true", :style => "cursor: pointer;", :href=>"#{Rails.application.secrets.host_name}/#features"}
+        Features
+        %span{:class => "#features"}
+    %li#menu-item-10310.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-10310
+      %a{"aria-haspopup" => "true", :style => "cursor: pointer;", :href=>"#{Rails.application.secrets.host_name}/#pages"}
+        About
+        %span{:class => "#pages"}
+    %li#menu-item-9801.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-9801
+      %a{"aria-haspopup" => "true", :style => "cursor: pointer;", :href=>"#{Rails.application.secrets.host_name}/#woocommerce"}
+        Applications
+        %span{:class => "#woocommerce"}
+    %li#menu-item-9802.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-9802
+      %a{"aria-haspopup" => "true", :style => "cursor: pointer;", :href=>"#{Rails.application.secrets.host_name}/#demo"}
+        How It Works
+        %span{:class => "#demo"}
+    %li#menu-item-9803.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-9803
+      %a{"aria-haspopup" => "true", :style => "cursor: pointer;", :href=>"#{Rails.application.secrets.host_name}/#shortcodes"}
+        GPS Tracking
+        %span{:class => "#shortcodes"}
+    %li#menu-item-9804.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-9804
+      %a{"aria-haspopup" => "true", :style => "cursor: pointer;", :href=>"#{Rails.application.secrets.host_name}/#reviews"}
+        Enrollment
+        %span{:class => "#reviews"}
+    %li#menu-item-10282.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-10282
+      %a{"aria-haspopup" => "true", :style => "cursor: pointer;", :href=>"#{Rails.application.secrets.host_name}/#contact"}
+        contact
+        %span{:class => "#contact"}
+    %li#menu-item-10304.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-10304
+      %a#login_href.cboxElement{"aria-haspopup" => "true", :href => "/users/sign_in"} Login

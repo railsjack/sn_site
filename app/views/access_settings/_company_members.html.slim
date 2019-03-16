@@ -1,0 +1,39 @@
+table.table.table-bordered#company_members_table
+  thead
+    tr.success
+      th User
+      th First Name
+      th Last Name
+      th Email
+      th Login
+      th Logout
+      th Access Settings
+      th Action
+      th History
+      th.hidden
+      th.hidden
+      th.hidden
+  tbody
+    - current_user.company.users.each do |member|
+      tr
+        - if member.admin
+          td Admin
+        - else
+          td User
+        - if member.admin
+          td.first_name= member.company.try(:contact_first_name)
+          td.last_name= member.company.try(:contact_last_name)
+        - else
+          td.first_name= member.profile.try(:first_name)
+          td.last_name= member.profile.try(:last_name)
+        td= member.email
+        td= member.current_sign_in_at.try('strftime', '%m/%d/%Y (%H:%M)')
+        td= member.last_sign_out_at.try('strftime', '%m/%d/%Y (%H:%M)')
+        td= link_to 'Modify Access', '#', class: 'btn btn-sm btn-success member_access'  unless member.admin
+        td
+          = link_to 'Edit', '#', class: 'btn btn-sm btn-success edit_member', style: 'margin-top:1px;' unless member.admin
+          = link_to 'Delete', '#', class: 'btn btn-sm btn-danger delete_member', style: 'margin-left:2px;margin-top:1px;' unless member.admin
+        td = link_to 'Show', '#', class: 'btn btn-sm btn-success member_history' unless member.admin
+        td.member_id.hidden= member.id
+        td.user_id.hidden= member.id
+        td.access.hidden= member.access_settings.pluck(:tab_id).join(',')

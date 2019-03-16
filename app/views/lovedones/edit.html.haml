@@ -1,0 +1,236 @@
+:css
+  .featured-svc-provider {
+    padding: 20px;
+  }
+  .featured-svc-provider ul li.active {
+    border-bottom: none;
+  }
+  .featured-svc-provider ul li.active a {
+    background-color: #d5ffc4 !important;
+  }
+  .featured-svc-provider .tab-content {
+    height: 200px;
+  }
+  .featured-svc-provider .tab-pane {
+    overflow: auto;
+    height: 100%;
+  }
+  .featured-svc-provider .selected-svc-providers ul {
+    padding: 0;
+    margin: 0;
+  }
+  .featured-svc-provider .selected-svc-providers ul li a:hover {
+    cursor: pointer;
+    background: none !important;
+  }
+
+= render 'form'
+
+/ <td></haml:block><haml:silent></haml:silent><haml:block></td>
+-#.row
+-#  .col-md-8.col-md-offset-2
+-#    .panel.panel-success
+-#      .panel-heading
+-#        %h3.panel-title Primary Contact
+-#      .panel-body
+-#        .table-responsive
+-#          %table.table.table-striped.table-bordered.table-hover
+-#            %thead
+-#              %tr.bg-success
+-#                %th Name
+-#                %th{:colspan => "3"} Actions
+-#            %tbody
+-#              - if @lovedone.primary_contact
+-#                %tr
+-#                  - if @lovedone.primary_contact.user.profile
+-#                    %td
+-#                      = @lovedone.primary_contact.user.name
+-#                  - else
+-#                    %td= @lovedone.primary_contact.user.name if @lovedone.primary_contact.user && @lovedone.primary_contact.user.name
+-#                  %td
+-#                    /= link_to 'Edit', edit_lovedone_primary_contact_path(@lovedone.primary_contact.lovedone, @lovedone.primary_contact)
+-#                    = link_to 'Edit', edit_user_path(@lovedone.primary_contact.user), :target=>"_blank"
+-#
+-#        - unless @lovedone.primary_contact
+-#          .form-group.pull-left
+-#            %select.form-control.pull-left.primary-contact-list
+-#              - @primary_contact_users.each do |primary_contact_user|
+-#                %option{value: primary_contact_user.id}=primary_contact_user.name
+-#          :javascript
+-#            var lovedone_id = "#{@lovedone.id}";
+-#          = link_to 'Assign Primary Contact', 'javascript:;', class: 'btn btn-success assign-primary-contact pull-left', style: "margin-left: 10px;"
+
+
+-#.row.hidden
+-#  .col-md-8.col-md-offset-2
+-#    .panel.panel-success
+-#      .panel-heading
+-#        %h3.panel-title Service Providers
+-#      .panel-body
+-#        .table-responsive
+-#          %table.table.table-striped.table-bordered.table-hover
+-#            %thead
+-#              %tr.bg-success
+-#                %th Company
+-#                %th Provider Type
+-#                %th{:colspan => "3"} Actions
+-#            %tbody
+-#              - @lovedone.providers.each do |provider|
+-#                - if provider.lovedone
+-#                  %tr
+-#                    %td= provider.company.company_name if provider.company && provider.company.company_name
+-#                    %td= provider.company.provider_type if provider.company && provider.company.provider_type
+-#                    %td
+-#                      = link_to 'Deactivate', lovedone_provider_url(provider.lovedone, provider), method: :delete, data: { confirm: 'Are you sure?' }
+-#      .panel-footer
+-#        %td
+-#          = link_to 'Add Service Provider', new_lovedone_provider_path(@lovedone), class: 'btn btn-success btn-md'
+
+-#.row.hidden
+-#  .col-md-8.col-md-offset-2
+-#    .panel.panel-success
+-#      .panel-heading
+-#        %h3.panel-title Service Providers
+-#      .panel-body.featured-svc-provider
+-#        %h4 Active Service Providers
+-#        .table-responsive
+-#          %table.table.table-striped.table-bordered.table-hover
+-#            %thead
+-#              %tr.bg-success
+-#                %th Business Name
+-#                %th City
+-#                %th State
+-#                %th{:colspan => "3"} Actions
+-#            %tbody.selected-providers-table
+-#              - @lovedone.providers.each do |provider|
+-#                - if provider.lovedone && !provider.company.nil?
+-#                  %tr{'data-id'=>provider.id, 'company-id'=> provider.company.id}
+-#                    %td= provider.company.business_name if provider.company && provider.company.business_name
+-#                    %td= provider.company.city if provider.company && provider.company.city
+-#                    %td= provider.company.state if provider.company && provider.company.state
+-#                    %td
+-#                      = link_to 'Deactivate', 'javascript:;', class: 'remove-provider', 'data-id'=>provider.id
+-#                      /= link_to 'Deactivate', lovedone_provider_url(provider.lovedone, provider), method: :delete, data: { confirm: 'Are you sure?' }
+-#        %h4 Available Service Providers
+-#        %ul#tabs.nav.nav-tabs{"data-tabs" => "tabs"}
+-#          %li.active
+-#            %a{"data-toggle" => "tab", :href => "#home_health"} &nbsp;Home Health&nbsp;
+-#          %li
+-#            %a{"data-toggle" => "tab", :href => "#transport"} &nbsp;Transport&nbsp;
+-#
+-#        .tab-content.panel.panel-default
+-#          #home_health.tab-pane.active{style: "padding: 10px;", class: "o-#{@home_healths.object_id}"}
+-#            = render 'devise/registrations/providers', {providers: @home_healths}
+-#          #transport.tab-pane{style: "padding: 10px;", class: "o-#{@transports.object_id}"}
+-#            = render 'devise/registrations/providers', {providers: @transports}
+
+
+.row.hide
+  .col-md-8.col-md-offset-2
+    .panel.panel-success
+      .panel-heading
+        %h3.panel-title Service Provider
+      .panel-body
+        - if @lovedone.employee
+          %p
+            Your loved one is being taken care by
+            %strong= @lovedone.employee.name
+            from service provider
+            = succeed "." do
+              %strong= @lovedone.employee.company.company_name
+          %p
+            The current status of the service is
+            %strong
+              = @lovedone.employee.service_status
+          View Map
+          %div{:style => "width: 600px;"}
+            #map{:style => "width: 600px; height: 400px;"}
+        - else
+          %p No service provider is associated with your loved one.
+
+    - if current_user.admin?
+      = link_to 'Go back to Loved Ones', lovedones_path, class:'btn btn-success'
+
+- if @lovedone.employee
+  :javascript
+    if(false){
+      var handler = Gmaps.build('Google');
+      var employee = #{raw @lovedone.employee.to_json} ;
+      var marker = {
+            "lat": employee.latitude,
+            "lng": employee.longitude,
+            /*"picture": {
+              "url": "https://addons.cdn.mozilla.net/img/uploads/addon_icons/13/13028-64.png",
+              "width":  36,
+              "height": 36
+            },*/
+            "infowindow": "Provider:" + employee.name
+          };
+      handler.buildMap({ provider: {}, internal: {id: 'map'}}, function(){
+        console.log("@lovedone.employee",employee);    
+        markers = handler.addMarkers([marker]);
+        handler.bounds.extendWith(markers);
+        handler.fitMapToBounds();
+      });
+    }
+
+:javascript
+  var lovedone_id = "#{@lovedone.id}";
+  $(function() {
+    $(document).on("click", '.featured-svc-providers a.select', function() {
+      var data_id, html;
+      data_id = $(this).attr('data-id');
+
+      if( $('.selected-providers-table tr[company-id='+data_id+']').size()> 0 ){
+        return;
+      }
+      var that = this;
+      $.post('/lovedones/'+lovedone_id+'/providers', {provider: {company_id: data_id, lovedone_id: lovedone_id} }, function(response){
+        var data_id = response.id;
+        html = "<li data-id='" + data_id + "'> <a data-id='" + data_id + "' class='remove-provider'><i class='glyphicon glyphicon-remove'></i></a>&nbsp;" + [$(that).attr('data-company-name'), $(that).attr('data-city-name'), $(that).attr('data-state-name')].join(',&nbsp;') + "</li>";
+
+        html = "<tr company-id='"+response.company_id+"' data-id='"+response.id+"'>\
+        <td>"+$(that).attr('data-business-name')+"</td>\
+        <td>"+$(that).attr('data-city-name')+"</td>\
+        <td>"+$(that).attr('data-state-name')+"</td>\
+        <td><a href='javascript:;' data-id='"+data_id+"' class='remove-provider'>Deactivate</a></td></tr>";
+
+        $('.selected-providers-table').append(html);
+      },'json');
+      
+    });
+    $(document).on("click", ".selected-providers-table a.remove-provider", function() {
+      if(!confirm('Are you sure?'))return;
+      var data_id;
+      data_id = $(this).attr('data-id');
+      var that = this;
+      $.ajax({
+        url: '/lovedones/'+lovedone_id+'/providers/'+data_id,
+        dataType: 'json',
+        method: 'DELETE', 
+        success: function(response){
+          $(that).parent().parent().remove();
+          $("td a[data-id='" + data_id + "']").html($("td a[data-id='" + data_id + "']").text());
+        }
+      })
+
+    });
+    $(document).on('click', ".btn-add-service-provider", function(){
+      if ($("input[name='selected_providers']").size() > 0) {
+        var s = "", r = [];
+
+        $(".selected-svc-providers ul li").each(function() {
+          r.push($(this).attr("data-id"));
+        });
+
+        s = r.join(",");
+        $("input[name='selected_providers']").val(s);
+
+      }
+    });
+    return setTimeout(function() {
+      return $('th').click(function() {
+        return $('.suggestion-search').trigger('keyup');
+      });
+    }, 1000);
+  });

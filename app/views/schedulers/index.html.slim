@@ -1,0 +1,53 @@
+.well
+  h4.text-center
+    - unless current_user.employee?
+      b style= 'margin-left: 183px;' Appointment Scheduler
+      = link_to 'Late Notice', late_notice_settings_schedulers_path , class: "btn btn-success pull-right", style: "margin-right: 10px; margin-top: -5px;"
+      = link_to 'Transfer', transfer_appointments_schedulers_path , class: "btn btn-success pull-right", style: "margin-right: 10px; margin-top: -5px;"
+    - else
+      b style= 'margin-left: 56px;'= "Appointment Scheduler for  #{current_user.employee.full_name}"
+      = link_to 'Transfer', transfer_appointments_schedulers_path, class: "btn btn-success pull-right", style: "margin-right: 10px; margin-top: -5px;"
+
+.text-center.well.hidden id= 'appointment_selection'
+  - unless current_user.employee?
+    input type= 'radio' name= 'scheduler' value= 'company' id= 'company_scheduler' class= 'scheduler_option'
+      label for= 'company_scheduler' class= 'location_margin'
+        |View Company Schedule
+    br
+  input type= 'radio' name= 'scheduler' value= 'employee' id= 'employee_scheduler' class= 'scheduler_option'
+    label for= 'employee_scheduler' class= 'location_margin' style= 'margin-right: 170px;'
+      |Employee Schedule
+  input type= 'radio' name= 'scheduler' value= 'lovedone' id= 'lovedone_scheduler' class= 'scheduler_option'
+    label for= 'lovedone_scheduler' class= 'location_margin'
+      |Loved One Schedule
+
+.row.text-center.hidden id= 'employee_cal'
+  label
+    |Select Employee:&nbsp
+  select id= 'employee_calendar'
+    option
+    - Employee.where(company_id: current_user.company).order('last_name ASC').each do |emp|
+      option value="#{emp.id}"
+        = emp.name
+  .pull-right
+    button.reloading_events_button.btn.btn-success.hidden style= 'margin-right:15px;'
+      span.glyphicon.glyphicon-refresh
+
+.row.text-center.hidden id= 'lovedone_cal'
+  label
+    |Select Loved One:&nbsp
+  select id= 'lovedone_calendar'
+    option
+    - Lovedone.where(company_id: current_user.company).order('last_name ASC').each do |lo|
+      option value="#{lo.id}"
+        = lo.name
+  .pull-right
+    button.reloading_events_button.btn.btn-success.hidden style= 'margin-right:15px;'
+      span.glyphicon.glyphicon-refresh
+
+br
+
+- if current_user.employee?
+  #employee_id data-employee-id= "#{current_user.employee.id}"
+
+#scheduler_calendar

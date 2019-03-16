@@ -1,0 +1,172 @@
+:css
+	a:hover{
+		background: #fff;
+		color: green;
+	}
+
+	.selected{
+		text-decoration: underline;
+		font-weight: bold;
+	}
+
+	ul.howto{
+		margin: 0;
+		padding: 0;
+		font-size: 14pt;
+		line-height: 30px;
+		list-style-type: decimal;
+		color: #333;
+	}
+
+	ul.howto li a{
+		color: #333;
+	}
+
+	.videoUiWrapper.thumbnail{
+		background-color: black;
+		border-radius: 6px;
+	}
+
+
+:javascript
+	var video_id = "#{@video_id}";
+	var tab_id = "#{@tab_id}";
+	$(function(){
+		if(video_id != ''){
+			//$('a[selected_id='+video_id+']').addClass('selected')
+			$('a[selected_id='+video_id+']').css("color", "grey")
+			switch(tab_id){
+				case '1':
+					$('#collapseOne').addClass('in')
+					$('#collapseTwo').removeClass('in')
+					$('#collapseThree').removeClass('in')
+					$('#collapseFour').removeClass('in')
+					$('#collapseFive').removeClass('in')
+					break;
+				case '2':
+					$('#collapseOne').removeClass('in')
+					$('#collapseTwo').addClass('in')
+					$('#collapseThree').removeClass('in')
+					$('#collapseFour').removeClass('in')
+					$('#collapseFive').removeClass('in')
+					break;
+				case '3':
+					$('#collapseOne').removeClass('in')
+					$('#collapseTwo').removeClass('in')
+					$('#collapseThree').addClass('in')
+					$('#collapseFour').removeClass('in')
+					$('#collapseFive').removeClass('in')
+					break;
+				case '4':
+					$('#collapseOne').removeClass('in')
+					$('#collapseTwo').removeClass('in')
+					$('#collapseThree').removeClass('in')
+					$('#collapseFour').addClass('in')
+					$('#collapseFive').removeClass('in')
+					break;
+				case '5':
+					$('#collapseOne').removeClass('in')
+					$('#collapseTwo').removeClass('in')
+					$('#collapseThree').removeClass('in')
+					$('#collapseFour').removeClass('in')
+					$('#collapseFive').addClass('in')
+					break;
+			}
+		}
+	})
+
+%link{:href => "/assets/css/video-default.css", :rel => "stylesheet"}/
+%script{:src => "/assets/js/jquery.video-ui.js", :type => "text/javascript"}
+
+.well.text-center
+	.row
+		=link_to 'Training Videos', tutorials_training_videos_path, id: 'training_videos_button', class: 'btn btn-success'
+		=link_to 'User Guides', tutorials_user_guides_path, id: 'user_guides_button', class: 'btn btn-default'
+
+.well
+	#training_videos_page
+		%h4.text-center
+			%b Training Videos
+			%hr
+		.row
+			.col-xs-6.col-md-4
+				.panel-group#accordion{"role" => "tablist", "aria-multiselectable" => "true"}
+
+					.panel.panel-default
+						.panel-heading#headingOne{"role" => "tab"}
+							%h4.panel-title
+								%a{"data-toggle" => "collapse", "data-parent" => "#accordion", "href" => "#collapseOne", "aria-expanded" => "true", "aria-controls" => "collapseOne"} Employees
+						.panel-collapse.collapse#collapseOne{"role" => "tabpanel", "aria-labelledby" => "headingOne"}
+							.panel-body
+								.ul
+									%li.margin_for_li_elements=link_to 'Mobile App (How to use)', tutorials_with_id_path('129879253', tab_id: 1), selected_id: 129879253
+									%li.margin_for_li_elements=link_to 'Employee (How to add, modify and delete)', tutorials_with_id_path('129879254', tab_id: 1), selected_id: 129879254
+									%li.margin_for_li_elements=link_to 'Username and Password (How to change for access to the mobile app)', tutorials_with_id_path('129879255', tab_id: 1), selected_id: 129879255
+									%li.margin_for_li_elements=link_to 'Designations (How to add, modify and delete)', tutorials_with_id_path('129879260', tab_id: 1), selected_id: 129879260
+									%li.margin_for_li_elements=link_to 'Reach Out (How to simultaneously message multiple employees)', tutorials_with_id_path('129879261', tab_id: 1), selected_id: 129879261
+
+					.panel.panel-default
+						.panel.panel-default
+							.panel-heading#headingTwo{"role" => "tab"}
+								%h3.panel-title
+									%a{"data-toggle" => "collapse", "data-parent" => "#accordion", "href" => "#collapseTwo", "aria-expanded" => "true", "aria-controls" => "collapseTwo"} Loved Ones
+						.panel-collapse.collapse#collapseTwo{"role" => "tabpanel", "aria-labelledby" => "headingTwo"}
+							.panel-body
+								.ul
+									%li.margin_for_li_elements=link_to 'Loved One (How to add, modify and delete)', tutorials_with_id_path('129879586', tab_id: 2), selected_id: 129879586
+									%li.margin_for_li_elements=link_to 'Follower (How to add, modify and delete)', tutorials_with_id_path('129879587', tab_id: 2), selected_id: 129879587
+									%li.margin_for_li_elements=link_to 'Follower Notifications (How to send remotely w/o using the app)', tutorials_with_id_path('129879588', tab_id: 2), selected_id: 129879588
+
+					.panel.panel-default
+						.panel.panel-default
+							.panel-heading#headingThree{"role" => "tab"}
+								%h3.panel-title
+									%a{"data-toggle" => "collapse", "data-parent" => "#accordion", "href" => "#collapseThree", "aria-expanded" => "true", "aria-controls" => "collapseThree"} Scheduler
+						.panel-collapse.collapse#collapseThree{"role" => "tabpanel", "aria-labelledby" => "headingThree"}
+							.panel-body
+								.ul
+									%li.margin_for_li_elements=link_to 'Layout (General overview)', tutorials_with_id_path('130863625', tab_id: 3), selected_id: 130863625
+									%li.margin_for_li_elements=link_to 'Appointments (How to add, modify and delete)', tutorials_with_id_path('130961330', tab_id: 3), selected_id: 130961330
+									%li.margin_for_li_elements=link_to 'Travel Time Conflicts (How to identify and overcome)', tutorials_with_id_path('131067251', tab_id: 3), selected_id: 131067251
+									%li.margin_for_li_elements=link_to 'Late Notice (How to configure)', tutorials_with_id_path('131176392', tab_id: 3), selected_id: 131176392
+									%li.margin_for_li_elements=link_to 'Schedule (How to transfer to employee)', tutorials_with_id_path('130863625', tab_id: 3), selected_id: 130863625
+
+					.panel.panel-default
+						.panel.panel-default
+							.panel-heading#headingFour{"role" => "tab"}
+								%h3.panel-title
+									%a{"data-toggle" => "collapse", "data-parent" => "#accordion", "href" => "#collapseFour", "aria-expanded" => "true", "aria-controls" => "collapseFour"} My Company
+						.panel-collapse.collapse#collapseFour{"role" => "tabpanel", "aria-labelledby" => "headingFour"}
+							.panel-body
+								.ul
+									%li.margin_for_li_elements=link_to 'Masking (How to conceal loved ones’ names in app and notifications)', tutorials_with_id_path('129879589', tab_id: 4), selected_id: 129879589
+									%li.margin_for_li_elements=link_to 'Restriction (How to limit what loved ones appear in the mobile app)', tutorials_with_id_path('129879592', tab_id: 4), selected_id: 129879592
+									%li.margin_for_li_elements=link_to 'Early Arrival Notice and Departure Reminder (How to use)', tutorials_with_id_path('130090100', tab_id: 4), selected_id: 130090100
+
+					.panel.panel-default
+						.panel.panel-default
+							.panel-heading#headingFive{"role" => "tab"}
+								%h3.panel-title
+									%a{"data-toggle" => "collapse", "data-parent" => "#accordion", "href" => "#collapseFive", "aria-expanded" => "true", "aria-controls" => "collapseFive"} Track
+						.panel-collapse.collapse#collapseFive{"role" => "tabpanel", "aria-labelledby" => "headingFive"}
+							.panel-body
+								.ul
+									%li.margin_for_li_elements=link_to 'Employee Existing Location (How to see employees during business)', tutorials_with_id_path('130090101', tab_id: 5), selected_id: 130090101
+									%li.margin_for_li_elements=link_to 'Employee Base Location (How to map employees and loved ones)', tutorials_with_id_path('130090103', tab_id: 5), selected_id: 130090103
+									%li.margin_for_li_elements=link_to 'Employee Encounter History (How to track employee mileage and time)', tutorials_with_id_path('130090102', tab_id: 5), selected_id: 130090102
+			.col-xs-12.col-md-8
+				.row
+					.col-md-offset-1.col-md-10
+						.videoUiWrapper.thumbnail{style: 'min-height: 450px; min-width: 700px;'}
+							- unless @video_id.nil?
+								%iframe#vimeoPlayer{:allowfullscreen => "", :frameborder => "0", :height => "450", :width => "700", :mozallowfullscreen => "", :src => "//player.vimeo.com/video/"+@video_id+"?autoplay=1", :webkitallowfullscreen => ""}
+
+:javascript
+		if(false) $('.demo1').each(function(){
+			var id = $(this).attr('id');
+			$('#'+id).videoUI({
+				'playMedia':true,
+				'autoHide':false,
+				'volumeMedia': 1
+			});
+		});

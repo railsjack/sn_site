@@ -1,0 +1,35 @@
+.col-md-12
+  .container
+    %h3 Family members
+    %table.table.table-striped.table-bordered.table-hover.table-responsive
+      %thead
+        %tr
+          %th Lastname
+          %th Firstname
+          %th Email
+          %th Mobilephone
+          %th Contact
+          %th City
+          %th County
+          %th State
+          %th Username
+          %th Password
+          %th.text-center{:colspan => "3"} Actions
+      %tbody
+        - @family_members.each do |family_member|
+          %tr
+            %td= family_member.lastname
+            %td= family_member.firstname
+            %td= family_member.email
+            %td= family_member.mobilephone
+            %td= family_member.contact
+            %td= family_member.city
+            %td= family_member.county
+            %td= family_member.state
+            %td= family_member.username
+            %td= family_member.password
+            %td= link_to 'Show', family_member
+            %td= link_to 'Edit', edit_family_member_path(family_member)
+            %td= link_to 'Delete', family_member, method: :delete, data: { confirm: 'Are you sure?' }
+    %br/
+    = link_to 'New Family member', new_family_member_path

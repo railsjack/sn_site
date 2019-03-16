@@ -1,0 +1,124 @@
+.container
+  .row
+    .well
+      h3.text-center Data Import Module
+
+  div
+    ul.nav.nav-tabs role="tablist" id="myTabs"
+      li.active role="presentation"
+        a aria-controls="employees" data-toggle="tab" href="#employees" role="tab"  Import Employees
+      li role="presentation"
+        a aria-controls="lovedones" data-toggle="tab" href="#lovedones" role="tab" id="lovedone_tab"  Import Loved Ones
+
+    .tab-content
+      #employees.tab-pane.fade.in.active role="tabpanel"
+        #upload_employees.hidden
+          = simple_form_for @company, url: import_employees_data_imports_path, multipart: true, method: :post, html: {class: 'employee_import_form'} do |e|
+            .col-md-8.col-md-offset-2
+              .panel.panel-success style='margin-top:20px;'
+                .panel-heading Employee Selection Criteria
+                .panel-body
+                  .form-group.col-md-12
+                    label.control-label.col-md-3 Software:
+                    .col-md-9
+                      = e.input :employee_spoke, label: false, collection: ApplicationHelper::EMPLOYEE_SPOKES, include_blank: true
+                  .form-group.col-md-12 style='margin-top:10px;'
+                    label.control-label.col-md-3 File:
+                    .col-md-9
+                      = e.input :document, as: :file, label: false, input_html: {accept: ".xls, .xlsx, .csv"}
+                  .pull-right= e.submit 'Upload', class: 'btn btn-success employee_submit'
+
+        - if @employees_import.count > 0
+          .col-md-12
+            #employee_import style='margin-top:20px;'
+              = form_for :employee_import, url: confirm_temp_employees_data_imports_path, html: {method: :put, class: 'temp_employees'} do
+                div style="float: right;;margin-left:10px;"= submit_tag 'Confirm Import', class: 'btn btn-success save_temp_employees'
+                div style="float: right;margin-bottom:10px;"= link_to 'Cancel Import', cancel_temp_employees_data_imports_path, data: {confirm: 'Are you sure to cancel?'}, class: 'btn btn-danger'
+                .search-table-outter style="float: right;"
+                  table
+                    thead
+                      tr.bg-success
+                        th.text-center Status
+                        th.text-center First Name
+                        th.text-center Last Name
+                        th.text-center Email
+                        th.text-center Phone
+                        th.text-center Address
+                        th.text-center City
+                        th.text-center State
+                        th.text-center County
+                        th.text-center Zip Code
+                    tbody
+                      - @employees_import.each do |emp|
+                        = fields_for "employee[]", emp do |emp_fields|
+                          tr
+                            td.text-center style="width: 80px;"
+                              b= emp.status.titleize
+                            td style="width: 200px;"= emp_fields.text_field :first_name, class: 'required_field form-control'
+                            td style="width: 200px;"= emp_fields.text_field :last_name, class: 'required_field form-control'
+                            td style="width: 250px;"= emp_fields.text_field :email, class: 'valid_email form-control'
+                            td style="width: 220px;"= emp_fields.text_field :phone_number, class: 'required_field form-control'
+                            td style="width: 250px;"= emp_fields.text_field :address, class: 'required_field form-control'
+                            td style="width: 250px;"= emp_fields.text_field :city, class: 'required_field form-control'
+                            td style="width: 250px;"= emp_fields.select :state, options_for_select(us_states, emp_fields.object.state), {}, {class: 'state_selector form-control'}
+                            td style="width: 130px;"= emp_fields.select :county, [], {}, {'data-selected-item' => emp_fields.object.county, class: 'county_selector form-control'}
+                            td style="width: 130px;"= emp_fields.text_field :zip, class: 'form-control'
+
+      #lovedones.tab-pane.fade.in.active role="tabpanel"
+        #upload_lovedones.hidden
+          = simple_form_for @company, url: import_lovedones_data_imports_path, multipart: true, method: :post, html: {class: 'lovedone_import_form'} do |e|
+            .col-md-8.col-md-offset-2
+              .panel.panel-success style='margin-top:20px;'
+                .panel-heading Loved One Selection Criteria
+                .panel-body
+                  .form-group.col-md-12
+                    label.control-label.col-md-3 Software:
+                    .col-md-9
+                      = e.input :lovedone_spoke, label: false, collection: ApplicationHelper::LOVEDONE_SPOKES, include_blank: true
+                  .form-group.col-md-12 style='margin-top:10px;'
+                    label.control-label.col-md-3 File:
+                    .col-md-9
+                      = e.input :document, as: :file, label: false, input_html: {accept: ".xls, .xlsx, .csv"}
+                  .pull-right= e.submit 'Upload', class: 'btn btn-success employee_submit'
+
+        - if @lovedones_import.count > 0
+          .col-md-12
+            #lovedone_import.hidden style='margin-top:20px;'
+              = form_for :lovedone_import, url: confirm_temp_lovedones_data_imports_path, html: {method: :put, class: 'temp_lovedones'} do
+                div style="float: right;;margin-left:10px;"= submit_tag 'Confirm Import', class: 'btn btn-success save_temp_lovedones'
+                div style="float: right;margin-bottom:10px;"= link_to 'Cancel Import', cancel_temp_lovedones_data_imports_path, data: {confirm: 'Are you sure to cancel?'}, class: 'btn btn-danger'
+                .search-table-outter style="float: right;"
+                  table
+                    thead
+                      tr.bg-success
+                        th.text-center Status
+                        th.text-center First Name
+                        th.text-center Last Name
+                        th.text-center Phone
+                        th.text-center Street
+                        th.text-center Apt Unit
+                        th.text-center City
+                        th.text-center State
+                        th.text-center County
+                        th.text-center Zip Code
+                    tbody
+                      - @lovedones_import.each do |lo|
+                        = fields_for "lovedone[]", lo do |lo_fields|
+                          tr
+                            td.text-center style="width: 80px;"
+                              b= lo.status.titleize
+                            td style="width: 200px;"= lo_fields.text_field :first_name, class: 'required_field form-control'
+                            td style="width: 200px;"= lo_fields.text_field :last_name, class: 'required_field form-control'
+                            td style="width: 220px;"= lo_fields.text_field :phone_number, class: 'required_field form-control'
+                            td style="width: 250px;"= lo_fields.text_field :street, class: 'required_field form-control'
+                            td style="width: 250px;"= lo_fields.text_field :apt_unit, class: 'form-control'
+                            td style="width: 250px;"= lo_fields.text_field :city, class: 'required_field form-control'
+                            td style="width: 250px;"= lo_fields.select :state, options_for_select(us_states, lo_fields.object.state), {}, {class: 'state_selector form-control'}
+                            td style="width: 130px;"= lo_fields.select :county, [], {}, {'data-selected-item' => lo_fields.object.county, class: 'county_selector form-control'}
+                            td style="width: 130px;"= lo_fields.text_field :zip_code, class: 'form-control'
+
+
+
+
+
+

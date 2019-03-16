@@ -1,0 +1,30 @@
+// Place all the styles related to the access_settings controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.member-modal-dialog{
+  width: 70% !important;
+  margin: 30px auto;
+}
+
+#memberHistoryContent{
+  .scroll{
+    max-height: 300px;
+    margin-left: 0%;
+  }
+  .created-title-color{
+    color: #F77F00;
+  }
+  .updated-title-color{
+    color: #007BB6;
+  }
+  .display-inline{
+    display:inline !important;
+  }
+}
+
+#check_boxes{
+  .col-lg-10{
+    height: auto !important;
+  }
+}

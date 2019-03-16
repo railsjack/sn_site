@@ -1,0 +1,9 @@
+%p
+	#{@primary_contact_name} has invited you to be notified via the Safety Notice system when #{@lovedone_name} interacts with a service provider. 
+
+%p
+	Please click on the link below to complete the FREE enrollment process:
+
+%p
+	=link_to 'Safety Notice Enrollment', url_for( host: Rails.application.secrets.domain_name, controller: 'users', only_path: false)+ "/sign_up?query=family&invitation_id=#{@invitation_id}"
+

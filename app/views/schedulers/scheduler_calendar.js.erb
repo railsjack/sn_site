@@ -1,0 +1,7 @@
+<%- if @employee.present? %>
+    $('#scheduler_calendar').html("<%= escape_javascript render(partial: 'schedulers/scheduler_calendar', locals: {employee: @employee.id, lovedone: -1, view: @view, current_day: @current_day}) %>");
+<%- elsif @lovedone.present? %>
+    $('#scheduler_calendar').html("<%= escape_javascript render(partial: 'schedulers/scheduler_calendar', locals: {lovedone: @lovedone.id, employee: -1, view: nil, current_day: @current_day}) %>");
+<%- else %>
+    $('#scheduler_calendar').html("<%= escape_javascript render(partial: 'schedulers/scheduler_calendar', locals: {lovedone: -1, employee: -1, view: nil, current_day: @current_day}) %>");
+<% end %>

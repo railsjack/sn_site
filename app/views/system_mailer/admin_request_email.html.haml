@@ -1,0 +1,13 @@
+%p New Service Provider enrollment application has been received for approval.
+%p
+  %b Information
+  %p= "Email: #{@new_user.email}"
+  %p= "Company Name: #{@new_user.company.company_name}" if @new_user.company.company_name.present?
+  %p= "Business Name: #{@new_user.company.business_name}" if @new_user.company.business_name.present?
+  - sp_link = link_to 'link', url_for(only_path: false, controller: "companymembers", action: "edit", id: @new_user.id)
+
+  %p
+    Please click this #{sp_link} to approve this service provider request
+%p &nbsp;
+
+%p Thank You

@@ -1,0 +1,204 @@
+- provide(:title, "SafetyNotice.com - Communication for those who can't !")
+
+:javascript
+  var readyInterval = 0;
+  $(document).ready(function(){
+    documentReady();
+  });
+  var documentReady = (function(){
+    $('form input').click(function(){
+      $('.tooltip').remove();
+    });
+    
+    $('form input').each(function(){
+      $(this).attr('data-placeholder', $(this).attr('placeholder')+"");
+    });
+
+    $('form input').mouseover(function(){
+      $(this).attr('placeholder','');
+    });
+    $('form input').mouseout(function(){
+      $(this).attr('placeholder', $(this).attr('data-placeholder'));
+    });
+
+    $('.mobile-phone-number')
+      .inputmask("(999)999-9999")
+      .blur(function(e){
+        if($(e.target).val() == "(___)___-____"){
+          $(e.target).val('');
+        }
+      });
+    $( "[title]" ).tooltip({
+      position: {
+        my: "right center",
+        at: "right+5 top-5"
+      }
+    });
+
+
+
+    setTimeout(function(){
+      $( "#user_lovedones_attributes_date_of_birth" ).datepicker({"dateFormat":"mm/dd/yy", yearRange:"1900:"+(new Date()).getFullYear(),
+        changeMonth: true,
+        changeYear: true,
+        showButtonPanel: true,
+        currentText: '',
+        closeText: 'Done',
+        onChangeMonthYear: function(year, month, instance){
+          var d = (instance.currentDay>0)?instance.currentDay:1;
+          instance.input.get(0).value = month+"/"+d+"/"+year;
+        }
+      });
+      $.datepicker._selectDateOverload = $.datepicker._selectDate;
+      $.datepicker._selectDate = function(id, dateStr) {
+          var target = $(id);
+          var inst = this._getInst(target[0]);
+          inst.inline = true;
+          $.datepicker._selectDateOverload(id, dateStr);
+          inst.inline = false;
+          this._updateDatepicker(inst);
+      }
+
+      jQuery.datepicker._hideDatepickerEx = jQuery.datepicker._hideDatepicker;
+    },500);
+
+
+    
+
+    $( "#user_lovedones_attributes_date_of_birth" ).keypress(function(event){
+      event.preventDefault();
+    });
+
+    $('form').submit(function(){
+        var datastore = {};
+        $('form input[type=text]').each(function(){
+          var id = $(this).attr('id');
+          if(id!=""){
+            var val = $(this).val();
+            datastore[id] = val;
+          }
+        });
+        $.cookie('datastore', JSON.stringify(datastore));
+      return true;
+    });
+    if($('.post-mode').text()=="true"){
+      var datastore = JSON.parse($.cookie('datastore'));
+      for(var k in datastore){
+        if($('#'+k).val()=="")$('#'+k).val(datastore[k]);
+      }
+    }
+
+    $(document).on('click', 'input[id=check_both]', function(){
+      var b_flag = $(this).get(0).checked;
+      $( 'input[type=checkbox]', $(this).parents('div#contact-method')).each(function(){
+        if($(this).attr('id')!="check_both"){
+          $(this).get(0).checked = b_flag;
+        }
+      });
+    });
+
+    $('form input[type=submit]').unbind('click').click(function(e){
+        var matched = false;
+        
+        $('form input[required]').each(function(){
+          if($(this).val()==""){
+            matched = true;
+            $(this).addClass('required-field-error');
+          }else{
+            $(this).removeClass('required-field-error');
+          }
+        });
+
+        if(matched)$('.required-field-error:first').focus();
+
+        return !matched;
+    });
+
+    $(document).on('click', '#contact-method input[type=checkbox]', function(event){
+      var email = $('#contact-method input[type=checkbox][value=email]').get(0);
+      var text = $('#contact-method input[type=checkbox][value=text]').get(0);
+      var both = $('#contact-method input[type=checkbox][value=both]').get(0);
+      both.checked = email.checked && text.checked;
+    });
+
+  });
+:css
+  h5.panel-title{
+    color: #9FC230;
+    font-size: 12pt;
+    text-indent: 20px;
+    margin-top: 10px;
+  }
+  #error_explanation {
+    width: 450px;
+    border: 1px solid #74B71B;
+    padding: 7px;
+    padding-bottom: 0;
+    margin-bottom: 20px;
+    background-color: #fff;
+    margin: 30px auto;
+  }
+  #error_explanation h2 {
+    text-align: left;
+    font-weight: bold;
+    padding: 5px 5px 5px 15px;
+    font-size: 12px;
+    margin: -7px;
+    margin-bottom: 0px;
+    background-color: #74B71B;
+    color: #fff;
+  }
+  #error_explanation ul li{
+    list-style: decimal;
+    padding: 0;
+  }
+  #error_explanation ul{
+    padding: 10px;
+    margin-left: 10px;
+  }
+
+  .field_with_errors{
+    padding: 0px;
+    display: block;
+    border-radius: 4px;
+  }
+
+  .field_with_errors input.form-control{
+    border: solid 1px #f00;
+  }
+
+  .field_with_errors input.form-control{
+    border-color: #f00 !important;
+  }
+
+  .balloon {
+    minWidth: "20px",
+    padding: "5px",
+    borderRadius: "6px",
+    border: "solid 1px #777",
+    boxShadow: "4px 4px 4px #555",
+    color: "#666",
+    background-color: "#efefef",
+    opacity: "0.85",
+    zIndex: "32767",
+    textAlign: "left"
+  }
+
+  .date-of-birth{
+    cursor: default !important;
+  }
+  .required-field-error{
+    border-color: #f00 !important;
+  }
+
+  .ui-datepicker-current{ display: none; }
+
+
+
+
+.post-mode.hidden=@post_method
+.col-md-8.col-md-offset-2
+  .row-fluid
+    = render 'form'
+
+

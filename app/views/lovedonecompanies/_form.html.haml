@@ -1,0 +1,3 @@
+= simple_form_for(@provider, url: lovedone_lovedonecompanies_path(@lovedone), html: {class: 'form-horizontal'})  do |f|
+	= f.input :company, collection: Company.all.map{|company| [company.company_name, company.id]}
+	= f.submit 'Assign now', class: 'btn btn-success btn-sm pull-right'

@@ -1,0 +1,72 @@
+.row
+  #regform.panel.panel-default{style:"width: 700px; margin: 0 auto;"}
+    = simple_form_for(@family_member, :html => { :role => 'form', :class => 'form-horizontal'}) do |f|
+      = f.error_notification
+      %h3 Family Members and/or Guardians
+      %h4 Step 1 – General Information
+      %p This is the enrollment section for family members, guardians and friends who wish to be notified when a loved one interacts with a service provider.  Family members, guardians and friends typically set up their own profile here.
+      %hr/
+      .form-group
+        = f.label :lastname, 'Last Name:', class: 'col-md-4 control-label'
+        .col-md-6{:title => "Enter your last name."}
+          = f.text_field :lastname, class: 'form-control', placeholder: 'Last Name', required: true
+      .form-group
+        = f.label :firstname, 'First Name:', class: 'col-md-4 control-label'
+        .col-md-6{:title => "Enter your first name."}
+          = f.text_field :firstname, class: 'form-control', placeholder: 'First Name', required: true
+      .form-group
+        = f.label :mobilephone, 'Mobile Phone Number:', class: 'col-md-4 control-label'
+        .col-md-6{:title => "If you choose to be notified by text message, this is the phone number where notifications will be sent."}
+          = f.text_field :mobilephone, class: 'form-control mobile-phone-number', placeholder: 'Mobile Phone Number'
+      .form-group
+        = f.label :contact, "Contact Method:", class: 'col-md-4 control-label'
+        .col-md-6#contact-method{:style => "margin-top: 6px;", :title => "Select how you would like to be notified.  You can select email, text or both."}
+          - Profile::contact_types.each do |a_value|
+            = f.check_box( :contact, { :multiple => true }, a_value, nil)
+            = f.label a_value
+            &nbsp;&nbsp;&nbsp;
+          %label
+            &nbsp;
+            %input#check_both{type:'checkbox', value: 'both'} &nbsp;Both
+      .form-group
+        = f.label :city, 'City:', class: 'col-md-4 control-label'
+        .col-md-6{:title => "Enter the city where you currently reside. "}
+          = f.text_field :city, class: 'form-control', placeholder: 'City', required: true
+      .form-group
+        = f.label :county, 'County:', class: 'col-md-4 control-label'
+        .col-md-6{:title => "Enter the county where you currently reside. "}
+          = f.text_field :county, class: 'form-control', placeholder: 'County', required: true
+      .form-group
+        = f.label :state,"State:", class: 'col-md-4 control-label'
+        .col-md-6{:title => "Enter the state where you currently reside."}
+          = f.select :state, options_for_select(us_states, "All"), {}, { :class => 'form-control' }
+      .panel.panel-default{style: 'padding-top: 10px;'}
+        .form-group
+          = f.label :email,"Email:", class: 'col-md-4 control-label'
+          .col-md-6{:title => "Create a user email for your account."}
+            = f.text_field :email, class: 'form-control', placeholder: 'Email', required: true
+        .form-group
+          = f.label :password,"Password:", class: 'col-md-4 control-label'
+          .col-md-6{:title => "Create a password for your account."}
+            = f.password_field :password, class: 'form-control', placeholder: 'Password', required: true
+        .form-group
+          = f.label :password_confirmation,"Password Confirmation:", class: 'col-md-4 control-label'
+          .col-md-6{:title => "Enter a password confirmation for your account."}
+            = f.password_field :password_confirmation, class: 'form-control', placeholder: 'Password Confirmation', required: true
+
+      %p &nbsp;
+      %h4 Step 2 – User Agreement
+      %p Safety Notice users must agree to the license terms in order to participate in the service.  
+
+      .form-group
+        = render "popups/user_terms_conditions"
+        .text-left{style: 'margin-top: 10px;'}
+          %label= f.check_box :terms
+          \&nbsp; I accept these Terms & Conditions
+
+    
+      %p &nbsp;
+      = f.submit 'CLICK HERE TO FINISH', :class => 'btn btn-success center-block'
+
+
+

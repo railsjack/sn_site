@@ -1,0 +1,16 @@
+<%= simple_form_for(@trip) do |f| %>
+  <%= f.error_notification %>
+
+  <div class="form-inputs">
+    <%= f.association :employee %>
+    <%= f.association :lovedone %>
+    <%= f.input :status %>
+    <%= f.input :state %>
+    <%= f.input :latitude %>
+    <%= f.input :longitude %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

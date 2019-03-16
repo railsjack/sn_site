@@ -1,0 +1,2 @@
+module SshHelper
+end

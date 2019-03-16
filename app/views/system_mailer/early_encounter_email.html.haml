@@ -1,0 +1,6 @@
+-#%p= "Notice:  #{@employee.first_name} #{@employee.last_name} has indicated arrival for the encounter with #{@lovedone.first_name} #{@lovedone.last_name} outside of the designated distance threshold. The distance from the address on record was calculated to be #{@distance.round(2)} miles."
+- if @employee.company.notification_masking
+  - first_last_name = "#{@lovedone.first_name} #{@lovedone.last_name[0]}"
+- else
+  - first_last_name = "#{@lovedone.first_name} #{@lovedone.last_name}"
+%p= "Early Arrival Notice - Employee: #{@employee.first_name} #{@employee.last_name}; Loved One: #{first_last_name}; Distance Away: #{@distance.round(2)} miles"

@@ -1,0 +1,13 @@
+<% if @precedingOption1.present? or @precedingOption2.present? %>
+    $('#createPrecedingApptModal').modal('hide');
+    $('#createEmployeeModal').css('z-index', 1040);
+    $('#calendar').fullCalendar( 'refetchEvents' );
+<% elsif @followingOption1.present? or @followingOption2.present? %>
+    $('#createFollowingApptModal').modal('hide');
+    $('#createEmployeeModal').css('z-index', 1040);
+    $('#calendar').fullCalendar( 'refetchEvents' );
+<% elsif @precedingFollowingOption1.present? or @precedingFollowingOption2.present? %>
+    $('#createPrecedingFollowingApptModal').modal('hide');
+    $('#createEmployeeModal').css('z-index', 1040);
+    $('#calendar').fullCalendar( 'refetchEvents' );
+<% end %>

@@ -1,0 +1,21 @@
+- tabs = current_user.tabs.pluck(:name)
+- if tabs.include?('Employees')
+  li= link_to 'Employees', company_employees_path(current_user.company)
+- if tabs.include?('Loved Ones')
+  li= link_to 'Loved Ones', lovedones_path
+- if tabs.include?('Scheduler')
+  li= link_to 'Scheduler', schedulers_path
+- if tabs.include?('My Company')
+  li= link_to 'My Company', edit_companymember_path(current_user)
+- if tabs.include?('Track')
+  li= link_to 'Track', controller: "employees", action: "track_locations", company_id: current_user.company
+- if tabs.include?('Reports')
+  li= link_to 'Reports', controller: "employees", action: "rep_by_emp", company_id: current_user.company
+- if tabs.include?('Data Import')
+  li= link_to 'Data Import', employees_data_imports_path
+- if tabs.include?('Data Export')
+  li= link_to 'Data Export', data_uploads_path
+- if tabs.include?('LifePatient')
+  li= link_to 'LifePatient', '#'
+- if tabs.include?('Help')
+  li= link_to 'Help', tutorials_training_videos_path

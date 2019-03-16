@@ -1,0 +1,47 @@
+// Place all the styles related to the companies controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+tr.featured{
+		td{
+			font-weight: bold;
+		}
+}
+.scroll {
+  max-height: 200px;
+  overflow: scroll;
+  overflow-x: hidden;
+  margin-left: 10%;
+}
+.no-result{
+  color: red;
+}
+
+.padding{
+  padding: 19px;
+}
+
+.top-margin-scroll{
+  margin-top: 5px;
+}
+
+.select_field{
+  > .employee_lovedone_employee_id{
+    > .col-lg-10 {
+      > .form-control {
+        width: 30% !important;
+      }
+    }
+  > .control-label{
+    text-align: inherit;
+  }
+  }
+}
+
+#s2id_lovedone_location{
+  width: 300px !important;
+}
+
+#all_lovedones{
+  height: 200px;
+}

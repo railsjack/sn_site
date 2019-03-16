@@ -1,0 +1,104 @@
+:javascript
+	$(function(){
+		$('.fixed-table-loading').hide();
+		$('#myModal').on('show.bs.modal', function (e) {
+			$('select', this).get(0).value = '';
+		  $('#family_frame').attr('src', 'about:blank');
+		});
+	});
+	function change_family_member(obj){
+		if(obj.value==""){
+			$('#family_frame').attr('src', 'about:blank');
+			return;
+		}
+		var src = $('#family_frame').attr('data-src');
+		$('#family_frame').attr('src', src.replace('lovedone_id', obj.value));
+	}
+	$(function(){
+	  	$('.fixed-table-loading').hide();
+			$('.suggestion-search').keyup(function(e){
+		  	var key = e.target.value.toLowerCase();
+		  	if(key==""){
+				$('.table tr').show();
+		  	}
+		  	$('.table tr:gt(0)').each(function(){
+				if($($(this).children().get(0)).find('a').text().toLowerCase().indexOf(key)==-1){
+			  	$(this).hide();
+				}
+		  	});
+		});
+	});
+:css
+	body .modal-dialog {
+	    width: 800px;
+	}
+.container
+	.row.relative
+		%div
+			-#- if request.url.index("admin")==nil
+			%h3.text-center= "Followers of #{@lovedone.first_name} #{@lovedone.last_name}"
+			-#- else
+			-#	%h3 Family members
+			-#%input{type:'hidden', id:'headtype', value:'true'}
+			.well
+				%div{style: "position: absolute; right: 0;"}
+					= link_to 'New Follower', new_lovedone_follower_path , class: "btn btn-danger  btn-sm pull-right", style: "margin-right: 10px;"
+					= link_to 'Back', lovedones_path , class: "btn btn-success  btn-sm pull-left", style: "margin-right: 10px;"
+				%div
+					Search:
+					%input.suggestion-search{:placeholder => "Search...", :type => "text"}/
+					&nbsp;&nbsp;&nbsp; Count of Followers:
+					%span#lovedones=@lovedone.followers.count
+
+		-#%a.btn.btn-success.pull-right{"data-target" => "#myModal", "data-toggle" => "modal"} View employees
+		-##myModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+		-#	.modal-dialog
+		-#		.modal-content
+		-#			.modal-header
+		-#				%button.close{"data-dismiss" => "modal", :type => "button"}
+		-#					%span{"aria-hidden" => "true"} ×
+		-#					%span.sr-only Close
+		-#				%h4#myModalLabel.modal-title
+		-#					%h3
+		-#						Add New Family Members for Loved One:
+		-#						%select{onchange:"change_family_member(this)"}
+		-#							%option
+		-#							- @lovedones.each do |lovedone|
+		-#								%option{value: lovedone.id}= "#{lovedone.last_name} #{lovedone.first_name}"
+		-#			.modal-body
+		-#				%iframe{id:"family_frame", :'data-src'=>new_lovedone_follower_path('lovedone_id'), width: '600', height: '500', frameborder: 0, name:'family_frame'}
+		-#			.modal-footer
+		-#				%button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Close
+		%table.table.table-striped.table-bordered.table-hover{"data-sort-name" => "name", "data-sort-order" => "asc", "data-toggle" => "table"}
+			%thead
+				%tr.bg-success
+					%th{"data-field" => "first_name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Name
+					%th{"data-field" => "email", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Email
+					%th{"data-field" => "phone_number", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Phone Number
+					-#%th{"data-field" => "lovedone", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Loved One
+					-#%th{"data-field" => "status", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Request status
+					%th{"data-field" => "edit_action"} Action
+					%th{"data-field" => "delete_action"} Action
+			%tbody
+				- @lovedone.followers.each do |follower|
+					- if follower.lovedone
+						%tr
+							%td= link_to follower.name, edit_lovedone_follower_path(follower.lovedone, follower) if follower.first_name or follower.last_name
+							%td= follower.email if follower.email
+							%td= follower.phone_number if follower.phone_number
+							-#%td= follower.lovedone.name if follower.lovedone
+							-#%td= follower.request_status
+							%td
+								-#- unless current_user.admin?
+								= link_to edit_lovedone_follower_path(follower.lovedone, follower), class: "btn btn-success	btn-xs" do
+									%i.glyphicon.glyphicon-edit  Edit
+							%td
+								= link_to lovedone_follower_path(follower.lovedone, follower), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-success	btn-xs" do
+									%i.glyphicon.glyphicon-remove  Delete
+		%br/
+
+
+
+
+
+

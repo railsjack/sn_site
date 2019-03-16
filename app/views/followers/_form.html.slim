@@ -1,0 +1,75 @@
+.row
+  = simple_form_for [@lovedone, @follower], html: {role: 'form', class: 'form-horizontal follower-form', autocomplete: 'off'} do |f|
+    .well.col-md-10.col-md-offset-1
+      .pull-left style="font-size:25px;"= "Follower of #{@lovedone.first_name} #{@lovedone.last_name}"
+      .pull-right
+        = f.button :submit, 'Save', class: 'btn btn-danger btn-md', id: 'follower-submit', style: 'margin-right:5px;'
+        = link_to 'Back', lovedone_followers_path(@lovedone), class: 'btn btn-success btn-md'
+    = f.error_notification
+    .col-md-5.col-md-offset-1
+      .panel.panel-success
+        .panel-heading
+          h3.panel-title Personal Information
+        .panel-body
+          .form-inputs
+            .form-group
+              = f.label :first_name, 'First Name', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :first_name, class: 'form-control'
+            .form-group
+              = f.label :last_name, 'Last Name', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :last_name, class: 'form-control'
+            .form-group
+              = f.label :street, 'Street', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :street, class: 'form-control'
+            .form-group
+              = f.label :apt_unit, 'Apartment/Unit #:', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :apt_unit, class: 'form-control'
+            .form-group
+              = f.label :city, 'City', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :city, class: 'form-control'
+            .form-group
+              = f.label :state, 'State', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.select :state, options_for_select(us_states, f.object.state), {}, {:class => 'form-control'}
+            .form-group
+              = f.label :county, 'County', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.select :county, [], {}, {:class => 'form-control', 'data-selected-item' => f.object.county}
+            .form-group
+              = f.label :zip_code, 'Zip Code', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :zip_code, class: 'form-control'
+            .form-group
+              = f.label :email, 'Email', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.input :email, class: 'form-control', label: false
+            .form-group
+              = f.label :phone_number, 'Phone Number', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :phone_number, class: 'form-control'
+    .col-md-5
+      .panel.panel-success
+        .panel-heading
+          h3.panel-title Appointment Notification Settings
+        .panel-body
+          .form-group
+            = f.label :setting, 'Setting', class: 'col-md-3 control-label'
+            .col-md-7
+              = f.input :setting, collection: Follower.settings.map { |k, v| [k.capitalize, k] }, label: false, include_blank: false
+      .panel.panel-success
+        .panel-heading
+          h3.panel-title Caregiver Arrival/Departure Notification Settings
+        .panel-body
+          .form-group
+            = f.label :contact_method_setting, 'Setting', class: 'col-md-3 control-label'
+            .col-md-7
+              = f.input :contact_method_setting, collection: [['Off', 'no_contact'], ['Email', 'contact_email'], ['Text', 'contact_text'], ['Both', 'both']], label: false, include_blank: false
+
+coffee:
+  $ ->
+    new window.follower_validation()

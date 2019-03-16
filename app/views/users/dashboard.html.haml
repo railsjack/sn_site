@@ -1,0 +1,38 @@
+.panel.panel-success.col-md-4.col-md-offset-4{style:"margin-top: 15px;"}
+	/ Default panel contents
+	.panel-heading Dashboard
+	.panel-body.col-md-12
+		%table.table.table-hover.table-bordered
+			%tr
+				%th{width: '70%'} Total Loved Ones
+				%td{width: '30%'}= @lovedone_count
+			%tr
+				%th
+				%th
+			%tr
+				%th Total Service Providers
+				%td= @service_provider_count
+			%tr
+				%td &nbsp; Transportation Providers
+				%td= @service_provider_count1
+			%tr
+				%td &nbsp; Home Health Providers
+				%td= @service_provider_count2
+			%tr
+				%th
+				%th
+			%tr
+				%th Total Family Members/Guardians
+				%td= @family_members_count
+			%tr
+				%th
+				%th
+			%tr
+				%th TOTAL SAFETY NOTICE PARTICIPANTS:
+				%td= @lovedone_count + @service_provider_count + @family_members_count
+			%tr
+				%th
+				%th
+			%tr
+				%th Service Providers Awaiting Approval
+				%td= @companies_awaiting

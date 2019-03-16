@@ -1,0 +1,43 @@
+:javascript
+  $(function(){
+    $('.fixed-table-loading').hide();
+    $('.table th:last').remove();
+    $('.table th:last').get(0).colSpan = 2;
+  });
+
+.col-md-12
+  .container.relative
+    %h3 Family members
+    %h4.pull-left 
+    .clearfix
+    %table.table.table-hover.table-bordered{"data-sort-name" => "name", "data-sort-order" => "asc", "data-toggle" => "table"}
+      %thead
+        %tr
+          %th{"data-field" => "name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Name
+          %th{"data-field" => "email", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Email
+          %th{"data-field" => "lovedone", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Loved One
+          %th{"data-field" => "datetime", "data-sortable" => "true"} Date/Time Stamp
+          %th.text-center{"data-field" => "actions"} Actions
+          %th.text-center{"data-field" => "actions1"} Actions
+      %tbody
+        - @profiles.each do |profile|
+          - unless profile.user.id == current_user.id
+            %tr
+              %td= "#{profile.last_name}, #{profile.first_name}"
+              %td= profile.user.email
+              %td
+                - unless profile.user.lovedones.count==0
+                  = profile.user.lovedones.first.name
+              %td= profile.created_at.strftime("%m/%d/%Y %H:%M")
+              %td
+                - if current_user.admin? or current_user.primary_contact?
+                  = link_to 'Edit', edit_familymember_path(profile.user)
+                - else
+                  Not allowed
+              %td
+                - if current_user.admin? or current_user.primary_contact?
+                  = link_to 'Delete', familymember_path(profile.user), method: :delete, data: { confirm: 'Are you sure?' }
+                - else
+                  Not allowed
+    %br/
+    = link_to 'Add New Follower', new_familymember_path, class: 'btn btn-success absolute', style:'top: 14px; right: 14px;'

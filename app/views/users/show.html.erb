@@ -1,0 +1,178 @@
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">User</h3>
+      </div>
+      <div class="panel-body">
+<p><strong>Name: </strong><%= @user.name if @user.name %></p>
+<p><strong>Email: </strong><%= @user.email if @user.email %></p>
+<p><strong>Role: </strong><%= @user.role if @user.role %></p>
+
+<% if @user.profile %>
+<p>
+  <strong>Last name:</strong>
+  <%= @user.profile.last_name  if @user.profile.first_name %>
+</p>
+
+<p>
+  <strong>First name:</strong>
+  <%= @user.profile.first_name  if @user.profile.first_name  %>
+</p>
+<%
+=begin %>    
+<p>
+  <strong>Middle initial:</strong>
+  <%= @user.profile.middle_initial  if @user.profile.middle_initial  %>
+</p>
+
+<p>
+  <strong>Nick name:</strong>
+  <%= @user.profile.nick_name  if @user.profile.nick_name  %>
+</p>
+
+<p>
+  <strong>Date of Birth:</strong>
+  <%= @user.profile.date_of_birth  if @user.profile.date_of_birth  %>
+</p>
+
+<p>
+  <strong>Gender:</strong>
+  <%= @user.profile.gender  if @user.profile.gender  %>
+</p>
+
+<p>
+  <strong>Address:</strong>
+  <%= @user.profile.address  if @user.profile.address  %>
+</p>
+<%
+=end %>
+          
+<p>
+  <strong>Phone Number:</strong>
+  <%= @user.profile.phone_number  if @user.profile.phone_number  %>
+</p>
+          
+<p>
+  <strong>City:</strong>
+  <%= @user.profile.city  if @user.profile.city  %>
+</p>
+
+<p>
+  <strong>Country:</strong>
+  <%= @user.profile.country  if @user.profile.country  %>
+</p>
+
+<p>
+  <strong>State:</strong>
+  <%= @user.profile.state  if @user.profile.state  %>
+</p>
+
+<p>
+  <strong>Zip:</strong>
+  <%= @user.profile.zip  if @user.profile.zip  %>
+</p>
+
+<p>
+  <strong>Contact method:</strong>
+  <%= @user.profile.contact_method  if @user.profile.contact_method  %>
+</p>
+<% end %>
+<% if @user.company %>
+<p>
+  <strong>Company name:</strong>
+  <%= @user.company.company_name %>
+</p>
+
+<p>
+  <strong>Business name:</strong>
+  <%= @user.company.business_name %>
+</p>
+
+<p>
+  <strong>Provider type:</strong>
+  <%= @user.company.provider_type %>
+</p>
+
+<p>
+  <strong>Telephone:</strong>
+  <%= @user.company.telephone %>
+</p>
+
+<p>
+  <strong>Mobile phone number:</strong>
+  <%= @user.company.mobile_phone_number %>
+</p>
+
+<p>
+  <strong>Get notification:</strong>
+  <%= @user.company.get_notification %>
+</p>
+
+
+
+<p>
+  <strong>Address:</strong>
+  <%= @user.company.address %>
+</p>
+
+<p>
+  <strong>City:</strong>
+  <%= @user.company.city %>
+</p>
+
+<p>
+  <strong>Country:</strong>
+  <%= @user.company.country %>
+</p>
+
+<p>
+  <strong>State:</strong>
+  <%= @user.company.state %>
+</p>
+
+<p>
+  <strong>Zip:</strong>
+  <%= @user.company.zip %>
+</p>
+
+<p>
+  <strong>Contact last name:</strong>
+  <%= @user.company.contact_last_name %>
+</p>
+
+<p>
+  <strong>Contact first name:</strong>
+  <%= @user.company.contact_first_name %>
+</p>
+
+                <td>
+                  <%= form_for(@user.company) do |f| %>
+                    <%#= f.select(:status, Company.statuses.keys.map {|status| [status.titleize,status]}) %>
+                    <%#= [["pending",0],["approved",1]] %>
+                    <%#= Company.statuses.keys.map {|status| [status.titleize,status]} %>
+                    <%#= f.select(:status,[["pending",false],["approved",true]]) %>
+                    <%= f.select(:status,[["pending","pending"],["approved","approved"]]) %>
+                    <%= f.submit 'Change status', :class => 'btn btn-success button-xs' %>
+                  <% end %>
+                </td>          
+<% end %>
+          
+</div>
+     <div class="panel-footer">
+         <% if current_user.admins? %>
+            <%= link_to 'Back', admin_users_path , class: 'btn btn-success btn-md'%>
+         <% elsif current_user.providers? %>   
+            <%= link_to 'Back', admin_providers_path , class: 'btn btn-success btn-md'%>
+         <% else %>
+            <%= link_to 'Back', users_path , class: 'btn btn-success btn-md'%>
+         <% end %>
+<td>
+<span class="pull-right">    
+  <%= link_to("Delete user", user_path(@user), :data => { :confirm => "Are you sure?" }, :method => :delete, :class => 'btn btn-danger btn-md') unless @user == current_user %>
+</span>             
+</td>
+    </div>        
+    </div>
+    </div>    
+</div>

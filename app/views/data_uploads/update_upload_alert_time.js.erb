@@ -1,0 +1,67 @@
+<% if @time_error == true %>
+    alert('The End Time preceds the Start Time. Please select an End Time that is later than the Start Time.');
+<% else %>
+    <% if @comp_type == 'payroll' and @alert_type == 'end_encounter_1' %>
+        $('#endEncounterModal').modal('hide');
+        payroll_callback();
+
+    <% elsif @comp_type == 'payroll' and @alert_type == 'abbreviated_time' %>
+        $('#abbrevTimeModal').modal('hide');
+        payroll_callback();
+
+    <% elsif @comp_type == 'payroll' and @alert_type == 'open_encounter' %>
+        $('#openEncounterModal').modal('hide');
+        payroll_callback();
+    <% end %>
+
+<% end %>
+
+function payroll_callback(){
+    scroll_position = $('.dataTables_scrollBody').scrollTop()
+    $('.modal-backdrop').hide();
+    $.ajax({
+        url: '/data_uploads/data_upload_preview',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            start_date: "<%= @selected_start_date%>",
+            end_date: "<%= @selected_end_date%>",
+            pr_f2f: "<%= @pr_f2f%>",
+            pr_dtb: "<%= @pr_dtb%>",
+            pr_dmb: "<%= @pr_dmb%>",
+            type: 'payroll'
+        },
+        success:function(data) {
+            $('#data_upload_table').DataTable({
+                scrollY: "260px",
+                scrollX: true,
+                order: [[2, "asc"], [1, "asc"]],
+                searching: false,
+                paging: false,
+                info: false
+            });
+            if (scroll_position != null) {
+                $('div.dataTables_scrollBody').scrollTop(scroll_position);
+            }
+        }
+    });
+}
+
+function data_upload_hidden_class(){
+    $('#abbrevTimeModal #abbrevTimeContent').removeClass('hidden');
+    $('#abbrevTimeOption1').removeClass('hidden');
+    $('#abbrevTimeOption2').removeClass('hidden');
+    $('#abbrevTimeSave').addClass('hidden');
+    $('#abbrevTimeOption2Content').addClass('hidden');
+
+    $('#endEncounterModal #endEncounterContent').removeClass('hidden');
+    $('#endEncounterOption1').removeClass('hidden');
+    $('#endEncounterOption2').removeClass('hidden');
+    $('#endEncounterSave').addClass('hidden');
+    $('#endEncounterOption2Content').addClass('hidden');
+
+    $('#openEncounterModal #openEncounterContent').removeClass('hidden');
+    $('#openEncounterOption1').removeClass('hidden');
+    $('#openEncounterSave').addClass('hidden');
+    $('#openEncounterOption1Content').addClass('hidden');
+}

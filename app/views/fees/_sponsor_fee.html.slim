@@ -1,0 +1,9 @@
+select id="sponsor_fee_selection"
+  option value="none"
+    | Select Sponsor
+  - Sponsor.all.each do |sponsor|
+    option value="#{sponsor.id}"
+      = sponsor.name
+
+.pull-right
+  = link_to 'Back', sponsors_path, class: 'btn btn-success btn-sm'

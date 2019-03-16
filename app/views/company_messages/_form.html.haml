@@ -1,0 +1,74 @@
+:css
+	::-webkit-input-placeholder {
+	   text-transform: capitalize;
+	   color: #333 !important;
+	}
+
+:javascript
+	var company_employees_search_path = "#{company_employees_search_path(@current_company)}";
+
+= simple_form_for([@current_company, @company_message]) do |f|
+	.row
+		.col-md-8
+			.well
+				.form-group
+					%label
+						Address
+					.clearfix
+				.col-md-6
+					%input.form-control#street{:type => "text", placeholder: 'Street'}/
+				.col-md-6
+					.form-group
+						%input.form-control#city{:type => "text", placeholder: 'City'}/
+				.col-md-6
+					.form-group
+						%select.form-control#state
+							- us_states.each do |state|
+								%option{value: state[1]}=state[0]
+				.col-md-6
+					.form-group
+						%input.form-control#zip{:type => "text", placeholder: 'Zip', maxlength: 5}/
+					.clearfix
+				%hr/
+				.form-group
+					%label
+						Distance (Miles) From Address
+				.col-md-3
+					%input.form-control#distance{:type => "number", value: 10}/
+				.clearfix
+				%hr/
+				%label
+					Designation
+					(
+					%input.all-designation{:type => "checkbox", value: 0}
+					Select All
+					)
+				.col-md-12
+					.row-fluid
+						- @designations.each do |designation|
+							.col-md-2.form-group
+								%label.checkbox
+									%input.designation-id{:type => "checkbox", value: designation.id}/
+									= designation.name
+				.clearfix
+				%a.btn.pull-right.btn-primary.btn-sm.btn-search{"data-loading-text" => "Searching..."} Search
+				.clearfix
+		.col-md-4
+			%p{style: "margin-left: -15px"}
+			%label
+				These employees match the selection criteria and will be sent the notification :
+			.clearfix
+			= f.input :company_message_employees, as: :check_boxes, collection: [], label: 'Employees', wrapper_html: {id: 'employees_list'}, label: false
+	.row
+		.col-md-8
+			.well
+				%label Message
+				= f.input :message, as: :text, label: false
+				= f.input :address, as: :hidden
+				.clearfix
+				%hr
+				%button.btn.pull-right.btn-danger{:type => "submit"}Send Message
+				.clearfix
+
+
+

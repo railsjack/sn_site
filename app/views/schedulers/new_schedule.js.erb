@@ -1,0 +1,565 @@
+<% if @existing_schedules != 0 %>
+    type = "<%= @type %>";
+    lovedone = "<%= @lovedone %>"
+    employee = "<%= @employee %>"
+    if(type == 'employee'){
+        id = employee;
+        selected_id = lovedone;
+    }
+    else if(type == 'lovedone'){
+        id = lovedone;
+        selected_id = employee;
+    }
+    setTimeout(function() {
+        $.ajax({
+            url: '/schedulers/existing_schedules',
+            dataType: 'script',
+            type: 'GET',
+            data: {
+                existing_schedules: "<%= @existing_schedules %>",
+                existing_name: "<%= @existing_name %>",
+                start_time: "<%= @s_datetime.first %>",
+                end_time: "<%= @e_datetime.first %>",
+                frequency_type: "<%= @frequency_type %>",
+                selected_id: selected_id,
+                id: id,
+                type: type,
+                loop_number: "<%= @loop_number %>",
+                key: "<%= @key %>"
+            }
+        });
+    }, 1000);
+
+<% elsif @preceding_following_both.present? %>
+    $("#createPrecedingFollowingApptModal #precedingFollowingHeader").html("<b style='color:green'>NOTICE</b><br><br><b>Appointment Date: <%= @s_datetime.second.strftime("%m-%d-%Y")%></b><br><br>There is inadequate travel time from the preceding appointment and the following appointment.");
+    $("#createPrecedingFollowingApptModal #precedingFollowingContent").html("<p>The travel time required from the preceding appointment is <b style='color:red'><%= @preceding_both.to_s %></b> minutes and the travel time necessary to the following appointment is <b style='color:red'><%= @following_both.to_s %></b> minutes.</p><p>Without modifying the time or duration of the preceding or following appointments and while still allowing for travel time, the maximum time available for this appointment is <b style='color:red'><%= @remaining_appt_time %></b> minutes.</p>");
+    <% if @edit_schedule_id.present? %>
+        $('#precedingFollowingOption3').addClass('hidden');
+        $('#pfContent3').addClass('hidden');
+    <% else %>
+            <% if @remaining_appt_time > 0 %>
+                $('#precedingFollowingOption2').removeClass('disabled');
+            <% else %>
+                $('#precedingFollowingOption2').addClass('disabled');
+            <% end %>
+        $('#precedingFollowingOption3').removeClass('hidden');
+        $('#pfContent3').removeClass('hidden');
+    <% end %>
+    $('#createEmployeeModal').css('z-index', 1030);
+    $('#createLovedoneModal').css('z-index', 1030);
+    $('#createPrecedingFollowingApptModal').modal({ backdrop: 'static', keyboard: false, show: true });
+<% elsif @preceding_subject_travel_time.present? %>
+    $("#createPrecedingApptModal #precedingHeader").html("<b style='color:green'>NOTICE</b><br><br><b>Appointment Date: <%= @s_datetime.second.strftime("%m-%d-%Y")%></b><br><br>There is inadequate travel time from the preceding appointment. The travel time required is <b style='color:red'><%= @preceding_subject_travel_time.to_s %></b> minutes.");
+    <% if @edit_schedule_id.present? %>
+        $('#precedingOption3').addClass('hidden');
+        $('#precedingContent3').addClass('hidden');
+    <% else %>
+        $('#precedingOption3').removeClass('hidden');
+        $('#precedingContent3').removeClass('hidden');
+    <% end %>
+    $('#createEmployeeModal').css('z-index', 1030);
+    $('#createLovedoneModal').css('z-index', 1030);
+    $('#createPrecedingApptModal').modal({ backdrop: 'static', keyboard: false, show: true });
+<% elsif @subject_following_travel_time.present? %>
+    $("#createFollowingApptModal #followingHeader").html("<b style='color:green'>NOTICE</b><br><br><b>Appointment Date: <%= @s_datetime.second.strftime("%m-%d-%Y")%></b><br><br>There is inadequate travel time to the following appointment. The travel time required is <b style='color:red'><%= @subject_following_travel_time.to_s %></b> minutes.");
+    <% if @edit_schedule_id.present? %>
+        $('#followingOption3').addClass('hidden');
+        $('#followingContent3').addClass('hidden');
+    <% else %>
+        $('#followingOption3').removeClass('hidden');
+        $('#followingContent3').removeClass('hidden');
+    <% end %>
+    $('#createEmployeeModal').css('z-index', 1030);
+    $('#createLovedoneModal').css('z-index', 1030);
+    $('#createFollowingApptModal').modal({ backdrop: 'static', keyboard: false, show: true });
+<% elsif @existing_schedules == 0 and @preceding_both.blank? and @following_both.blank? and @preceding_subject_travel_time.blank? and @subject_following_travel_time.blank? %>
+    check_frequency();
+<% end %>
+
+// Cancel and close Button clicked on any modal window
+
+$('.scheduler-cancel-button').on('click', function(){
+    $('.three-quarters-loader').addClass('hidden');
+    $('#createLovedoneModal').css('z-index', 1040);
+    $('#createEmployeeModal').css('z-index', 1040);
+});
+
+$('.scheduler-close-button').on('click', function(){
+    $('.three-quarters-loader').addClass('hidden');
+    $('#createLovedoneModal').css('z-index', 1040);
+    $('#createEmployeeModal').css('z-index', 1040);
+});
+
+//--------------------------------------------
+
+<!--Preceding Appointment Options-->
+$('#precedingOption1').unbind("click");
+$('#precedingOption2').unbind("click");
+$('#precedingOption3').unbind("click");
+
+$('#precedingOption1').bind('click', function(){
+    if(confirm("Are you sure you want to add this appointment?")) {
+        $.ajax({
+            url: '/schedulers/schedule_options',
+            dataType: 'script',
+            type: 'GET',
+            data: {
+                edit_id: "<%= @edit_schedule_id %>",
+                lovedone: "<%= @lovedone %>",
+                employee: "<%= @employee %>",
+                option_type: 'precedingOption1',
+                frequency: "<%= @frequency_type %>",
+                key: "<%= @key %>"
+            },
+            success: function (data) {
+                $('#calendar').fullCalendar('refetchEvents');
+                $('#createPrecedingApptModal').modal('hide');
+                check_frequency();
+            }
+        });
+    }
+});
+
+$('#precedingOption2').bind('click', function(){
+    $.ajax({
+        url: '/schedulers/schedule_options',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            edit_id: "<%= @edit_schedule_id %>",
+            difference: "<%= TimeDifference.between(@s_datetime.first, @e_datetime.first).in_minutes %>",
+            lovedone: "<%= @lovedone %>",
+            employee: "<%= @employee %>",
+            option_type: 'precedingOption2',
+            frequency: "<%= @frequency_type %>",
+            key: "<%= @key %>"
+        },
+        success: function (data) {
+            $('#calendar').fullCalendar('refetchEvents');
+            $('#createPrecedingApptModal').modal('hide');
+            check_frequency();
+        }
+    });
+});
+
+$('#precedingOption3').bind('click', function(){
+    lovedone = "<%= @lovedone %>";
+    employee = "<%= @employee %>";
+    type = "<%= @type %>";
+    if(type == 'employee'){
+        id = employee;
+        selected_id = lovedone;
+    }
+    else if(type == 'lovedone'){
+        id = lovedone;
+        selected_id = employee;
+    }
+    $.ajax({
+        url: '/schedulers/another_employee_schedule',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            edit_id: "<%= @edit_schedule_id %>",
+            start_time: "<%= @p_start_time %>",
+            end_time: "<%= @p_end_time %>",
+            frequency: "<%= @frequency_type %>",
+            selected_id: selected_id,
+            id: id,
+            type: "<%= @type %>",
+            loop_number: "<%= @loop_number %>",
+            key: "<%= @key %>"
+        },
+        success: function () {
+//            $('#calendar').fullCalendar('refetchEvents');
+//            $('#createPrecedingApptModal').modal('hide');
+//            check_frequency();
+        }
+    });
+});
+<!---------------------------------->
+
+<!--Following Appointment Options-->
+$('#followingOption1').unbind('click');
+$('#followingOption2').unbind('click');
+$('#followingOption3').unbind('click');
+//$('#followingOption4').unbind('click');
+
+$('#followingOption1').bind('click', function(){
+    if(confirm("Are you sure you want to add this appointment?")) {
+        $.ajax({
+            url: '/schedulers/schedule_options',
+            dataType: 'script',
+            type: 'GET',
+            data: {
+                edit_id: "<%= @edit_schedule_id %>",
+                lovedone: "<%= @lovedone %>",
+                employee: "<%= @employee %>",
+                option_type: 'followingOption1',
+                frequency: "<%= @frequency_type %>",
+                key: "<%= @key %>"
+            },
+            success: function (data) {
+                $('#calendar').fullCalendar('refetchEvents');
+                $('#createFollowingApptModal').modal('hide');
+                check_frequency();
+            }
+        });
+    }
+});
+$('#followingOption2').bind('click', function(){
+    $.ajax({
+        url: '/schedulers/schedule_options',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            edit_id: "<%= @edit_schedule_id %>",
+            difference: "<%= TimeDifference.between(@s_datetime.first, @e_datetime.first).in_minutes %>",
+            lovedone: "<%= @lovedone %>",
+            employee: "<%= @employee %>",
+            option_type: 'followingOption2',
+            frequency: "<%= @frequency_type %>",
+            key: "<%= @key %>"
+        },
+        success: function (data) {
+            $('#calendar').fullCalendar('refetchEvents');
+            $('#createFollowingApptModal').modal('hide');
+            check_frequency();
+        }
+    });
+});
+//$('#followingOption3').bind('click', function(){
+//    alert('Following option 3 Clicked');
+//});
+$('#followingOption3').bind('click', function(){
+    lovedone = "<%= @lovedone %>";
+    employee = "<%= @employee %>";
+    type = "<%= @type %>";
+    if(type == 'employee'){
+        id = employee;
+        selected_id = lovedone;
+    }
+    else if(type == 'lovedone'){
+        id = lovedone;
+        selected_id = employee;
+    }
+    $.ajax({
+        url: '/schedulers/another_employee_schedule',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            edit_id: "<%= @edit_schedule_id %>",
+            start_time: "<%= @p_start_time %>",
+            end_time: "<%= @p_end_time %>",
+            frequency: "<%= @frequency_type %>",
+            selected_id: selected_id,
+            id: id,
+            type: "<%= @type %>",
+            loop_number: "<%= @loop_number %>",
+            key: "<%= @key %>"
+        },
+        success: function () {
+//            $('#calendar').fullCalendar('refetchEvents');
+//            $('#createPrecedingApptModal').modal('hide');
+//            check_frequency();
+        }
+    });
+});
+<!---------------------------------->
+
+<!--Preceding Following Appointment Options-->
+$('#precedingFollowingOption1').unbind('click');
+$('#precedingFollowingOption2').unbind('click');
+$('#precedingFollowingOption3').unbind('click');
+
+$('#precedingFollowingOption1').bind('click', function(){
+    if(confirm("Are you sure you want to add this appointment?")) {
+        $.ajax({
+            url: '/schedulers/schedule_options',
+            dataType: 'script',
+            type: 'GET',
+            data: {
+                edit_id: "<%= @edit_schedule_id %>",
+                start_time: "<%= @s_datetime.first %>",
+                end_time: "<%= @e_datetime.first %>",
+                lovedone: "<%= @lovedone %>",
+                employee: "<%= @employee %>",
+                option_type: 'precedingFollowingOption1',
+                frequency: "<%= @frequency_type %>",
+                key: "<%= @key %>"
+            },
+            success: function (data) {
+                $('#calendar').fullCalendar('refetchEvents');
+                $('#createPrecedingApptModal').modal('hide');
+                check_frequency();
+            }
+        });
+    }
+});
+$('#precedingFollowingOption2').bind('click', function(){
+    $.ajax({
+        url: '/schedulers/schedule_options',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            edit_id: "<%= @edit_schedule_id %>",
+            lovedone: "<%= @lovedone %>",
+            employee: "<%= @employee %>",
+            option_type: 'precedingFollowingOption2',
+            frequency: "<%= @frequency_type %>",
+            key: "<%= @key %>"
+        },
+        success: function (data) {
+            $('#calendar').fullCalendar('refetchEvents');
+            $('#createPrecedingApptModal').modal('hide');
+            check_frequency();
+        }
+    });
+});
+$('#precedingFollowingOption3').bind('click', function(){
+    lovedone = "<%= @lovedone %>";
+    employee = "<%= @employee %>";
+    type = "<%= @type %>";
+    if(type == 'employee'){
+        id = employee;
+        selected_id = lovedone;
+    }
+    else if(type == 'lovedone'){
+        id = lovedone;
+        selected_id = employee;
+    }
+    $.ajax({
+        url: '/schedulers/another_employee_schedule',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            edit_id: "<%= @edit_schedule_id %>",
+            start_time: "<%= @p_start_time %>",
+            end_time: "<%= @p_end_time %>",
+            frequency: "<%= @frequency_type %>",
+            selected_id: selected_id,
+            id: id,
+            type: "<%= @type %>",
+            loop_number: "<%= @loop_number %>",
+            key: "<%= @key %>"
+        }
+    });
+});
+<!---------------------------------->
+
+function check_frequency(){
+    var frequency = "<%= @frequency_type %>";
+    lovedone = "<%= @lovedone %>";
+    employee = "<%= @another_employee_request.present? ? params[:prev_employee] : @employee %>";
+    type = "<%= @type %>";
+    if(type == 'employee'){
+        id = employee;
+        selected_id = lovedone;
+    }
+    else if(type == 'lovedone'){
+        id = lovedone;
+        selected_id = employee;
+    }
+
+    <% case @frequency_type %>
+        <% when 1 %>
+            $('#createEmployeeModal').modal('hide');
+            $('#createLovedoneModal').modal('hide');
+            $('.three-quarters-loader').addClass('hidden');
+            $('#calendar').fullCalendar('refetchEvents');
+
+        <% when 2 %>
+            <%
+            count = @loop_number.to_i + 1
+            while count < 7
+                @p_start_time, @p_end_time = Scheduler.day_addition(@p_start_time), Scheduler.day_addition(@p_end_time)
+                if @p_start_time.first != 6 and @p_start_time.first != 0
+                %>
+                    $.ajax({
+                        url: '/schedulers/new_schedule',
+                        dataType: 'script',
+                        type: 'GET',
+                        data: {
+                            start_time: "<%= @p_start_time.second %>",
+                            end_time: "<%= @p_end_time.second %>",
+                            frequency: 2,
+                            selected_id: selected_id,
+                            id: id,
+                            type: type,
+                            loop_number: "<%= count %>",
+                            key: "<%= @key %>"
+                        }
+                    });
+            <%      break
+                end
+                count = count + 1
+            end %>
+            <% if count == 7 %>
+                $('#createEmployeeModal').modal('hide');
+                $('#createLovedoneModal').modal('hide');
+                $('#calendar').fullCalendar('refetchEvents');
+                $('.three-quarters-loader').addClass('hidden');
+            <% end %>
+
+        <% when 3 %>
+            <%
+            count = @loop_number.to_i + 1
+            if count < 7
+                @p_start_time, @p_end_time = Scheduler.day_addition(@p_start_time), Scheduler.day_addition(@p_end_time)
+                %>
+                $.ajax({
+                    url: '/schedulers/new_schedule',
+                    dataType: 'script',
+                    type: 'GET',
+                    data: {
+                        start_time: "<%= @p_start_time.second %>",
+                        end_time: "<%= @p_end_time.second %>",
+                        frequency: 3,
+                        selected_id: selected_id,
+                        id: id,
+                        type: type,
+                        loop_number: "<%= count %>",
+                        key: "<%= @key %>"
+                    }
+                });
+            <% elsif count == 7 %>
+                $('#createEmployeeModal').modal('hide');
+                $('#createLovedoneModal').modal('hide');
+                $('#calendar').fullCalendar('refetchEvents');
+                $('.three-quarters-loader').addClass('hidden');
+            <% end %>
+
+        <% when 4 %>
+            <%
+            count = @loop_number.to_i + 1
+            while count < 7
+                @p_start_time, @p_end_time = Scheduler.day_addition(@p_start_time), Scheduler.day_addition(@p_end_time)
+                if @p_start_time.first == 1 or @p_start_time.first == 3 or @p_start_time.first == 5
+                %>
+                    $.ajax({
+                        url: '/schedulers/new_schedule',
+                        dataType: 'script',
+                        type: 'GET',
+                        data: {
+                            start_time: "<%= @p_start_time.second %>",
+                            end_time: "<%= @p_end_time.second %>",
+                            frequency: 4,
+                            selected_id: selected_id,
+                            id: id,
+                            type: type,
+                            loop_number: "<%= count %>",
+                            key: "<%= @key %>"
+                        }
+                    });
+            <%      break
+                end
+                count = count + 1
+            end
+            %>
+            <% if count == 7 %>
+                $('#createEmployeeModal').modal('hide');
+                $('#createLovedoneModal').modal('hide');
+                $('#calendar').fullCalendar('refetchEvents');
+                $('.three-quarters-loader').addClass('hidden');
+            <% end %>
+
+        <% when 5 %>
+            <%
+            count = @loop_number.to_i + 1
+            while count < 7
+                @p_start_time, @p_end_time = Scheduler.day_addition(@p_start_time), Scheduler.day_addition(@p_end_time)
+                if @p_start_time.first == 2 or @p_start_time.first == 4
+                %>
+                    $.ajax({
+                        url: '/schedulers/new_schedule',
+                        dataType: 'script',
+                        type: 'GET',
+                        data: {
+                            start_time: "<%= @p_start_time.second %>",
+                            end_time: "<%= @p_end_time.second %>",
+                            frequency: 5,
+                            selected_id: selected_id,
+                            id: id,
+                            type: type,
+                            loop_number: "<%= count %>",
+                            key: "<%= @key %>"
+                        }
+                    });
+            <%      break
+                end
+                count = count + 1
+            end
+            %>
+            <% if count == 7 %>
+                $('#createEmployeeModal').modal('hide');
+                $('#createLovedoneModal').modal('hide');
+                $('#calendar').fullCalendar('refetchEvents');
+                $('.three-quarters-loader').addClass('hidden');
+            <% end %>
+
+        <% when 6 %>
+            <%
+            count = @loop_number.to_i + 1
+            while count < 30
+                @p_start_time, @p_end_time = Scheduler.day_addition(@p_start_time), Scheduler.day_addition(@p_end_time)
+                if @p_start_time.first != 0 and @p_start_time.first != 6
+                %>
+                    $.ajax({
+                        url: '/schedulers/new_schedule',
+                        dataType: 'script',
+                        type: 'GET',
+                        data: {
+                            start_time: "<%= @p_start_time.second %>",
+                            end_time: "<%= @p_end_time.second %>",
+                            frequency: 6,
+                            selected_id: selected_id,
+                            id: id,
+                            type: type,
+                            loop_number: "<%= count %>",
+                            key: "<%= @key %>"
+                        }
+                    });
+            <%      break
+                end
+                count = count + 1
+            end
+            %>
+            <% if count == 30 %>
+                $('#createEmployeeModal').modal('hide');
+                $('#createLovedoneModal').modal('hide');
+                $('#calendar').fullCalendar('refetchEvents');
+                $('.three-quarters-loader').addClass('hidden');
+            <% end %>
+
+        <% when 7 %>
+            <%
+            count = @loop_number.to_i + 1
+            if count < 30
+                @p_start_time, @p_end_time = Scheduler.day_addition(@p_start_time), Scheduler.day_addition(@p_end_time)
+                %>
+                $.ajax({
+                    url: '/schedulers/new_schedule',
+                    dataType: 'script',
+                    type: 'GET',
+                    data: {
+                        start_time: "<%= @p_start_time.second %>",
+                        end_time: "<%= @p_end_time.second %>",
+                        frequency: 7,
+                        selected_id: selected_id,
+                        id: id,
+                        type: type,
+                        loop_number: "<%= count %>",
+                        key: "<%= @key %>"
+                    }
+                });
+            <% elsif count == 30 %>
+                $('#createEmployeeModal').modal('hide');
+                $('#createLovedoneModal').modal('hide');
+                $('#calendar').fullCalendar('refetchEvents');
+                $('.three-quarters-loader').addClass('hidden');
+            <% end %>
+
+        <% else %>
+                console.log('Nothing Selected');
+    <% end %>
+
+}

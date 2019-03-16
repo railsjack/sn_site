@@ -1,0 +1,101 @@
+= simple_form_for [@company,@employee], html: {class: 'form-horizontal employee-form', autocomplete: 'false'} do |f|
+  input name='nohead' value="true" type='hidden'
+  - if f.object.errors.messages.count>0
+    #error_explanation
+      ul
+        - f.object.errors.messages.each do |message|
+          li= message[0].to_s.humanize + " " + message[1][0]
+  .row
+    .well.col-md-10.col-md-offset-1
+      .pull-left style="font-size:25px;" Employee Information
+      .pull-right
+        = f.button :submit, class: 'btn btn-danger btn-md', value: "Save", id: 'lovedone-submit', style: 'margin-right:5px;'
+        - if current_user.admin?
+          = link_to 'Back', admin_employees_path, class: 'btn btn-success btn-md'
+        - else
+          = link_to 'Back', company_employees_path, class: 'btn btn-success btn-md'
+
+    .col-md-6.col-md-offset-1
+      .panel.panel-success
+        .panel-heading
+          h3.panel-title Personal Information
+        .panel-body
+          .form-inputs
+            .form-group
+              = f.label :first_name, 'First Name', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :first_name, class: 'form-control'
+            .form-group
+              = f.label :last_name, 'Last Name', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :last_name, class: 'form-control'
+            .form-group
+              = f.label :address, 'Address', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :address, class: 'form-control'
+            .form-group
+              = f.label :state, 'State', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.select :state, options_for_select(us_states, f.object.state), {}, {class: 'form-control'}
+            .form-group
+              = f.label :county, 'County', class: 'col-md-3 control-label'
+              .col-md-7 title= ""
+                = f.select :county, [], {}, {:class => 'form-control', 'data-selected-item' => f.object.county}
+            .form-group
+              = f.label :city, 'City', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :city, class: 'form-control'
+            .form-group
+              = f.label :zip, 'Zip', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :zip, class: 'form-control'
+            .form-group
+              = f.label :email, 'Email', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :email, class: 'form-control', label: false
+            .form-group
+              = f.label :phone_number, 'Mobile Phone', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :phone_number, class: 'form-control', label: false
+            = f.input :username, as: :hidden
+            .form-group
+              = f.label :username, 'Mobile App Username', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :username, class: 'form-control username'
+            .form-group
+              = f.label :password, 'Mobile App Password', class: 'col-md-3 control-label'
+              .col-md-7
+                = f.text_field :password, class: 'form-control'
+            .form-group
+              .col-md-7.col-md-offset-3
+                span.text-danger * Minimum is 8 characters
+
+          .form-inputs
+            = f.input :designation_id, collection: @company.designations.all, label: 'Designation', as: :radio_buttons, item_wrapper_class: 'radio-inline'
+          .form-inputs.hidden
+            = f.input :distance, readonly: true
+
+          .form-inputs.hidden
+            = f.input :latitude
+          .form-inputs.hidden
+            = f.input :longitude
+
+    .col-md-4
+      .panel.panel-success
+        .panel-heading
+          h3.panel-title Appointment Notification Settings
+        .panel-body
+          .form-group
+            = f.label :setting, 'Setting', class: 'col-md-3 control-label'
+            .col-md-9
+              = f.input :setting, collection: Employee.settings.map { |k, v| [k.capitalize, k] }, label: false, include_blank: false
+
+css:
+  .radio input[type="radio"], .radio-inline input[type="radio"], .checkbox input[type="checkbox"], .checkbox-inline input[type="checkbox"] {
+    position: static;
+    margin-left: -24px;
+  }
+
+coffee:
+  $ ->
+    new window.employee_validation()

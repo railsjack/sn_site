@@ -1,0 +1,23 @@
+%h3=@title
+%table{:border => "1", :cellpadding => "10", :cellspacing => "0", :style => "border-collapse: collapse;"}
+	%tr
+		%th{:style => "text-align: left;"} From
+		%td{:style => "width: 120px;"}= @start_date.strftime("%m/%d/%Y")
+	%tr
+		%th{:style => "text-align: left;"} To
+		%td{:style => "width: 120px;"}= @end_date.strftime("%m/%d/%Y")
+	%tr
+		%th{:style => "text-align: left;"} Messages Sent
+		%td{:style => "width: 120px;"}= @message_count
+	%tr
+		%th{:style => "text-align: left;"} Amount
+		%td{:style => "width: 120px;"}= "#{number_to_currency(@amount)}"
+
+%br/
+%br/
+%br/
+%br/
+
+
+%p SafetyNotice.com
+%p= @sender.email

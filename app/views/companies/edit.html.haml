@@ -1,0 +1,17 @@
+.col-md-8.col-md-offset-2
+	.panel.panel-default{style:"margin-top: 10px;"}
+		.panel-heading
+			%h3
+				- if current_user.admin?
+					Editing Service Provider
+				- else
+					Editing Company
+		.panel-body
+			= render 'form'
+			.clearfix
+		.panel-footer
+			- if current_user.admin?
+				= link_to 'Back', admin_providers_path, class: 'btn btn-default pull-right'
+			- else
+				= link_to 'Back', companies_path
+			.clearfix

@@ -1,0 +1,32 @@
+- previous_date = nil
+- Time.zone = @employee.company.time_zone
+- Scheduler.where("DATE_FORMAT(start_time, '%Y-%m-%d')>=? and DATE_FORMAT(end_time, '%Y-%m-%d')<=? and employee_id=?", @start_date, @end_date, @employee.id).order('start_time ASC').each do |appt|
+  - lovedone_address = "#{appt.lovedone.street} #{appt.lovedone.apt_unit} #{appt.lovedone.city} #{appt.lovedone.state} #{appt.lovedone.zip_code}"
+  - appt_date = appt.start_time.strftime('%m/%d/%y')
+  - appt_time = "(#{appt.start_time.strftime('%H:%M')} - #{appt.end_time.strftime('%H:%M')}); #{appt.lovedone.full_name}; "
+  - if previous_date.nil?
+    = appt_date
+    br
+    = appt_time
+    a href="https://maps.google.com/?q=#{lovedone_address}"= "#{lovedone_address}"
+    |;&nbsp
+    = appt.lovedone.phone_number
+    - previous_date = appt_date
+    br
+  - elsif previous_date == appt_date
+    = appt_time
+    a href="https://maps.google.com/?q=#{lovedone_address}"= "#{lovedone_address}"
+    |;&nbsp
+    = appt.lovedone.phone_number
+    - previous_date = appt_date
+    br
+  - else
+    br
+    = appt_date
+    br
+    = appt_time
+    a href="https://maps.google.com/?q=#{lovedone_address}"= "#{lovedone_address}"
+    |;&nbsp
+    = appt.lovedone.phone_number
+    - previous_date = appt_date
+    br

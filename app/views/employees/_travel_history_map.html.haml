@@ -1,0 +1,71 @@
+- if !@start_lat and !@start_lng and !@end_lat and !@end_lng
+	- @start_lat = @start_lng = @end_lat = @end_lng = 0
+.well.col-md-5
+	%h4.text-center{style: 'color:green;'}
+		%b Map
+	%hr
+	%br
+	%b
+		- if default_check == true and @employee_string.present?
+			.text-center.no-result= @employee_string
+		- elsif @employee_string.present?
+			.text-center= @employee_string.split('/')[0]
+			.text-center= @employee_string.split('/')[1]
+			.text-center= @employee_string.split('/')[2]
+	%br
+	#map.travel-map
+
+
+:javascript
+	var default_check = '#{default_check}';
+	var start_lat = #{@start_lat};
+	var start_lng = #{@start_lng};
+	var end_lat = #{@end_lat};
+	var end_lng = #{@end_lng};
+	var color = '#{@leg_color}';
+
+	console.log(start_lat, start_lng, end_lat, end_lng, color)
+
+	if(default_check == "true"){
+		var business_name = '#{@business_name}'
+		window.gm_handler = Gmaps.build('Google');
+			var default_position = {lat: start_lat, lng: start_lng};
+			gm_handler.buildMap({provider: {}, internal: {id: 'map'}}, function () {
+				window.markers = gm_handler.addMarkers([
+					{
+						"lat": default_position.lat,
+						"lng": default_position.lng,
+						"infowindow": business_name
+					}
+				]);
+				gm_handler.bounds.extendWith(window.markers);
+				gm_handler.fitMapToBounds();
+				gm_handler.map.serviceObject.setZoom(10);
+		  });
+	}
+	if (default_check == "false"){
+		var map = new google.maps.Map(document.getElementById("map"));
+
+		function renderDirections(result, color) {
+			var directionsRenderer =  new google.maps.DirectionsRenderer({
+				polylineOptions: {
+					strokeColor: color
+				}
+			})
+			directionsRenderer.setMap(map);
+			directionsRenderer.setDirections(result);
+		}
+
+		var directionsService = new google.maps.DirectionsService;
+
+		function requestDirections(start, end, color) {
+			directionsService.route({
+				origin: start,
+				destination: end,
+				travelMode: google.maps.DirectionsTravelMode.DRIVING
+			}, function(result) {
+				renderDirections(result, color);
+			});
+		}
+		requestDirections(start_lat+', '+start_lng, end_lat+', '+end_lng, color);
+	}

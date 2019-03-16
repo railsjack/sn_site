@@ -1,0 +1,38 @@
+// Place all the styles related to the companymembers controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+body .modal-dialog {
+  width: 70%;
+}
+
+.user_company_status {
+  width: 200px;
+  position: absolute;
+  top: 40px;
+  right: 50px;
+  > {
+    label {
+      width: 50px;
+    }
+    div {
+      width: 130px;
+    }
+  }
+}
+
+.min-height{
+  min-height: 100px !important;
+}
+
+.zone-min-height{
+  min-height: 344px !important;
+}
+
+.status-alignment{
+  margin-right: 20px;
+}
+
+.arrival-margin{
+  margin-left: 15px;
+}

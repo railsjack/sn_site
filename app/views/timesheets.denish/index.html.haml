@@ -1,0 +1,29 @@
+%h1 Listing timesheets
+
+%table{:width=>'100%'}
+  %tr
+    %th Starttime
+    %th Endtime
+    %th Lovedone
+    %th Employee
+    %th Provider
+    %th Company
+    %th
+    %th
+    = debug(@timesheets)
+/   - @timesheets.each do |timesheet|
+/     %tr
+/       %td= timesheet.starttime
+/       %td= timesheet.endtime
+/       %td= timesheet.lovedone_id
+/       %td= timesheet.employee_id
+/       %td= timesheet.provider_id
+/       %td= timesheet.company_id
+  
+/       %td= link_to 'Show', timesheet
+/       %td= link_to 'Edit', edit_timesheet_path(timesheet)
+/       %td= link_to 'Destroy', timesheet, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+/ %br
+
+= link_to 'New Timesheet', new_timesheet_path

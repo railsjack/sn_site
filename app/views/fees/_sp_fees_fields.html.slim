@@ -1,0 +1,30 @@
+= simple_form_for(@company, url: update_sp_fees_fields_fee_path(@company.id), method: :post, html: {class: "form-horizontal"}) do |c|
+  = c.fields_for :fee do |f|
+    .form-group
+      = f.label :employee_fee, 'Employee Fee (USD)', class: 'col-md-5 control-label'
+      .col-md-4
+        = f.input :employee_status, as: :radio_buttons, label: false, item_wrapper_class: 'radio-inline'
+      .col-md-3
+        = f.input :employee_fee, label: false, class: 'form-control'
+
+    .form-group
+      = f.label :base_fee, 'Base Fee (USD)', class: 'col-md-5 control-label'
+      .col-md-4
+        = f.input :base_status, as: :radio_buttons, label: false, item_wrapper_class: 'radio-inline'
+      .col-md-3
+        = f.input :base_fee, label: false, class: 'form-control'
+
+    .form-group
+      = f.label :reach_out_fee, 'Reach Out Fee (USD)', class: 'col-md-5 control-label'
+      .col-md-4
+        = f.input :reach_out_status, as: :radio_buttons, label: false, item_wrapper_class: 'radio-inline'
+      .col-md-3
+        = f.input :reach_out_fee, label: false, class: 'form-control'
+
+    .form-group
+      = f.label :transfer_fee, 'Transfer Fee (USD)', class: 'col-md-5 control-label'
+      .col-md-4
+        = f.input :transfer_status, as: :radio_buttons, label: false, item_wrapper_class: 'radio-inline'
+      .col-md-3
+        = f.input :transfer_fee, label: false, class: 'form-control'
+    = f.button :submit, class: 'btn btn-success (USD)', value: 'Save'

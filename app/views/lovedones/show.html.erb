@@ -1,0 +1,100 @@
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">Loved one</h3>
+      </div>
+      <div class="panel-body">
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Last name:</strong>
+  <%= @lovedone.last_name %>
+</p>
+
+<p>
+  <strong>First name:</strong>
+  <%= @lovedone.first_name %>
+</p>
+
+<p>
+  <strong>Middle initial:</strong>
+  <%= @lovedone.middle_initial %>
+</p>
+
+
+<p>
+  <strong>Date of Birth:</strong>
+  <%= @lovedone.date_of_birth.strftime("%m/%d/%Y") %>
+</p>
+
+<p>
+  <strong>Gender:</strong>
+  <%= if @lovedone.gender == 'true'
+        "Male"
+      else
+        "Female"
+      end
+  %>
+</p>
+
+<p>
+  <strong>City:</strong>
+  <%= @lovedone.city %>
+</p>
+
+
+<p>
+  <strong>State:</strong>
+  <%= @lovedone.state %>
+</p>
+
+<p>
+  <strong>Zip Code:</strong>
+  <%= @lovedone.zip_code %>
+</p>
+          
+</div>
+     <div class="panel-footer">
+        <%= link_to 'Edit', edit_lovedone_path(@lovedone) , class: 'btn btn-success btn-md'%> |
+        <%= link_to 'Back', lovedones_path , class: 'btn btn-success btn-md'%>         
+    </div>        
+    </div>
+    </div>    
+</div>
+
+<% if @lovedone.employee %>
+<p>Your loved one is being taken care by <strong><%= @lovedone.employee.name %></strong> from service provider <strong><%= @lovedone.employee.company.company_name %></strong>.</p>
+<p>The current status of the service is <strong><%= @lovedone.employee.service_status %> </strong></p>
+View Map     
+<div style='width: 800px;' >
+  <div id="map" style='width: 800px; height: 400px;'></div>
+</div>
+
+<% end %>
+
+<% if @lovedone.employee %>
+<script src="//maps.google.com/maps/api/js?v=3.13&amp;sensor=false&amp;libraries=geometry"></script>
+<script 
+src='//google-maps-utility-library-v3.googlecode.com/svn/tags/markerclustererplus/2.0.14/src/markerclusterer_packed.js'></script>
+
+<script type="text/javascript">
+    handler = Gmaps.build('Google');
+    handler.buildMap({ provider: {}, internal: {id: 'map'}}, function(){
+      markers = handler.addMarkers([
+        {
+          "lat": @lovedone.employee.latitude,
+          "lng": @lovedone.employee.longitude,
+          "picture": {
+            "url": "https://addons.cdn.mozilla.net/img/uploads/addon_icons/13/13028-64.png",
+            "width":  36,
+            "height": 36
+          },
+          "infowindow": "Provider:" + @lovedone.employee.name
+        }
+      ]);
+      handler.bounds.extendWith(markers);
+      handler.fitMapToBounds();
+    });
+</script>
+<% end %>

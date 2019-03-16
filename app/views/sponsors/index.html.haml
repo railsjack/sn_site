@@ -1,0 +1,58 @@
+:javascript
+  $(function(){
+    $('.fixed-table-loading').hide();
+    $('.table th:last').remove();
+    $('.table th:last').get(0).colSpan = 2;
+    $('.suggestion-search').keyup(function(e){
+      var key = e.target.value.toLowerCase();
+      if(key==""){
+        $('.table tr').show();
+      }
+      $('.table tr:gt(0)').each(function(){
+        if($($(this).children().get(0)).text().toLowerCase().indexOf(key)==-1){
+          $(this).hide();
+        }
+      });
+    });
+  });
+
+.container
+  .row.relative
+    .table-responsive{style: "position: relative;"}
+    %div
+      %h3.text-center Sponsors
+      .well
+        %div{style: "position: absolute; right: 0;"}
+          = link_to 'Fee', sponsor_fees_path, class: 'btn btn-success btn-sm pull-right', style: "margin-right: 10px;"
+          -#= link_to 'Sponsor Type', sponsor_type_sponsors_path, class: 'btn btn-success btn-sm pull-right', style: "margin-right: 10px;"
+          = link_to 'Add New Sponsor', new_sponsor_path, class: 'btn btn-success btn-sm pull-right', style: 'margin-right: 10px;'
+        %div
+          Search:
+          %input.suggestion-search{:placeholder => "Search...", :type => "text"}/
+          &nbsp;&nbsp;&nbsp; Count of Sponsors:
+          %span#companies= @sponsors.count
+      %table.table.table-striped.table-bordered.table-hover{"data-sort-name" => "name", "data-sort-order" => "asc", "data-toggle" => "table"}
+        %thead
+          %tr.bg-success
+            %th{"data-field" => "name", "data-sortable" => "true", "data-sorter"=>"stringSorter"}  Name
+            %th{"data-field" => "phone", "data-sortable" => "true", "data-sorter"=>"stringSorter"}  Phone
+            %th{"data-field" => "email", "data-sortable" => "true", "data-sorter"=>"stringSorter"}  Email Address
+            %th{"data-field" => "website", "data-sortable" => "true", "data-sorter"=>"stringSorter"}  Website
+            %th{"data-field" => "sponsor_type", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Sponsor type
+            %th{"data-field" => "provider", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Provider
+            %th{"data-field" => "action1", :colspan => "1"} Actions
+            %th{"data-field" => "action2", :colspan => "1"} Actions
+        %tbody
+          - @sponsors.each do |sponsor|
+            %tr
+              %td= sponsor.name
+              %td= sponsor.phone
+              %td= sponsor.email
+              %td= sponsor.website
+              %td= sponsor.nation
+              - if sponsor.nation.downcase.eql? 'specific'
+                %td= sponsor.company.company_name
+              - else
+                %td ---
+              %td= link_to 'Edit', edit_sponsor_path(sponsor) , class: "btn btn-success btn-sm"
+              %td= link_to 'Delete', sponsor_path(sponsor),method: :delete, data:{confirm: 'Are you sure to remove this sponsor?'} , class: "btn btn-success  btn-sm"

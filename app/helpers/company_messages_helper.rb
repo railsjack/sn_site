@@ -1,0 +1,2 @@
+module CompanyMessagesHelper
+end

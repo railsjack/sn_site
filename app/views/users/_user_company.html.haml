@@ -1,0 +1,11 @@
+%td= company.business_name
+%td= company.city
+%td= company.county
+%td= company.state
+%td= "#{company.contact_last_name}, #{company.contact_first_name}"
+%td= number_to_phone(company.mobile_phone_number).gsub(/\)/,') ')
+%td= company.created_at.to_s.gsub! ' UTC',''
+%td= company.status
+%td
+  = link_to edit_company_path(company), class: "btn btn-success btn-sm" do
+    %i.glyphicon.glyphicon-edit Edit

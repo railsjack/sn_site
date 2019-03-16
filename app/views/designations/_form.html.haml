@@ -1,0 +1,8 @@
+= simple_form_for([@current_company, @designation], html: {class: 'form-horizontal'}) do |f|
+	/= f.input :name, :collection => CompanyCategory::categories, required: false
+	= f.input :name, required: false
+	= f.input :color, collection: Designation::colors, disabled: @current_company.designations.collect(&:color), required: false
+	- if f.object.new_record?
+		= f.submit class: 'btn btn-primary pull-right', value: 'Add New Designation'
+	- else
+		= f.submit class: 'btn btn-primary pull-right', value: 'Update Designation'

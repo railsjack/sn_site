@@ -1,0 +1,15 @@
+.well
+  h4.text-center
+    b Data Export Settings
+    .pull-right
+      = link_to 'Back', data_uploads_path, class: 'btn btn-success'
+
+= simple_form_for(@company, url: update_settings_data_upload_path(@company.id), method: :post, html: {class: "form-horizontal"}) do |c|
+  .well.col-md-7.col-md-offset-3
+    .form-group
+      label class= 'col-md-4 control-label' Abbreviated Time Threshold (Minutes):
+      .col-md-6
+        = c.input :abbreviated_time, label: false
+    hr
+    .text-center
+      = c.button :submit, class: 'btn btn-success', value: 'Save'

@@ -1,0 +1,91 @@
+- resource = @family_member
+- resource_name = resource.class.to_s.downcase
+- resource.profile || resource.build_profile
+- submit_url = familymembers_path + "?query=family&adminmode=true"
+- if params[:action] == 'edit' || params[:action] == 'update'
+  - submit_url = familymembers_path + "/#{params[:id]}?query=family&adminmode=true"
+= form_for(resource, :as => resource_name, :url => submit_url, :html => { :role => 'form', :class => 'form-horizontal'}) do |f|
+  - unless f.object.errors.messages.empty?
+    #error_explanation
+      %ul
+        - f.object.errors.messages.each do |message|
+          %li= message[0].to_s.humanize + " " + message[1][0]
+
+        
+  /%input{name: "user[lovedones_attributes][id]", type: "hidden", value: params[:lovedone_id]}/
+  = f.fields_for :profile do |profile_form|
+    %hr/
+    .form-group
+      = f.label :state,"Loved One:", class: 'col-md-4 control-label'
+      .col-md-6{:title => "Please choose a loved one."}
+        - if params[:action] == 'edit' || params[:action]=='update'
+          - lovedone_name = ''
+          - lovedone_name = f.object.lovedones.first.name unless f.object.lovedones.first.nil?
+          %input{value: lovedone_name, class: 'form-control', readonly: true}
+        - else
+          - selected_lovedone_id = ''
+          - selected_lovedone_id = f.object.lovedones.first.id unless f.object.lovedones.first.nil?
+          = f.select :lovedones, options_for_select(@lovedones.map{|lovedone| [lovedone.name, lovedone.id]}, selected_lovedone_id), {}, { :class => 'form-control' }
+    .form-group
+      = profile_form.label :last_name, 'Last Name:', class: 'col-md-4 control-label'
+      .col-md-6{:title => "Enter your last name."}
+        = profile_form.text_field :last_name, class: 'form-control', placeholder: 'Last Name', required: true
+    .form-group
+      = profile_form.label :first_name, 'First Name:', class: 'col-md-4 control-label'
+      .col-md-6{:title => "Enter your first name."}
+        = profile_form.text_field :first_name, class: 'form-control', placeholder: 'First Name', required: true
+    .form-group
+      = profile_form.label :phone_number, 'Mobile Phone Number:', class: 'col-md-4 control-label'
+      .col-md-6{:title => "If you choose to be notified by text message, this is the phone number where notifications will be sent."}
+        = profile_form.text_field :phone_number, class: 'form-control mobile-phone-number', placeholder: 'Mobile Phone Number'
+    .form-group
+      = profile_form.label :contact_method, "Contact Method:", class: 'col-md-4 control-label'
+      .col-md-6#contact-method{:style => "margin-top: 6px;", :title => "Select how you would like to be notified.  You can select email, text or both."}
+        - Profile::contact_types.each do |a_value|
+          = profile_form.check_box( :contact_method, { :multiple => true }, a_value, nil)
+          = profile_form.label a_value
+          &nbsp;&nbsp;&nbsp;
+        %label
+          &nbsp;
+          %input#check_both{type:'checkbox', value: 'both'} &nbsp;Both
+    .form-group
+      = profile_form.label :state,"State:", class: 'col-md-4 control-label'
+      .col-md-6{:title => "Enter the state where you currently reside."}
+        = profile_form.select :state, options_for_select(us_states, profile_form.object.state), {}, { :class => 'form-control' }
+    .form-group
+      = profile_form.label :county, 'County:', class: 'col-md-4 control-label'
+      .col-md-6{:title => "Enter the county where you currently reside. "}
+        = profile_form.select :county, [], {}, { :class => 'form-control' , required: true, 'data-selected-item'=> profile_form.object.county}
+    .form-group
+      = profile_form.label :city, 'City:', class: 'col-md-4 control-label'
+      .col-md-6{:title => "Enter the city where you currently reside. "}
+        = profile_form.text_field :city, class: 'form-control', placeholder: 'City', required: true
+    .form-group
+      = f.label :email,"Email:", class: 'col-md-4 control-label'
+      .col-md-6{:title => "Create a user email for your account."}
+        = f.text_field :email, class: 'form-control', placeholder: 'Email', required: true
+
+    - unless params[:action] == "edit" || params[:action] == "update"
+      .form-group
+        = f.label :password,"Password:", class: 'col-md-4 control-label'
+        .col-md-6{:title => "Create a password for your account."}
+          = f.password_field :password, class: 'form-control', placeholder: 'Password', required: true
+      .form-group
+        = f.label :password_confirmation,"Password Confirmation:", class: 'col-md-4 control-label'
+        .col-md-6{:title => "Enter a password confirmation for your account."}
+          = f.password_field :password_confirmation, class: 'form-control', placeholder: 'Password Confirmation', required: true
+
+    .form-group
+      .col-md-4.col-md-offset-4
+        %p &nbsp;
+        = f.submit 'Save', :class => 'btn btn-success center-block pull-left'
+        &nbsp;
+        = link_to 'Go back', familymembers_path, :class => 'btn btn-success center-block pull-right', style: 'color: white;'
+
+
+:javascript
+  $(function(){
+    var state_selector = '#user_profile_attributes_state';
+    var county_selector = '#user_profile_attributes_county';
+    fn_init_state_county(state_selector, county_selector);
+  });

@@ -1,0 +1,43 @@
+// Place all the styles related to the scheduling controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+#s2id_employee_calendar, #s2id_lovedone_calendar {
+  min-width: 300px !important;
+}
+
+.modal-dialog {
+  width: 30% !important;
+}
+
+.form-modal-dialog{
+  width: 50% !important;
+  margin: 30px auto;
+}
+
+.existing-modal-dialog{
+  width: 70% !important;
+  margin: 30px auto;
+}
+
+.transfer-generate-button{
+  margin-top:30px;
+}
+
+.transfer-start-padding{
+  padding-top:32px;
+}
+
+.transfer-end-padding{
+  padding-top:45px;
+}
+
+.green-color{
+  color:green;
+}
+
+.fc-highlight{
+  background-color: #3a87ad !important;
+  opacity: 0.7 !important;
+}
+

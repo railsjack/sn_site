@@ -1,0 +1,86 @@
+- if request.url.index("new") == nil
+  :javascript
+    $(function(){
+      $('#company_status').change(function(){
+        $('form').get(0).submit();
+      });
+    });
+:css
+  body .modal-dialog {
+    width: 700px;
+  }
+  .company_status {
+    width: 200px;
+    position: absolute;
+    top: 40px;
+    right: 50px;
+  }
+  .company_status > label{ width: 50px; }
+  .company_status > div{ width: 130px; }
+
+:javascript
+  $(document).on('click', 'input[id=check_both]', function(){
+    var b_flag = $(this).get(0).checked;
+    $( 'input[type=checkbox]', $(this).parents('div#contact-method')).each(function(){
+      if($(this).attr('id')!="check_both"){
+        $(this).get(0).checked = b_flag;
+      }
+    });
+  });
+  $(document).on('click', '#contact-method input[type=checkbox]', function(event){
+    var email = $('#contact-method input[type=checkbox][value=email]').get(0);
+    var text = $('#contact-method input[type=checkbox][value=text]').get(0);
+    var both = $('#contact-method input[type=checkbox][value=both]').get(0);
+    both.checked = email.checked && text.checked;
+  });
+
+
+= simple_form_for(@company, :html=>{class: "form-horizontal"}) do |f|
+  = f.error_notification
+  .form-inputs
+    = f.input :status, :collection=>Company.statuses, class:'provider-status'
+    = f.input :company_name
+    = f.input :business_name
+    = f.input :address
+    = f.input :city
+    = f.input :county
+    = f.input :state, collection: us_states
+    = f.input :zip
+    = f.input :telephone
+    = f.input :mobile_phone_number
+    = f.input :contact_last_name
+    = f.input :contact_first_name
+    .form-group
+      = f.label :contact_method, "Contact Method:", class: 'col-lg-2 control-label'
+      .col-lg-10#contact-method{:style => "margin-top: 6px;", :title => "Select how the primary contact would like to be notified.  The selections are email, text or both."}
+        - Company::contact_types.each do |a_value|
+          = f.label 'aa' do
+            = f.check_box( :contact_method, { :multiple => true}, a_value, nil)
+            = a_value.humanize
+
+          &nbsp;&nbsp;&nbsp;
+        %label
+          &nbsp;
+          %input#check_both{type:'checkbox', value:'both'} &nbsp;Both
+    = f.input :provider_type, collection: Company::provider_types.compact.reject{|i| i[0].blank? }
+    = f.input :email
+    = f.input :get_notification
+    = f.input :latitude
+    = f.input :longitude
+  .form-actions
+    = f.button :submit, class:'btn btn-success'
+    - unless f.object.id==nil
+      %input{type:'hidden', id:'headtype', value:'true'}
+      %a.btn.btn-success{"data-target" => "#myModal", "data-toggle" => "modal"} View employees
+      #myModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+        .modal-dialog
+          .modal-content
+            .modal-header
+              %button.close{"data-dismiss" => "modal", :type => "button"}
+                %span{"aria-hidden" => "true"} ×
+                %span.sr-only Close
+              %h4#myModalLabel.modal-title=raw "Employees for <strong>#{f.object.company_name}</strong>" 
+            .modal-body
+              %iframe{src: company_employees_path(f.object)+"?nohead=true", width: '100%', height: '500', frameborder: 0}
+            .modal-footer
+              %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Close

@@ -1,0 +1,23 @@
+.container
+  .row
+    .col-md-offset-2.col-md-8
+      .page-header
+        %h3
+          Import Loved Ones
+      = form_tag import_lovedones_post_path, method: :post, multipart: true, class: 'csv-form' do
+        .form-group
+          %label
+            Choose your csv file:
+        .form-group
+          = file_field_tag :file, class: 'csv-file form-control'
+
+        .form-group
+          %label
+            Service Providers List
+          %select.form-control.btn-sm.service-provider-list{:name => "service_provider", require: true}
+            %option{value: ''} Select Service Provider
+            - @service_providers.each do |provider|
+              %option{value: provider.id}=provider.business_name
+
+        .form-group
+          %a.btn-upload-csv.btn.btn-primary.pull-right Upload

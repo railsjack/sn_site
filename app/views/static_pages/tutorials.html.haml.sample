@@ -1,0 +1,66 @@
+:css
+	a:hover{
+		background: #fff;
+		color: green;
+	}
+
+	.selected{
+		text-decoration: underline;
+		font-weight: bold;
+	}
+
+	ul.howto{
+		margin: 0;
+		padding: 0;
+		font-size: 14pt;
+		line-height: 30px;
+		list-style-type: decimal;
+		color: #333;
+	}
+
+	ul.howto li a{
+		color: #333;
+	}
+
+	.videoUiWrapper.thumbnail{
+		background-color: black;
+		border-radius: 6px;
+	}
+
+
+:javascript
+	var video_id = "#{@video_id}";
+	$(function(){
+		$('a[selected_id='+video_id+']').addClass('selected')
+	})
+
+%link{:href => "/assets/css/video-default.css", :rel => "stylesheet"}/
+%script{:src => "/assets/js/jquery.video-ui.js", :type => "text/javascript"}
+
+.container
+	.row-fluid
+		.col-md-2.pull-left{style: "width: 350px; height: 300px;"}
+			%h3 "How To" Library
+			%ul.howto
+				%li=link_to 'Use the App', tutorials_with_id_path('116984198'), :selected_id=>1
+				%li=link_to 'Add/Modify/Delete an Employee', tutorials_with_id_path('116984195'), :selected_id=>5
+				%li=link_to "See an Employee's Location", tutorials_with_id_path('117139964'), :selected_id=>2
+				%li=link_to 'See an Employee and Loved One Interaction', tutorials_with_id_path('116984192'), :selected_id=>3
+				%li=link_to 'Send Notifications Administratively', tutorials_with_id_path('116984194'), :selected_id=>4
+				%li=link_to 'Generate a Report', tutorials_with_id_path('117136300'), :selected_id=>6
+		.col-md-8.pull-left
+			.row
+				.col-md-offset-1.col-md-10
+					.videoUiWrapper.thumbnail{style: "min-height: 480px; min-width: 640px;"}
+						- unless @video_id.nil?
+							%iframe{:allowfullscreen => "", :frameborder => "0", :height => "480", :mozallowfullscreen => "", :src => "//player.vimeo.com/video/"+@video_id+"?autoplay=1", :webkitallowfullscreen => "", :width => "640"}
+
+		:javascript
+			if(false) $('.demo1').each(function(){
+				var id = $(this).attr('id');
+				$('#'+id).videoUI({
+					'playMedia':true,
+					'autoHide':false,
+					'volumeMedia': 1
+				});
+			});

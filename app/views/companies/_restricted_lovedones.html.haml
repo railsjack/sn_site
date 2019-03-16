@@ -1,0 +1,8 @@
+- if object.assigned_lovedones.count > 0
+  .scroll
+    - object.assigned_lovedones.order('last_name ASC').each do |lovedone|
+      = lovedone.name
+      = link_to '', employee_lovedone_path(lovedone.id, employee_id: object.id, company_id: object.company.id), method: :delete, data: { confirm: 'Are you sure?' }, class: 'glyphicon glyphicon-remove'
+      %br
+- else
+  .no-result This employee currently has no restrictions and has full access to all loved ones.

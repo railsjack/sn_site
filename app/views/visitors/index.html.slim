@@ -1,0 +1,8 @@
+- if current_user
+  h3 class="text-center"
+    - if current_user.provider?
+      = "Welcome #{@company.business_name}"
+    - elsif current_user.employee?
+      = "Welcome #{current_user.employee.first_name}"
+  - if current_user.company && current_user.company.pending?
+    = "Your account is not yet approved by Administrator. Please #{link_to 'Sign in', new_user_session_path} after few days."

@@ -1,0 +1,128 @@
+:javascript
+	$(document).ready(function() {
+		$(".tel").inputmask("(999) 999-9999").blur(function(e) {
+			if ($(e.target).val() === "(___) ___-____") {
+				$(e.target).val("");
+			}
+		});
+
+		$('input:checkbox[value=email]').click(function() {
+			email_check_verify(this)
+		});
+
+		$('input:checkbox[value=text]').click(function() {
+			tel_check_verify(this)
+		});
+
+		$('#company_zone_notification_attributes_early_arrival_status_false').click(function() {
+			early_arrival_status_off(this)
+		});
+
+		$('#company_zone_notification_attributes_early_arrival_status_true').click(function() {
+			early_arrival_status_on(this)
+		});
+
+
+		email_check_verify($('input:checkbox[value=email]'));
+		tel_check_verify($('input:checkbox[value=text]'));
+		early_arrival_status_off($('#company_zone_notification_attributes_early_arrival_status_false'))
+	});
+
+	function email_check_verify(object){
+		  var $this = $(object);
+		  if ($this.is(':checked')) {
+			  document.getElementById("company_zone_notification_attributes_email").readOnly = false;
+		  } else {
+			  document.getElementById("company_zone_notification_attributes_email").readOnly = true;
+		  }
+	}
+	function tel_check_verify(object){
+		  var $this = $(object);
+		  if ($this.is(':checked')) {
+			  document.getElementById("company_zone_notification_attributes_phone_number").readOnly = false;
+		  } else {
+			  document.getElementById("company_zone_notification_attributes_phone_number").readOnly = true;
+		  }
+	}
+	function early_arrival_status_off(object){
+		var $this = $(object);
+		if ($this.is(':checked')){
+			$("#early_arrival_check").addClass('hidden');
+		} else {
+			$("#early_arrival_check").removeClass('hidden');
+		}
+	}
+	function early_arrival_status_on(object){
+		var $this = $(object);
+		if ($this.is(':checked')){
+			$("#early_arrival_check").removeClass('hidden');
+		} else {
+			$("#early_arrival_check").addClass('hidden');
+		}
+	}
+
+.well
+	%h4.text-center
+		%label Early Arrival Notification & Departure Reminder Settings
+
+
+= simple_form_for(@company, url: update_notification_companymember_path(@company_member), method: :post, html: {class: "form-horizontal"}) do |c|
+	= c.fields_for :zone_notification do |f|
+		.well.col-md-6.zone-min-height
+			%h4.text-center{style: 'color:green;'}
+				%b Early Arrival Notification
+			%hr
+			.form-group
+				= f.label :early_arrival_status, 'System Status:', class: 'col-lg-4 control-label'
+				.col-lg-6
+					= f.radio_button :early_arrival_status, true, checked: true, value: true
+					= f.label :early_arrival_status, 'On', class: 'status-alignment'
+
+					= f.radio_button :early_arrival_status, false, value: false
+					= f.label :early_arrival_status, 'Off'
+
+			#early_arrival_check
+				.form-group
+					= f.label :contact_method, "Contact Method:", class: 'col-lg-4 control-label'
+					.col-lg-10
+					- ZoneNotification::contact_types.each do |type|
+						%span.arrival-margin
+						= f.check_box( :contact_method, {multiple: true}, type, '')
+						= type.humanize
+				.form-group.notification-email
+					= f.label :email, 'Email:', class: 'col-lg-4 control-label'
+					.col-lg-6
+						= f.input :email, label: false, readonly: true
+				.form-group.notification-phone-number
+					= f.label :phone_number, 'Phone Number:', class: 'col-lg-4 control-label'
+					.col-lg-6
+						= f.input :phone_number, label: false, readonly: true
+
+		.well.col-md-6.zone-min-height
+			%h4.text-center{style: 'color:green;'}
+				%b Departure Reminder
+			%hr
+			.form-group
+				= f.label :system_status, 'System Status:', class: 'col-lg-4 control-label'
+				.col-lg-6
+					= f.radio_button :system_status, true, checked: true, value: true
+					= f.label :system_status, 'On', class: 'status-alignment'
+
+					= f.radio_button :system_status, false, value: false
+					= f.label :system_status, 'Off'
+			.form-group
+				= f.label :distance_threshold, 'Distance Threshold Zone (Miles):', class: 'col-lg-4 control-label'
+				.col-lg-6
+					= f.input :distance_threshold, label: false, input_html: { min: '0'}
+			.form-group
+				= f.label :time_threshold, 'Time Threshold (Minutes):', class: 'col-lg-4 control-label'
+				.col-lg-6
+					= f.input :time_threshold, label: false, input_html: { min: '0'}
+			.form-group
+				= f.label :recurring_threshold, 'Final Time Threshold (Minutes):', class: 'col-lg-4 control-label'
+				.col-lg-6
+					= f.input :recurring_threshold, label: false, input_html: { min: '0'}
+
+
+		= f.button :submit, class: 'btn btn-success', value: 'Save'
+		= link_to 'Back', edit_companymember_path(@company_member), class: 'btn btn-success'

@@ -1,0 +1,44 @@
+.row.formreg.section.offset-header.has-pattern.box-new
+  .col-md-12
+    .container
+      .row{:style => "margin-top: 45px;"}
+        #regform.panel.panel-default.col-md-offset-3
+          %p#notice= notice
+          %p
+            %strong Lastname:
+            = @family_member.lastname
+          %p
+            %strong Firstname:
+            = @family_member.firstname
+          %p
+            %strong Email:
+            = @family_member.email
+          %p
+            %strong Mobilephone:
+            = @family_member.mobilephone
+          %p
+            %strong Contact:
+            = @family_member.contact
+          %p
+            %strong City:
+            = @family_member.city
+          %p
+            %strong County:
+            = @family_member.county
+          %p
+            %strong State:
+            = @family_member.state
+          %p
+            %strong Username:
+            = @family_member.username
+          %p
+            %strong Password:
+            = @family_member.password
+          = link_to 'Edit', edit_family_member_path(@family_member)
+          |
+          \#{link_to 'Back', family_members_path}
+          %div
+            %div
+              %div
+                %div
+                  %div

@@ -1,0 +1,43 @@
+.container
+  .panel.panel-success
+    .panel-heading
+      %h3.panel-title.pull-left
+        Messages Sent to Employees
+      = link_to 'Send New Message', new_company_company_message_path(@current_company), class: 'btn pull-right btn-sm btn-primary'
+      .clearfix
+    .panel-body
+      %table.table
+        %thead
+          %tr
+            %th{width: '20%'}
+              Date/Time
+            %th{width: '30%'}
+              Message
+            %th{width: '30%'}
+              Employees
+            %th{width: '20%'}
+              Action
+        %tbody
+          - @all_messages.each do |message|
+            %tr
+              %td= message.created_at.strftime("%m/%d/%Y %H:%M")
+              %td
+                = link_to message.message.truncate(45), "#", onclick: "showModal('#{escape_javascript(message.message)}', 'Message')"
+              %td{style:'text-indent: 30px;'}
+                - employees = []
+                - message.company_message_employees.each_with_index do |employee, index|
+                  - employees << "#{index+1}. #{employee.employee.name}"
+                = link_to employees.count, "#", onclick: "showModal('#{employees.join('<br>')}', 'Recipients') " if employees.count>0
+              %td
+                = link_to 'Delete', company_company_message_path(@current_company, message), method: :delete, data: {confirm: 'Are you sure?'}, class: 'btn btn-danger btn-xs'
+
+
+#messagesModal.modal.fade.bs-example-modal-sm{"aria-hidden" => "true", "aria-labelledby" => "mySmallModalLabel", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog.modal-sm
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h4#mySmallModalLabel.modal-title
+      .modal-body
+        \...

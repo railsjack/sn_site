@@ -1,0 +1,49 @@
+.well
+  h4.text-center
+    b Add Appointment
+    .pull-right
+      = link_to 'Back', data_uploads_path, class: 'btn btn-success'
+.well.col-md-4.col-md-offset-4
+  .form-group
+    label class= 'col-md-4 control-label' Employee:
+    .col-md-7
+      select class= "form-control" id= "new_appt_employee"
+        option value="none" Select Employee
+        - Employee.where(company_id: current_user.company.id).order('last_name ASC').each do |emp|
+          option value=emp.id
+            = emp.name
+    br
+    br
+  .form-group
+    label class= 'col-md-4 control-label' Loved One:
+    .col-md-7
+      select class= "form-control" id= "new_appt_lovedone"
+        option value="none" Select Loved One
+        - Lovedone.where(company_id: current_user.company.id).order('last_name ASC').each do |lovedone|
+          option value=lovedone.id
+            = lovedone.name
+    br
+    br
+
+  .form-group
+    label class= 'col-md-4 control-label' Date:
+    .col-md-7
+      input type="text" class= "form-control" id= "new_appt_date"
+    br
+    br
+  .form-group
+    label class= 'col-md-4 control-label' Start Time:
+    .col-md-7
+      input type="text" class= "form-control" id= "new_appt_start_datetime"
+    br
+    br
+  .form-group
+    label class= 'col-md-4 control-label' End Time:
+    .col-md-7
+      input type="text" class= "form-control" id= "new_appt_end_datetime"
+    br
+    br
+
+  hr
+  .text-center
+    button class="btn btn-success" id="new_appt_add_button" Add Appointment

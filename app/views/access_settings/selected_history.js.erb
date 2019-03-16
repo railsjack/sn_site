@@ -1,0 +1,9 @@
+$('#selectedHistoryModal #selectedHistoryContent').html("<%= escape_javascript render(partial: 'selected_history', locals: {audits: @audits}) %>");
+
+$('#selected_history_table').DataTable({
+    columns: [{ width: "8%" }, { "width": "10%" }, { "width": "8%" }, { "width": "50%" }],
+    columnDefs: [ { targets: 3, orderable: false }],
+    sScrollX: "100%",
+    sScrollXInner: "110%",
+    info: false
+});

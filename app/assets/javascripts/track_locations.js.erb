@@ -1,0 +1,216 @@
+if(window.location.href.indexOf("track_locations") > -1) {
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('.location_search:first').trigger('click');
+        }, 1000);
+
+        var company_address = document.querySelector('#company_address');
+        var company_latitude = company_address.dataset.latitude;
+        var company_longitude = company_address.dataset.longitude;
+
+        window.gm_handler = Gmaps.build('Google');
+        var default_position = {lat: company_latitude, lng: company_longitude};
+        gm_handler.buildMap({provider: {}, internal: {id: 'multi_markers'}}, function () {
+            window.markers = gm_handler.addMarkers([
+                {
+                    "lat": default_position.lat,
+                    "lng": default_position.lng
+                }
+            ]);
+            gm_handler.bounds.extendWith(window.markers);
+            gm_handler.fitMapToBounds();
+            gm_handler.map.serviceObject.setZoom(10);
+        });
+
+        $('.location_search').on('click', function () {
+            locationType = $(this).val();
+            companyId = $(this).data('id');
+            if (locationType == 'current') {
+                $('#dropdown_items').addClass('hidden');
+            } else {
+                $('#dropdown_items').removeClass('hidden');
+                $('#lovedone_location').select2("val", '-- Select Loved One --')
+            }
+            $.ajax({
+                url: '/employees/get_locations',
+                dataType: 'script',
+                type: 'GET',
+                data: {
+                    company_id: companyId,
+                    location_type: locationType
+                }
+            });
+        });
+
+        $('#lovedone_location').on('change', function () {
+            lovedoneId = $(this).val();
+            $.ajax({
+                url: '/employees/get_locations',
+                dataType: 'script',
+                type: 'GET',
+                data: {
+                    company_id: companyId,
+                    lovedone_id: lovedoneId,
+                    location_type: 'lovedone'
+                }
+            });
+        });
+
+    });
+
+    function get_icon(text, color) {
+        var icon_url = 'https://thydzik.com/thydzikGoogleMap/markerlink.php?text=' + text + '&color=' + color;
+        return icon_url
+    }
+
+    function lovedone(latitude, longitude, address, markers_data) {
+
+        $('#required_address').removeClass('hidden');
+        $('#required_address label').html(address);
+
+        clearInterval(window.interval_id);
+        default_pos = {lat: latitude, lng: longitude};
+        var latlng = new google.maps.LatLng(latitude, longitude);
+
+        gm_handler.buildMap({provider: {zoom: 10, latlng: latlng}, internal: {id: 'multi_markers'}},
+            function () {
+                if (markers_data.length > 0) {
+
+                    icon_markers = markers_data;
+
+                    marker_obj = {
+                        lat: default_pos.lat,
+                        lng: default_pos.lng,
+                        iconname: 'lovedone'
+                    };
+                    markers_data.push(marker_obj);
+
+                    markers = gm_handler.addMarkers(markers_data, {visible: true});
+                    var count_name = 0;
+                    var count_color = 0;
+                    markers.map(function (marker) {
+                        name = count_name++;
+                        color = count_color++;
+                        if (icon_markers[name].iconname == "lovedone") {
+                            marker.serviceObject.setIcon("<%= image_path 'star_on.png' %>");
+                        }
+                        else if (icon_markers[name].iconname != "lovedone") {
+                            marker.serviceObject.setIcon(get_icon(icon_markers[name].iconname, icon_markers[color].iconcolor));
+                        }
+                    });
+
+                    gm_handler.fitMapToBounds();
+                    gm_handler.map.serviceObject.setZoom(10);
+                    gm_handler.map.serviceObject.setCenter(latlng);
+                }
+            });
+    }
+
+    function update(company_id, markers_data) {
+        var url = '/companies/' + company_id + '/get_locations.json';
+        var original_zoom = gm_handler.map.serviceObject.getZoom();
+        var original_center = gm_handler.map.serviceObject.getCenter();
+        window.gm_handler.removeMarkers(markers);
+        $.get(url, function (data) {
+            markers_data = data;
+            if (markers_data.length > 0) {
+                icon_markers = markers_data;
+                markers = gm_handler.addMarkers(markers_data, {visible: true});
+                var count_icon = 0;
+                var count_color = 0;
+                markers.map(function (marker) {
+                    marker.serviceObject.setIcon(get_icon(icon_markers[count_icon++].iconname, icon_markers[count_color++].iconcolor));
+                });
+                gm_handler.bounds.extendWith(markers);
+                gm_handler.fitMapToBounds();
+                gm_handler.map.serviceObject.setZoom(original_zoom);
+                gm_handler.map.serviceObject.setCenter(original_center);
+            }
+        });
+    }
+
+    function employee_existing_location(company_id, markers_data) {
+        $('#required_address').addClass('hidden');
+        update(company_id, markers_data);
+        window.interval_id = setInterval('update(company_id, markers_data)', 10 * 1000);
+    }
+
+    function employee_base_location(markers_data, company_lat, company_lng) {
+        clearInterval(window.interval_id);
+        initMap12(markers_data, company_lat, company_lng);
+//        var latlng = new google.maps.LatLng(company_lat, company_lng);
+//
+//        gm_handler.buildMap({provider: {zoom: 10, latlng: latlng}, internal: {id: 'multi_markers'}},
+//            function () {
+//                if (markers_data.length > 0) {
+//                    icon_markers = markers_data;
+//                    console.log(icon_markers);
+//                    window.markers = gm_handler.addMarkers(markers_data, {visible: true});
+//                    var count_icon = 0;
+//                    var count_color = 0;
+//                    markers.map(function (marker) {
+//                        marker.serviceObject.setIcon(get_icon(icon_markers[count_icon++].iconname, icon_markers[count_color++].iconcolor));
+//                    });
+//                    gm_handler.bounds.extendWith(markers);
+//                    gm_handler.map.serviceObject.setZoom(10);
+//                    gm_handler.map.serviceObject.setCenter(latlng);
+//                }
+//                else{
+//                    gm_handler.map.serviceObject.setZoom(10);
+//                    gm_handler.map.serviceObject.setCenter(latlng);
+//                }
+//            });
+    }
+
+    function initMap12(markers_data, company_lat, company_lng) {
+        var latLng = new google.maps.LatLng(company_lat, company_lng);
+
+        $('#multi_markers').html('');
+        map = new google.maps.Map(document.getElementById('multi_markers'), {
+            zoom: 10,
+            center: latLng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        markers_mapping(markers_data, map)
+    }
+
+    function markers_mapping(markers_data, map){
+        $.each(markers_data, function(index, mar){
+            var homeLatLng = new google.maps.LatLng(mar.lat, mar.lng);
+            if(mar.iconcolor == 'ffffff'){
+                var label = 'label-black'
+            }
+            else{
+                var label = 'label-white'
+            }
+            var marker = new MarkerWithLabel({
+                position: homeLatLng,
+                map: map,
+                labelContent: mar.iconname,
+                labelAnchor: new google.maps.Point(8, 50),
+                labelClass: label,
+                labelInBackground: false,
+                icon: pinSymbol(mar.iconcolor)
+            });
+
+            var iw = new google.maps.InfoWindow({
+                content: mar.infowindow
+            });
+            google.maps.event.addListener(marker, "click", function (e) {
+                iw.open(map, this);
+            });
+        });
+    }
+
+    function pinSymbol(color) {
+        console.log(color)
+        return {
+            path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
+            fillColor: '#' + color,
+            fillOpacity: 1,
+            strokeColor: '#000',
+            strokeWeight: 3,
+            scale: 1.5
+        };
+    }
+}

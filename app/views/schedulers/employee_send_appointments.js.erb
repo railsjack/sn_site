@@ -1,0 +1,8 @@
+$('#employee_transfer').prop('disabled', true);
+if($('#employee_user').length < 1){
+    text = 'The appointments have been successfully transferred to the employees';
+}
+else{
+    text = 'The appointments have been successfully transferred to the employee';
+}
+setTimeout(function(){alert(text);}, 100);

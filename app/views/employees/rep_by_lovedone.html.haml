@@ -1,0 +1,128 @@
+:css
+  td{
+    height: 20px !important;
+    line-height: 10px !important;
+  }
+  a{
+    color: black!important;
+  }
+  a:visited, a:hover{
+    background: none;
+  }
+  .well{
+    background-color: white;
+    padding-top: 10px;
+    padding-bottom: 0;
+  }
+  .table .date{ width: 10% }
+  .table .number{ width: 8% }
+  .table .transported{ width: 30% }
+  .table .picked{ width: 13% }
+  .table .dropped{ width: 13% }
+  .table .total{ width: 13% }
+
+  .col-lg-10{
+    white-space: nowrap;
+    margin-bottom: 18px;
+    height: 15px;
+  }
+  .col-lg-2.control-label{
+    line-height: 33px !important;
+  }
+  .timesheet_starttime label, .notification_updated_at label{
+    line-height: 20px;
+  }
+  .simple_form.form-inline{
+    margin-bottom: 20px;
+  }
+
+.employees
+  %h3.text-center.heading
+    =@title
+    %br
+    =link_to rep_by_lovedone_url do
+      %input{type: 'checkbox', checked: true, name: 'check1'}
+      By Loved One
+    = "/"
+    =link_to rep_by_emp_url do
+      %input{type: 'checkbox', checked: false, name: 'check1'}
+      By Employee
+  
+  .container
+    .row.text-center
+      = simple_form_for(@timesheet, url: rep_by_lovedone_url, html:{class:'form-inline', method: 'get'})  do |f|
+        = f.input :starttime, label: 'From:', as: :date, default: @from
+        = f.input :endtime, label: 'To:', as: :date, default: @to
+        = f.submit "Generate Report", class: 'btn btn-primary'
+      .clear
+    - seconds_2 = 0
+    - @lovedones.each do |report|
+      .well
+        %h4=report[:lovedone_name]
+        - seconds_1 = 0
+        - seconds = 0
+        %table.table
+          %thead
+            %tr
+              - if @company.provider_type == 'Transport'
+                %th.date Date
+                -#%th.number Trip #
+                %th
+                %th.transported Driver
+                %th.picked Pick Up Time
+                %th.dropped Drop Off Time
+                %th.total Total Trip Time
+              - elsif @company.provider_type == 'Home_Health'
+                %th.date Date
+                -#%th.number Visit #
+                %th
+                %th.transported Caregiver
+                %th.picked Arrival Time
+                %th.dropped Departure Time
+                %th.total Total Visit Time
+          %tbody
+            - count = report[:lovedone_timesheets].count - 1
+            - report[:lovedone_timesheets].each_with_index do |timesheet, n|
+              - second = timesheet.endtime.to_i - timesheet.starttime.to_i
+              - second = 60 if second>0 and second<60
+              - seconds = seconds + second
+              %tr
+                %td=timesheet[:starttime].strftime('%m/%d/%Y')
+                -#%td=timesheet.trip_id
+                %td
+                %td="#{timesheet.emp_first_name} #{timesheet.emp_last_name}"
+                %td=timesheet.starttime.present? ? timesheet.starttime.strftime('%R') : ''
+                %td=timesheet.endtime.present? ? timesheet.endtime.strftime('%R') : ''
+                %td.text-center=Time.at(second).gmtime.strftime('%R')
+              - if n == count
+                %tr
+                  %td.text-right.no-border{colspan: 10} &nbsp;
+                %tr
+                  %td.text-right.no-border{colspan: 5}
+                    - if @company.provider_type == 'Transport'
+                      Total Driver Trip Time This Period
+                    - elsif @company.provider_type == 'Home_Health'
+                      Total Loved One Visit Time This Period
+                  %td.text-center.no-border=Time.at(seconds).gmtime.strftime('%R')
+                - seconds_1 = seconds_1 + seconds
+        - seconds_2 = seconds_2 + seconds_1
+    - if seconds_2>0
+      %table.table
+        %tr
+          %td.text-right
+            %strong 
+              - if @company.provider_type == 'Transport'
+                TOTAL TRIP TIME FOR THIS REPORT
+              - elsif @company.provider_type == 'Home_Health'
+                TOTAL VISIT TIME FOR THIS REPORT
+          %td.text-center
+            %strong=Time.at(seconds_2).gmtime.strftime('%R')
+    - else
+      %table.table
+        %tr
+          %td.text-center
+            - if !@init_page
+              %strong No Result
+
+
+

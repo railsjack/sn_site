@@ -1,0 +1,54 @@
+:css
+  .fixed-table-loading, .no-records-found{
+      display: none !important;
+  }
+
+:javascript
+  setInterval(function (){
+    $.ajax("#{active_lo_update_path(@company.id)}", function(response){
+    });
+  }, 10000);
+
+  $(function(){
+    $('.fixed-table-loading').hide();
+      $('.suggestion-search').keyup(function(e){
+        var key = e.target.value.toLowerCase();
+        if(key==""){
+          $('.table tr').show();
+        }
+        $('.table tr:gt(0)').each(function(){
+          if($($(this).children().get(0)).find('a').text().toLowerCase().indexOf(key)==-1){
+            $(this).hide();
+          }
+        });
+      });
+  });
+
+  $(function(){
+    $('.table th:last').remove();
+    $('.table th:last').get(0).colSpan = 2;
+    $('.table th:last').get(0).style.textAlign = 'center';
+    setTimeout(function(){
+     $('.fixed-table-loading').hide();
+    }, 100)
+  });
+
+.container
+  .row
+    .table-responsive{style: 'position: relative;'}
+      %h3.text-center Employees
+      .well
+        - if current_user.serviceprovider?
+          %div{style: "position: absolute; right: 0;"}
+            = link_to 'New Employee', new_company_employee_path+"?nohead=#{params[:nohead]}" , class: "btn btn-danger  btn-sm pull-right", style: "margin-right: 10px;"
+            = link_to 'Designations', company_designations_path+"?nohead=#{params[:nohead]}" , class: "btn btn-success  btn-sm pull-right", style: "margin-right: 10px;"
+            = link_to 'Reach Out', new_company_company_message_path(@company), class: "btn btn-success  btn-sm pull-right", style: "margin-right: 10px;"
+
+        %div
+          Search:
+          %input.suggestion-search{placeholder: "Search...", type: "text"}/
+          &nbsp;&nbsp;&nbsp; Count of Employees:
+          %span#employees=@employees.count
+
+      %div#employees_table
+        = render partial: 'company_employees_info', locals: {employees: @employees}

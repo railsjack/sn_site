@@ -1,0 +1,96 @@
+- track_link = link_to 'link', url_for(only_path: false, controller: "employees", action: "track_employee", id: @employee.id, l: @lovedone.id)
+- business_name = @employee.company.business_name
+
+-# Notification Masking
+- if @employee.company.notification_masking
+  - first_last_name = "#{@lovedone.first_name} #{@lovedone.last_name[0]}"
+- else
+  - first_last_name = "#{@lovedone.first_name} #{@lovedone.last_name}"
+
+- if @which_message == 0
+  - if @employee.company.provider_type == "Transport"
+    - if @employee.service_status == "PickUp"
+      - if @operation_mode == 'Handy'
+        %p
+          = "SAFETY NOTICE: Hello! #{business_name} has just picked up #{first_last_name}. "
+      - else
+        %p
+          SAFETY NOTICE: Hello!  By clicking on this #{track_link}, you will be able to follow #{business_name} as they transport #{first_last_name}.&nbsp;
+    - elsif @employee.service_status == "DropOff"
+      %p
+        = "SAFETY NOTICE: #{business_name} is pleased to inform you #{first_last_name} has been successfully transported to the destination.  Thank you! "
+  - elsif @employee.company.provider_type == "Home_Health"
+    - if @employee.service_status == "Arrival"
+      - if @operation_mode == 'Handy'
+        %p
+          = "SAFETY NOTICE: Hello! #{business_name} has arrived to provide services to #{first_last_name}. "
+      - else
+        %p
+          SAFETY NOTICE: Hello!  By clicking on this #{track_link}, you can confirm the arrival of #{business_name} to provide service for #{first_last_name}.&nbsp;
+    - elsif @employee.service_status == "Departure"
+      %p
+        = "SAFETY NOTICE: #{business_name} is pleased to inform you they have completed the visit with #{first_last_name}.  Thank you! "
+- elsif @which_message == 1
+  - if @employee.company.provider_type == "Transport"
+    - if @employee.service_status == "PickUp"
+      - if @operation_mode == 'Handy'
+        %p
+          = "SAFETY NOTICE: Hi! #{business_name} is now picking up #{first_last_name}. "
+      - else
+        %p
+          SAFETY NOTICE: Hi!  Click on this #{track_link} to follow #{business_name} and their transport of #{first_last_name}.&nbsp;
+    - elsif @employee.service_status == "DropOff"
+      %p
+        = "SAFETY NOTICE: #{first_last_name} has been successfully transported to the destination by #{business_name}.  Enjoy your day! "
+  - elsif @employee.company.provider_type == "Home_Health"
+    - if @employee.service_status == "Arrival"
+      - if @operation_mode == 'Handy'
+        %p
+          = "SAFETY NOTICE: Hello! #{business_name} has arrived to render services to #{first_last_name}. "
+      - else
+        %p
+          SAFETY NOTICE: Hi!  This #{track_link} will enable you to validate #{business_name} is on site granting assistance to #{first_last_name}.&nbsp;
+    - elsif @employee.service_status == "Departure"
+      %p
+        = "SAFETY NOTICE: #{first_last_name}'s visitation by #{business_name} has been successfully completed.  Enjoy your day! "
+- elsif @which_message == 2
+  - if @employee.company.provider_type == "Transport"
+    - if @employee.service_status == "PickUp"
+      - if @operation_mode == 'Handy'
+        %p
+          = "SAFETY NOTICE: Hello! #{business_name} is now transporting #{first_last_name}. "
+      - else
+        %p
+          SAFETY NOTICE: Hello!  This #{track_link} will enable you to follow #{business_name} during their transport of #{first_last_name}.&nbsp;
+    - elsif @employee.service_status == "DropOff"
+      %p
+        = "SAFETY NOTICE: #{business_name} is happy to inform you #{first_last_name} has been successfully transported. Thank you! "
+  - elsif @employee.company.provider_type == "Home_Health"
+    - if @employee.service_status == "Arrival"
+      - if @operation_mode == 'Handy'
+        %p
+          = "SAFETY NOTICE: Hi! #{business_name} is now granting assistance to #{first_last_name}. "
+      - else
+        %p
+          SAFETY NOTICE: Hello!  Click on this #{track_link} to confirm the arrival of #{business_name} to render care to #{first_last_name}.&nbsp;
+    - elsif @employee.service_status == "Departure"
+      %p
+        = "SAFETY NOTICE: #{business_name} is happy to inform you they have successfully interacted with #{first_last_name}. Thank you! "
+
+- if @which_message == 0
+  - unless @sponsor.nil?
+    %p
+      This notification has been sponsored by
+      = precede ' ' do
+        = succeed '.' do
+          %a{href: "http://#{@sponsor.website}"}= @sponsor.name
+
+- if @which_message == 1 || @which_message == 2
+  - unless @sponsor.nil?
+    %p
+      This message is proudly sponsored by
+      = precede ' ' do
+        = succeed '.' do
+          %a{href: "http://#{@sponsor.website}"}= @sponsor.name
+
+

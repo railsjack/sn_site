@@ -1,0 +1,15 @@
+var markers_data = <%= raw @hash.to_json %>;
+var company_id = <%= @company.id %>;
+var company_lat = <%= @company.latitude %>;
+var company_lng = <%= @company.longitude %>;
+
+
+<% if @lat and @lng and params[:location_type]=='lovedone' %>
+    lovedone(<%=@lat%>,<%=@lng%>,'<%=@address%>',markers_data);
+<% end %>
+
+<% if params[:location_type] == 'current' %>
+    employee_existing_location(company_id, markers_data);
+<%elsif params[:location_type] == 'base' %>
+    employee_base_location(markers_data, company_lat, company_lng);
+<% end %>

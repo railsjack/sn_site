@@ -1,0 +1,29 @@
+- if appointments.present?
+	.scroll style='max-height:200px;'
+		table#myTable.table.table-striped.table-bordered
+			thead
+				tr.bg-success
+					th Date
+					th Time
+					th Employee
+					th Loved One
+			tbody
+				- appointments.each do |appt|
+					- employee = appt.employee
+					- lovedone = appt.lovedone
+					- company = employee.company
+					tr
+						td= appt.start_time.strftime('%m/%d/%y')
+						td= appt.start_time.strftime('%H:%M')
+						td= employee.name
+						td= lovedone.name
+
+	.form-group.transfer-end-padding
+		label class='col-lg-2 control-label' Transfer:
+		.col-lg-8
+            button class='btn btn-danger' id='employee_transfer' style='margin-right: 5px !important;' To Employee
+            button class='btn btn-danger' id='lovedone_follower_transfer' To Loved One & Follower
+
+- else
+	h4
+		b.no-result No appointment exists in selected duration

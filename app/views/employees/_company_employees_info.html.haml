@@ -1,0 +1,44 @@
+%table.table.table-hover.table-bordered{"data-sort-name" => "last_name", "data-sort-order" => "asc", "data-toggle" => "table"}
+  %thead
+    %tr.bg-success
+      %th{"data-field" => "name"} Name
+      %th{"data-field" => "username"} User Name
+      %th{"data-field" => "designation"} Designation
+      %th{"data-field" => "lovedone"}
+        .col.lg-6{style:"float:left;width:50%;", "data-field" => "active"} Active Loved One
+        .col-lg-6{style:"float:left;width:50%;", "data-field" => "location"} Location
+      %th{"data-field" => "edit-link"} Action
+      %th{"data-field" => "delete-link"} Action
+  %tbody
+    - employees.each do |employee|
+      %tr
+        %td= link_to employee.name, edit_company_employee_path(employee.company, employee)
+        %td= employee.username
+        %td= employee.designation.try(:name)
+        %td
+          - if  employee.active_trips and employee.active_trips.count>0
+            - employee.active_trips.each do |active_trip|
+              .col-lg-6
+                = "#{active_trip.lovedone.last_name}, #{active_trip.lovedone.first_name} (#{active_trip.created_at.strftime("%m/%d/%Y %H:%M")})"
+              .col-lg-6
+                - latitude = active_trip.end_latitude
+                - longitude = active_trip.end_longitude
+                - count = active_trip.count
+                - if active_trip.operation_mode.nil?
+                  -#- if count == 0
+                  - if latitude and longitude
+                    - result = current_employee_address(latitude,longitude,latitude,longitude)
+                    - if result['status'] != "ZERO_RESULTS"
+                      = result['destination_addresses'].first
+                  %a{href: "https://maps.google.com?daddr=#{latitude},#{longitude}", target: "_blank"}
+                    %i.glyphicon.glyphicon-map-marker
+                - else
+                  %label Administrative
+          - else
+            &nbsp;
+        %td
+          = link_to edit_company_employee_path(employee.company, employee), class: "btn btn-success btn-xs" do
+            %i.glyphicon.glyphicon-edit  Edit
+        %td
+          = link_to company_employee_path(employee.company, employee), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-success btn-xs" do
+            %i.glyphicon.glyphicon-remove  Delete

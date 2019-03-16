@@ -1,0 +1,843 @@
+- provide(:title, "SafetyNotice.com - Communication for those who can't !")
+:css
+  h5.panel-title {
+    color: #9FC230;
+    font-size: 12pt;
+    text-indent: 20px;
+    margin-top: 10px;
+  }
+
+  .overlay {
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+  }
+
+  .required-field-error-checkboxes {
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    margin-left: 15px;
+    padding: 5px;
+    width: 300px;
+  }
+
+  #error_explanation h2 {
+    display: none;
+  }
+
+  #error_explanation ul li {
+    list-style: none;
+  }
+
+  #error_explanation ul li:before {
+    content: "- ";
+  }
+
+  .svc-provider-banner .inner {
+    border: solid 1px #73b31e;
+  }
+
+  .ui-datepicker-current {
+    display: none;
+  }
+
+  #regform textarea {
+    margin-bottom: 0;
+  }
+
+  .formreg, main, .main {
+    background: url(/bg.jpg);
+  }
+
+  .featured-svc-provider {
+    padding: 20px;
+  }
+  .featured-svc-provider ul li.active {
+    border-bottom: none;
+  }
+  .featured-svc-provider ul li.active a {
+    background-color: #d5ffc4 !important;
+  }
+  .featured-svc-provider .tab-content {
+    height: 200px;
+  }
+  .featured-svc-provider .tab-pane {
+    overflow: auto;
+    height: 100%;
+  }
+  .featured-svc-provider .selected-svc-providers ul {
+    padding: 0;
+    margin: 0;
+  }
+  .featured-svc-provider .selected-svc-providers ul li a:hover {
+    cursor: pointer;
+    background: none !important;
+  }
+  .featured-svc-provider .no-selected{
+    color: #d00;
+  }
+
+:javascript
+
+  var readyInterval;
+
+  readyInterval = 0;
+
+  window.documentReady = (function() {
+    var datastore, k;
+    $("form input").click(function() {
+      $(".tooltip").remove();
+    });
+    $("form input").each(function() {
+      $(this).attr("data-placeholder", $(this).attr("placeholder") + "");
+    });
+    $("form input").mouseover(function() {
+      $(this).attr("placeholder", "");
+    });
+    $("form input").mouseout(function() {
+      $(this).attr("placeholder", $(this).attr("data-placeholder"));
+    });
+    $(".mobile-phone-number").inputmask("(999)999-9999").blur(function(e) {
+      if ($(e.target).val() === "(___)___-____") {
+        $(e.target).val("");
+      }
+    });
+    $("[title]").tooltip({
+      position: {
+        my: "right center",
+        at: "right+5 top-5"
+      }
+    });
+    setTimeout((function() {
+      $("#user_lovedones_attributes_date_of_birth").datepicker({
+        dateFormat: "mm/dd/yy",
+        yearRange: "1900:" + (new Date()).getFullYear(),
+        changeMonth: true,
+        changeYear: true,
+        showButtonPanel: true,
+        currentText: "",
+        closeText: "Done",
+        onChangeMonthYear: function(year, month, instance) {
+          var d;
+          d = (instance.currentDay > 0 ? instance.currentDay : 1);
+          instance.input.get(0).value = month + "/" + d + "/" + year;
+        }
+      });
+      $.datepicker._selectDateOverload = $.datepicker._selectDate;
+      $.datepicker._selectDate = function(id, dateStr) {
+        var inst, target;
+        target = $(id);
+        inst = this._getInst(target[0]);
+        inst.inline = true;
+        $.datepicker._selectDateOverload(id, dateStr);
+        inst.inline = false;
+        this._updateDatepicker(inst);
+      };
+      jQuery.datepicker._hideDatepickerEx = jQuery.datepicker._hideDatepicker;
+    }), 500);
+    $("#user_lovedones_attributes_date_of_birth").keypress(function(event) {
+      event.preventDefault();
+    });
+    $("form").submit(function() {
+      var datastore, r, s;
+      datastore = {};
+      $("form input[type=text], form input[type=password], form input[type=radio], form input[type=checkbox], form input[type=hidden], form select").each(function() {
+        var id, val;
+        id = $(this).attr("id");
+        if (id !== "") {
+          if ($(this).attr("type") === "checkbox") {
+            if ($(this).prop("checked")) {
+              val = $(this).val();
+              datastore[id] = val;
+            }
+          } else if ($(this).attr("type") === "radio") {
+            if ($(this).prop("checked")) {
+              val = $(this).val();
+              datastore[id] = val;
+            }
+          } else {
+            val = $(this).val();
+            datastore[id] = val;
+          }
+        }
+      });
+      $.cookie("datastore", JSON.stringify(datastore));
+      if ($("input[name='selected_providers']").size() > 0) {
+        s = "";
+        r = [];
+        $(".selected-svc-providers ul li").each(function() {
+          r.push($(this).attr("data-id"));
+        });
+        s = r.join(",");
+        $("input[name='selected_providers']").val(s);
+      }
+      return 0;
+    });
+    if ($(".post-mode").text() === "true") {
+      datastore = JSON.parse($.cookie("datastore"));
+      for (k in datastore) {
+        if ($("#" + k).prop("type") === "checkbox") {
+          $("#" + k).prop("checked", true);
+          continue;
+        }
+        if ($("#" + k).prop("type") === "radio") {
+          $("#" + k).prop("checked", true);
+          continue;
+        }
+        if ($("#" + k).val() === "") {
+          $("#" + k).val(datastore[k]);
+        }
+      }
+    }
+    $(document).on("click", "input[id=check_both]", function() {
+      var b_flag;
+      b_flag = $(this).get(0).checked;
+      $("input[type=checkbox]", $(this).parents("div#contact-method")).each(function() {
+        if ($(this).attr("id") !== "check_both") {
+          $(this).get(0).checked = b_flag;
+        }
+      });
+    });
+    $(document).on("click", "#contact-method input[type=checkbox]", function(event) {
+      var both, email, text;
+      email = $("#contact-method input[type=checkbox][value=email]").get(0);
+      text = $("#contact-method input[type=checkbox][value=text]").get(0);
+      both = $("#contact-method input[type=checkbox][value=both]").get(0);
+      both.checked = email.checked && text.checked;
+    });
+    $(".form-group > label").each(function() {
+      if ($(this).attr("required") === "required" || $("input[required]", $(this).next()).size() > 0 || $("select[required]", $(this).next()).size() > 0) {
+        $(this).text($(this).text() + " *");
+      }
+    });
+    $("form input[type=submit]").unbind("click").click(function(e) {
+      var matched;
+      matched = false;
+      $("form input[required], form select[required]").each(function() {
+        var patt_email, v;
+        if ($(this).val() === "") {
+          matched = true;
+          $(this).addClass("required-field-error");
+        } else {
+          if ($(this).prop("id") === "user_profile_attributes_phone_number") {
+            v = $(this).val().replace(/[^\d]/g, "") + "";
+            if (v.length !== 10) {
+              $(this).addClass("required-field-error");
+              matched = true;
+            } else {
+              $(this).removeClass("required-field-error");
+            }
+          } else {
+            if ($(this).attr("id").indexOf("email") > -1) {
+              patt_email = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+              v = $(this).val();
+              if (patt_email.test(v)) {
+                $(this).removeClass("required-field-error");
+              } else {
+                $(this).parent().attr("data-original-title", "Please enter the valid email address.");
+                $(this).addClass("required-field-error");
+                matched = true;
+              }
+            } else {
+              $(this).removeClass("required-field-error");
+            }
+          }
+        }
+      });
+      $("#contact-method").removeClass("required-field-error-checkboxes");
+      $("#contact-method").removeClass("required-field-error");
+      if ($("#user_profile_attributes_contact_method_email").size() > 0) {
+        if (!$("#user_profile_attributes_contact_method_email").prop("checked") && !$("#user_profile_attributes_contact_method_text").prop("checked")) {
+          $("#contact-method").addClass("required-field-error required-field-error-checkboxes");
+          matched = true;
+        }
+      }
+      $("#gender").removeClass("required-field-error-checkboxes");
+      $("#gender").removeClass("required-field-error");
+      if ($("#user_lovedones_attributes_gender_true").size() > 0) {
+        if (!$("#user_lovedones_attributes_gender_true").prop("checked") && !$("#user_lovedones_attributes_gender_false").prop("checked")) {
+          $("#gender").addClass("required-field-error required-field-error-checkboxes");
+          matched = true;
+        }
+      }
+      if ($("#user_company_attributes_contact_method_email").size() > 0) {
+        if (!$("#user_company_attributes_contact_method_email").prop("checked") && !$("#user_company_attributes_contact_method_text").prop("checked")) {
+          $("#contact-method").addClass("required-field-error required-field-error-checkboxes");
+          matched = true;
+        }
+      }
+      if ($("#user_password").size() > 0) {
+        if ($("#user_password").val() !== "" && $("#user_password").val() !== $("#user_password_confirmation").val()) {
+          $("#user_password, #user_password_confirmation").addClass("required-field-error");
+          $("#user_password").parent().attr("data-original-title", "The password should be same to the password confirmation.");
+          matched = true;
+        }
+      }
+      if ($("#user_terms").size() > 0) {
+        if (!$("#user_terms").prop("checked")) {
+          $("#user_terms").parent().parent().addClass("required-field-error").addClass("required-field-error-checkboxes");
+          matched = true;
+        }
+      }
+      if (matched) {
+        $("html").animate({
+          scrollTop: $(".required-field-error:first").offset().top * 1 - 300
+        }, 400, function() {
+          $(".tooltip").hide();
+          $(".required-field-error:first").focus();
+        });
+      }
+      return !matched;
+    });
+  });
+
+  $(function() {
+    documentReady();
+    $(document).on("click", '.featured-svc-providers a.select', function() {
+      var data_id, html;
+      data_id = $(this).attr('data-id');
+      if ($(".selected-svc-providers ul li[data-id='" + data_id + "']").size() > 0) {
+        return;
+      }
+      html = "<li data-id='" + data_id + "'> <a data-id='" + data_id + "' class='remove-provider'><i class='glyphicon glyphicon-remove'></i></a>&nbsp;" + [$(this).attr('data-company-name'), $(this).attr('data-city-name'), $(this).attr('data-state-name')].join(',&nbsp;') + "</li>";
+      $('.selected-svc-providers ul').append(html);
+      check_selected_provider();
+    });
+    $(document).on("click", ".selected-svc-providers a.remove-provider", function() {
+      var data_id;
+      data_id = $(this).attr('data-id');
+      $(this).parent().remove();
+      $("td a[data-id='" + data_id + "']").html($("td a[data-id='" + data_id + "']").text());
+      check_selected_provider();
+    });
+    check_selected_provider();
+    return setTimeout(function() {
+      return $('th').click(function() {
+        return $('.suggestion-search').trigger('keyup');
+      });
+    }, 1000);
+  });
+
+  window.check_selected_provider = function(){
+    if($('.selected-svc-providers ul li[data-id]').size()>0){
+      $('.selected-svc-providers ul li.no-selected').hide();
+    }else{
+      $('.selected-svc-providers ul li.no-selected').show();
+    }
+  };
+
+  window.stringSorter = function(a, b) {
+    if (stripTags(a.toLowerCase()) < stripTags(b.toLowerCase())) {
+      return -1;
+    } else {
+      return 1;
+    }
+  };
+
+  window.numberSorter = function(a, b) {
+    if (a < b) {
+      return -1;
+    } else {
+      return 1;
+    }
+  };
+
+  window.stripTags = function(html) {
+    return $.trim($("<p>" + html + "</P>").text());
+  };
+
+
+.overlay{style: 'display: none;'}
+.post-mode.hidden=@post_method
+.row.formreg.section.offset-header.has-pattern.box-new
+  .col-md-12
+    .container
+      .row
+        #regform.panel.panel-default{style:"width: 700px; margin: 0 auto;"}
+          - if params[:query] == "user"
+            :javascript
+              $(function(){
+
+                var state_selector = '#user_lovedones_attributes_state';
+                var county_selector = '#user_lovedones_attributes_county';
+                fn_init_state_county(state_selector, county_selector);
+
+                state_selector = '#user_profile_attributes_state';
+                county_selector = '#user_profile_attributes_county';
+                fn_init_state_county(state_selector, county_selector);
+
+              });
+            = form_for(resource, :as => resource_name, :url => registration_path(resource_name) + "?query=user", :html => { :role => 'form', :class => 'form-horizontal'}) do |f|
+              = devise_error_messages!
+              - resource.lovedones || resource.build_lovedones
+              = f.fields_for :lovedones_attributes do |lovedone_form|
+                %h3 Loved Ones
+                %h4 Step 1 - General Information
+                %p This is the enrollment section for loved ones.  The information is typically entered for your loved one by a family member or guardian.
+                %hr/
+                .form-group
+                  = lovedone_form.label :last_name, 'Last Name:', class: 'col-md-4 control-label'
+                  .col-md-6{}
+                    = lovedone_form.text_field :last_name, class: 'form-control', placeholder: 'Last Name',:title => "Enter the loved one's last name.", required: true
+                .form-group
+                  = lovedone_form.label :first_name, 'First Name:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the loved one's first name."}
+                    = lovedone_form.text_field :first_name, class: 'form-control', placeholder: 'First Name', required: true
+                .form-group
+                  = lovedone_form.label :middle_initial, 'Middle Initial:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the loved one's middle initial."}
+                    = lovedone_form.text_field :middle_initial, class: 'form-control', placeholder: 'Middle initial'
+                .form-group
+                  = lovedone_form.label :date_of_birth, 'Date of Birth:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "This date is used to distinguish two people with the same name."}
+                    = lovedone_form.text_field :date_of_birth, class: 'form-control date-of-birth', placeholder: 'Date of Birth', required: true
+                .form-group
+                  = lovedone_form.label :gender, 'Gender:', class: 'col-md-4 control-label', required: true
+                  .col-md-6#gender{:style => "margin-top: 6px;", :title => "Check the appropriate box for the loved one's gender.  This information is also used to distinguish two people with the same name."}
+                    %label
+                      Male #{lovedone_form.radio_button :gender, true}
+                    %label{:style => "margin-left: 20px;"}
+                      Female #{lovedone_form.radio_button :gender, false}
+                .form-group
+                  = lovedone_form.label :apt_unit, "Apartment/Unit#:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the apartment/unit number where the loved one currently resides. This information is also used to distinguish two people with the same name."}
+                    = lovedone_form.text_field :apt_unit, class: 'form-control', placeholder: 'Apartment/Unit#', required: true
+                .form-group
+                  = lovedone_form.label :street, "Street:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the street where the loved one currently resides. This information is also used to distinguish two people with the same name."}
+                    = lovedone_form.text_field :street, class: 'form-control', placeholder: 'Street', required: true
+                .form-group
+                  = lovedone_form.label :state,"State:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the state where the loved one currently resides.  This information is also used to distinguish two people with the same name."}
+                    = lovedone_form.select :state, options_for_select(us_states, ""), {}, { :class => 'form-control' , required: true}
+                .form-group
+                  = lovedone_form.label :county,"County:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the county where the loved one currently resides. This information is also used to distinguish two people with the same name."}
+                    = lovedone_form.select :county, [], {}, { :class => 'form-control' , required: true}
+                    /= lovedone_form.text_field :county, class: 'form-control', placeholder: 'County', required: true
+                .form-group
+                  = lovedone_form.label :city,"City:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the city where the loved one currently resides. This information is also used to distinguish two people with the same name."}
+                    = lovedone_form.text_field :city, class: 'form-control', placeholder: 'City', required: true
+                .form-group
+                  = lovedone_form.label :zip_code, "Zip Code:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the zip code where the loved one currently resides. This information is also used to distinguish two people with the same name."}
+                    = lovedone_form.text_field :zip_code, class: 'form-control', placeholder: 'Zip Code', required: true
+
+              %p &nbsp;
+              - resource.profile || resource.build_profile
+              = f.fields_for :profile do |profile_form|
+                %h4 Step 2 - Primary Contact Information
+                %p Each loved one must have a primary contact.  The individual enrolling the loved one is typically the primary contact.  The primary contact may be changed at any time. Please enter the primary contact’s information below for this loved one.
+                %hr/
+                .form-group
+                  = profile_form.label :last_name, 'Last Name:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the primary contact's last name."}
+                    = profile_form.text_field :last_name, class: 'form-control', placeholder: 'Last Name', required: true
+                .form-group
+                  = profile_form.label :first_name, 'First Name:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the primary contact's first name."}
+                    = profile_form.text_field :first_name, class: 'form-control', placeholder: 'First Name', required: true
+                .form-group
+                  = profile_form.label :phone_number, 'Mobile Phone Number:', class: 'col-md-4 control-label'
+
+                  .col-md-6{:title => "If the primary contact chooses to be notified by text message, this is the phone number where notifications will be sent."}
+                    = profile_form.text_field :phone_number, class: 'form-control mobile-phone-number', placeholder: 'Mobile Phone Number', required: true
+                .form-group
+                  = profile_form.label :contact_method, "Contact Method:", class: 'col-md-4 control-label', required: true
+                  .col-md-6#contact-method{:style => "margin-top: 6px;", :title => "Select how the primary contact would like to be notified.  The selections are email, text or both."}
+                    - Profile::contact_types.each do |a_value|
+                      = profile_form.check_box( :contact_method, { :multiple => true}, a_value, nil)
+                      = profile_form.label a_value
+                      &nbsp;&nbsp;&nbsp;
+                    %label
+                      &nbsp;
+                      %input#check_both{type:'checkbox', value:'both'} &nbsp;Both
+                .form-group
+                  = profile_form.label :state,"State:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the state where the primary contact currently resides.  This information is also used to distinguish two people with the same name."}
+                    = profile_form.select :state, options_for_select(us_states, ""), {}, { :class => 'form-control', required: true }
+                .form-group
+                  = profile_form.label :county, 'County:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the county where the primary contact currently resides. This information is also used to distinguish two people with the same name."}
+                    = profile_form.select :county, [], {}, { :class => 'form-control', required: true }
+                .form-group
+                  = profile_form.label :city, 'City:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the city where the primary contact currently resides. This information is also used to distinguish two people with the same name."}
+                    = profile_form.text_field :city, class: 'form-control', placeholder: 'City', required: true
+                .panel.panel-default
+                  .form-group{style: 'padding-top: 10px;'}
+                    = f.label :email,"Email:", class: 'col-md-4 control-label'
+                    .col-md-6{:title => "Create a user email for the primary contact's account. If the primary contact chooses to be notified by email, this is the address where notifications will be sent."}
+                      = f.text_field :email, class: 'form-control', placeholder: 'Email', required: true
+                  .form-group
+                    = f.label :password,"Password:", class: 'col-md-4 control-label'
+                    .col-md-6{:title => "Create a password for the primary contact."}
+                      = f.password_field :password, class: 'form-control', placeholder: 'Password', required: true
+                  .form-group
+                    = f.label :password_confirmation,"Password Confirmation:", class: 'col-md-4 control-label'
+                    .col-md-6{:title => "Enter a password confirmation for the primary contact."}
+                      = f.password_field :password_confirmation, class: 'form-control', placeholder: 'Password Confirmation', required: true
+                  .form-group
+                    .col-md-6.col-md-offset-4
+                      %span.text-danger (Minimum is 8 characters.)
+
+                %p &nbsp;
+                %h4 Step 3 - User Agreement
+                %p Safety Notice users must agree to the license terms in order to participate in the service.  
+
+                .form-group
+                  = render "popups/user_terms_conditions"
+                  .text-left{style: 'margin-top: 10px;', title: "You should accept these terms in order to finish this form."}
+                    %label= f.check_box :terms
+                    \&nbsp; I accept these Terms & Conditions
+
+                %p &nbsp;
+                %h4 Step 4 - Invitations For Linking to the Loved One
+                %p Here is where the primary contact can invite family members and/or friends to follow this loved one.   All that is required to send an invitation is to enter the recipient’s email address in the space provided.   Up to four invitations can be sent at once.  If additional invitations are desired, the primary contact must login after the enrollment process to send out supplemental invitations.  The primary contact is encouraged to invite family members now, but it is not required to complete the enrollment process.
+                %p &nbsp;
+                .form-group
+                  %label.col-md-4.control-label{for: "invitation_email"} Invitation Email:
+                  .col-md-6{title: "Invitation Email 1"}
+                    %input#invitation_email1.form-control{name: "user[invites][][email]", placeholder: "Invitation Email 1", type: "text", value: ""}/
+                .form-group
+                  %label.col-md-4.control-label{for: "invitation_email"} Invitation Email:
+                  .col-md-6{title: "Invitation Email 2"}
+                    %input#invitation_email2.form-control{name: "user[invites][][email]", placeholder: "Invitation Email 2", type: "text", value: ""}/
+                .form-group
+                  %label.col-md-4.control-label{for: "invitation_email"} Invitation Email:
+                  .col-md-6{title: "Invitation Email 3"}
+                    %input#invitation_email3.form-control{name: "user[invites][][email]", placeholder: "Invitation Email 3", type: "text", value: ""}/
+                .form-group
+                  %label.col-md-4.control-label{for: "invitation_email"} Invitation Email:
+                  .col-md-6{title: "Invitation Email 4"}
+                    %input#invitation_email4.form-control{name: "user[invites][][email]", placeholder: "Invitation Email 4", type: "text", value: ""}/
+                %p &nbsp;
+                %h4 Step 5 –  Service Provider Linking
+                %p Most loved ones currently have service providers they are accustomed to dealing with.   This step is where a primary contact can search the Safety Notice database of service providers and link them to a loved one.  Once the link is accomplished, the loved one’s name will become active in the service provider’s client list.  Up to five service providers can be linked to a love one in this step. This step is encouraged, but not required to complete the enrollment process.
+
+                %p Please note that there are separate tabs for home health agencies and transportation companies.  Simply click on the appropriate tab for a current list of the respective service providers in the category.  
+
+                %p Once a service provider is selected, it will appear under the “Selected Service Providers” label.    To remove a provider from the selected list, click the “X” next to the provider’s name.
+
+                %p If a service provider’s name and proper office location is not found in the database, Step 6 can be used to refer service providers to Safety Notice for future participation.
+
+                /- if !@featured_companies.nil? && @featured_companies.count>0
+                /  %p &nbsp;
+                /  .row-fluid
+                /    - @featured_companies.all.shuffle[0,3].each do |company|
+                /      .col-md-4.svc-provider-banner
+                /        .inner.text-center
+                /          = image_tag company.picture(:medium), class:'img-thumbnail img-rounded'
+                /    .clearfix
+
+                %p &nbsp;
+                .row-fluid
+                - if !@sponsors_ads.nil? && @sponsors_ads.count>0
+                  - @sponsors_ads.all.shuffle[0,3].each do |sponsor|
+                    .col-md-4.svc-provider-banner
+                      .inner.text-center
+                        = image_tag sponsor.picture(:medium), class:'img-thumbnail img-rounded'
+                - (3-@sponsors_ads.count).times do 
+                  .col-md-4.svc-provider-banner
+                    .inner.text-center
+                      = image_tag '/images/missing.png', class:'img-thumbnail img-rounded'
+                .clearfix
+
+                %p &nbsp;
+                .panel.panel-default.featured-svc-provider
+                  .form-group
+                    %h4.panel-title Service Providers
+                    %p &nbsp;
+
+                    %ul#tabs.nav.nav-tabs{"data-tabs" => "tabs"}
+                      %li.active
+                        %a{"data-toggle" => "tab", :href => "#home_health"} &nbsp;Home Health&nbsp;
+                      %li
+                        %a{"data-toggle" => "tab", :href => "#transport"} &nbsp;Transport&nbsp;
+
+                    .tab-content.panel.panel-default
+                      #home_health.tab-pane.active{style: "padding: 10px;", class: "o-#{@home_healths.object_id}"}
+                        = render 'providers', {providers: @home_healths}
+                      #transport.tab-pane{style: "padding: 10px;", class: "o-#{@transports.object_id}"}
+                        = render 'providers', {providers: @transports}
+
+                    .selected-svc-providers
+                      %input{name: 'selected_providers', type: 'hidden', value: ''}
+                      %h5 Selected Service Providers:
+                      %ul
+                        %li.no-selected No service providers have been selected for linking.
+                %p &nbsp;
+                %h4 Step 6 -  Service Provider Referrals
+                %p If a service provider’s name is not found in Step 5, this is where a primary contact sends the names of the loved one’s favorite providers to Safety Notice.  Once a referral is received, they will be invited participate in the service.  The primary contact is encouraged to refer service providers here, but it is not required to complete the enrollment process.
+                = f.fields_for :leads do |lead_form|
+                  .panel.panel-default
+                    .form-group
+                      %h5.panel-title Referral 1
+                      %label.col-md-4.control-label{for: "user_leads_company_name"} Company Name:
+                      .col-md-6{title: "Enter the company name."}
+                        %input#user_leads_company_name.form-control{name: "user[leads][][company_name]", placeholder: "Company Name", type: "text"}/
+                    .form-group
+                      %label.col-md-4.control-label{for: "user_leads_phone_number"} Company Phone Number:
+                      .col-md-6{title: "Enter the phone number for the company."}
+                        %input#user_leads_phone_number.form-control.mobile-phone-number{name: "user[leads][][phone_number]", placeholder: "Company Phone Number", type: "text"}/
+                  .panel.panel-default
+                    .form-group
+                      %h5.panel-title Referral 2
+                      %label.col-md-4.control-label{for: "user_leads_company_name"} Company Name:
+                      .col-md-6{title: "Enter the company name."}
+                        %input#user_leads_company_name.form-control{name: "user[leads][][company_name]", placeholder: "Company Name", type: "text"}/
+                    .form-group
+                      %label.col-md-4.control-label{for: "user_leads_phone_number"} Company Phone Number:
+                      .col-md-6{title: "Enter the phone number for the company."}
+                        %input#user_leads_phone_number.form-control.mobile-phone-number{name: "user[leads][][phone_number]", placeholder: "Company Phone Number", type: "text"}/
+                  .panel.panel-default
+                    .form-group
+                      %h5.panel-title Referral 3
+                      %label.col-md-4.control-label{for: "user_leads_company_name"} Company Name:
+                      .col-md-6{title: "Enter the company name."}
+                        %input#user_leads_company_name.form-control{name: "user[leads][][company_name]", placeholder: "Company Name", type: "text"}/
+                    .form-group
+                      %label.col-md-4.control-label{for: "user_leads_phone_number"} Company Phone Number:
+                      .col-md-6{title: "Enter the company phone number."}
+                        %input#user_leads_phone_number.form-control.mobile-phone-number{name: "user[leads][][phone_number]", placeholder: "Company Phone Number", type: "text"}/
+
+
+                %p &nbsp;
+                .panel.panel-default{style:"padding: 7px; color: #d00;"}
+                  NOTICE: AFTER CLICKING THE FINISH BUTTON BELOW, AN EMAIL WILL BE SENT TO THE
+                  PRIMARY CONTACT.   IT WILL CONTAIN A LINK NECESSARY TO CONFIRM THE ACCOUNT’S
+                  CREATION AND COMPLETE THE ENROLLMENT PROCESS.  IF THE EMAIL IS NOT RECEIVED
+                  PROMPTLY, IT MAY HAVE BEEN ROUTED INTO A SPAM FOLDER.
+                %p &nbsp;
+                = f.submit 'CLICK HERE TO FINISH', :class => 'btn btn-success center-block'
+
+
+
+          - if params[:query] == "serviceprovider"
+            :javascript
+              $(function(){
+
+                var state_selector = '#user_company_attributes_state';
+                var county_selector = '#user_company_attributes_county';
+                fn_init_state_county(state_selector, county_selector);
+
+              });
+            - @company = resource.company || resource.build_company
+            - resource.profile || resource.build_profile
+            = form_for(resource, :as => resource_name, :url => registration_path(resource_name) + "?query=serviceprovider", :html => { :role => 'form', :class => 'form-horizontal'}) do |f|
+              %h3 Service Providers
+              %h4 Step 1 - General Information
+              
+              %p This is the enrollment section for providers rendering services to seniors, handicapped individuals and those with special needs.  If the company has more than one location that wishes to participate in Safety Notice, each office MUST be entered separately.
+
+              = devise_error_messages!
+              %br/
+              = f.fields_for :company, @company do |company_form|
+                .form-group
+                  = company_form.label :company_name, "Company Name", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the company name."}
+                    = company_form.text_field :company_name, class: 'form-control', placeholder: 'Company Name', required: true
+                .form-group
+                  = company_form.label :business_name, "Business Name", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the business name (even if it is same as the company name)."}
+                    = company_form.text_field :business_name, class: 'form-control', placeholder: 'Business Name', required: true
+                .form-group
+                  = company_form.label :address, 'Address', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the physical address of the business."}
+                    = company_form.text_field :address, class: 'form-control', placeholder: 'Address', required: true
+
+
+                .form-group
+                  = company_form.label :state,"State:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the state where the business is located."}
+                    = company_form.select :state, options_for_select(us_states, ""), {}, { :class => 'form-control' , required: true}
+
+                .form-group
+                  = company_form.label :county,"County:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the city where the business is located."}
+                    = company_form.select :county, [], {}, { :class => 'form-control' , required: true}
+                    /= lovedone_form.text_field :county, class: 'form-control', placeholder: 'County', required: true
+
+                .form-group
+                  = company_form.label :city, class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the city where the business is located."}
+                    = company_form.text_field :city, class: 'form-control', placeholder: 'City', required: true
+
+
+
+                .form-group
+                  = company_form.label :zip, class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the zip code."}
+                    = company_form.text_field :zip, class: 'form-control', placeholder: 'Zip', required: true
+                .form-group
+                  = company_form.label :telephone, 'Telephone', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the phone number for the business. "}
+                    = company_form.text_field :telephone, class: 'form-control mobile-phone-number', placeholder: 'Phone Number', required: true
+                .form-group
+                  = company_form.label :mobile_phone_number, 'Mobile Phone Number:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "If the business chooses to be notified about employee activity, this is the text message number where notifications will be sent."}
+                    = company_form.text_field :mobile_phone_number, class: 'form-control mobile-phone-number', placeholder: 'Mobile Phone Number', required: true
+
+                .form-group
+                  = company_form.label :contact_method, "Contact Method:", class: 'col-md-4 control-label', required: true
+                  .col-md-6#contact-method{:style => "margin-top: 6px;", :title => "Select how the service provider would like to be notified."}
+                    - Profile::contact_types.each do |a_value|
+                      = company_form.check_box( :contact_method, { :multiple => true}, a_value, nil)
+                      = company_form.label a_value
+                      &nbsp;&nbsp;&nbsp;
+                    %label
+                      &nbsp;
+                      %input#check_both{type:'checkbox', value:'both'} &nbsp;Both
+
+                .form-group
+                  = company_form.label :contact_last_name, 'Contact Last Name', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the Last Name of the main contact at the Business."}
+                    = company_form.text_field :contact_last_name, class: 'form-control', placeholder: 'Contact Last Name', required: true
+                .form-group
+                  = company_form.label :contact_first_name, 'Contact First Name', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the First Name of the main contact at the Business."}
+                    = company_form.text_field :contact_first_name, class: 'form-control', placeholder: 'Contact First Name', required: true
+
+                .form-group
+                  = company_form.label :provider_type, "Provider Type", class: 'col-md-4 control-label'
+                  / todo required filed with options Transport and Home_Health
+                  .col-md-6{:title => "Select the provider type for the business."}
+                    = company_form.select :provider_type, options_for_select(Company::provider_types, 'Home_Health'), {}, { :class => 'form-control', :required=>true}
+                %label{:style => "margin-left: 35px;"} Notification:  Would you like to be notified when your employees/contractors interact with a loved one?
+                .form-group
+                  %label.col-md-4.control-label
+                  .col-md-6
+                    %p
+                      = company_form.label :get_notification, "Yes", :value => "true"
+                      = company_form.radio_button :get_notification, true
+                      &nbsp;&nbsp;&nbsp;
+                      = company_form.label :get_notification, "No", :value => "false"
+                      = company_form.radio_button :get_notification, false, :checked => true
+                .panel.panel-default
+                  .form-group{style: "margin-top: 10px;"}
+                    = f.label :email, 'Email Address', class: 'col-md-4 control-label'
+                    .col-md-6{:title => "Create a user email for the service provier's account. If the business chooses to be notified about employee activity, this is the email address where notifications will be sent."}
+                      = f.text_field :email, class: 'form-control', placeholder: 'Email Address', required: true
+                  .form-group
+                    = f.label :password, 'Password', class: 'col-md-4 control-label'
+                    .col-md-6{:title => "Create a password for this account."}
+                      = f.password_field :password, class: 'form-control', placeholder: 'Password', required: true
+                  .form-group
+                    = f.label :password_confirmation, 'Password Confirmation', class: 'col-md-4 control-label'
+                    .col-md-6{:title => "Enter a password confirmation for this account"}
+                      = f.password_field :password_confirmation, class: 'form-control', placeholder: 'Password Confirmation', required: true
+                  .form-group
+                    .col-md-6.col-md-offset-4
+                      %span.text-danger (Minimum is 8 characters.)
+                %p &nbsp;
+                %h4 Step 2 - User Agreement
+                %p Safety Notice users must agree to the license terms in order to participate in the service.
+                .form-group
+                  = render "popups/provider_terms_conditions"
+                  .text-left{style: 'margin-top: 10px;', title: "You should accept these terms in order to finish this form."}
+                    %label= f.check_box :terms
+                    \&nbsp; I accept these Terms & Conditions
+                %p &nbsp;
+                .panel.panel-default{style:"padding: 7px; color: #d00;"}
+                  NOTICE: AFTER CLICKING THE FINISH BUTTON BELOW, YOUR ENROLLMENT REQUEST WILL
+                  BE FORWARDED TO US FOR APPROVAL. UPON REVIEW AND SUBSEQUENT APPROVAL, YOU
+                  WILL RECEIVE AN EMAIL VERIFYING YOUR ENROLLMENT HAS BEEN COMPLETED.  IF THE
+                  EMAIL IS NOT RECEIVED PROMPTLY, IT MAY HAVE BEEN ROUTED INTO A SPAM FOLDER.
+                %p &nbsp;
+                = f.submit 'CLICK HERE TO FINISH', :class => 'btn btn-success center-block'
+
+
+
+
+
+          - if params[:query] == "family"
+            :javascript
+              $(function(){
+                var state_selector = '#user_profile_attributes_state';
+                var county_selector = '#user_profile_attributes_county';
+                fn_init_state_county(state_selector, county_selector);
+              });
+            - resource.profile || resource.build_profile
+            = form_for(resource, :as => resource_name, :url => registration_path(resource_name) + "?query=family&invitation_id=#{params[:invitation_id]}", :html => { :role => 'form', :class => 'form-horizontal'}) do |f|
+              = devise_error_messages!
+              - lovedone_id = ''
+              - invitation_email = ''
+              - unless params[:invitation_id].nil?
+                - invitation = Invitation.where(id: params[:invitation_id]).first
+                - lovedone_id = invitation.lovedone_id unless invitation.nil?
+                - invitation_email = invitation.email unless invitation.nil?
+              %input{name: "user[lovedones_attributes][id]", type: "hidden", value: lovedone_id}/
+              = f.fields_for :profile do |profile_form|
+                %h3 Family Members and/or Guardians
+                %h4 Step 1 – General Information
+                %p This is the enrollment section for family members, guardians and friends who wish to be notified when a loved one interacts with a service provider.  Family members, guardians and friends typically set up their own profile here.
+                %hr/
+                .form-group
+                  = profile_form.label :last_name, 'Last Name:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter your last name."}
+                    = profile_form.text_field :last_name, class: 'form-control', placeholder: 'Last Name', required: true
+                .form-group
+                  = profile_form.label :first_name, 'First Name:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter your first name."}
+                    = profile_form.text_field :first_name, class: 'form-control', placeholder: 'First Name', required: true
+                .form-group
+                  = profile_form.label :phone_number, 'Mobile Phone Number:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "If you choose to be notified by text message, this is the phone number where notifications will be sent."}
+                    = profile_form.text_field :phone_number, class: 'form-control mobile-phone-number', placeholder: 'Mobile Phone Number', required: true
+                .form-group
+                  = profile_form.label :contact_method, "Contact Method:", class: 'col-md-4 control-label', required: true
+                  .col-md-6#contact-method{:style => "margin-top: 6px;", :title => "Select how you would like to be notified.  You can select email, text or both."}
+                    - Profile::contact_types.each do |a_value|
+                      = profile_form.check_box( :contact_method, { :multiple => true }, a_value, nil)
+                      = profile_form.label a_value
+                      &nbsp;&nbsp;&nbsp;
+                    %label
+                      &nbsp;
+                      %input#check_both{type:'checkbox', value: 'both'} &nbsp;Both
+                .form-group
+                  = profile_form.label :state,"State:", class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the state where you currently reside."}
+                    = profile_form.select :state, options_for_select(us_states, "All"), {}, { :class => 'form-control', required: true }
+                .form-group
+                  = profile_form.label :county, 'County:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the county where you currently reside. "}
+                    = profile_form.select :county, [], {}, { :class => 'form-control', required: true }
+                .form-group
+                  = profile_form.label :city, 'City:', class: 'col-md-4 control-label'
+                  .col-md-6{:title => "Enter the city where you currently reside. "}
+                    = profile_form.text_field :city, class: 'form-control', placeholder: 'City', required: true
+                .panel.panel-default{style: 'padding-top: 10px;'}
+                  .form-group
+                    = f.label :email,"Email:", class: 'col-md-4 control-label'
+                    .col-md-6{:title => "Create a user email for your account."}
+                      = f.text_field :email, class: 'form-control', placeholder: 'Email', required: true, value: invitation_email, readonly: !invitation_email.nil? && !invitation.blank?
+                  .form-group
+                    = f.label :password,"Password:", class: 'col-md-4 control-label'
+                    .col-md-6{:title => "Create a password for your account."}
+                      = f.password_field :password, class: 'form-control', placeholder: 'Password', required: true
+                  .form-group
+                    = f.label :password_confirmation,"Password Confirmation:", class: 'col-md-4 control-label'
+                    .col-md-6{:title => "Enter a password confirmation for your account."}
+                      = f.password_field :password_confirmation, class: 'form-control', placeholder: 'Password Confirmation', required: true
+                  .form-group
+                    .col-md-6.col-md-offset-4
+                      %span.text-danger (Minimum is 8 characters.)
+
+                %p &nbsp;
+                %h4 Step 2 – User Agreement
+                %p Safety Notice users must agree to the license terms in order to participate in the service.  
+
+                .form-group
+                  = render "popups/user_terms_conditions"
+                  .text-left{style: 'margin-top: 10px;'}
+                    %label= f.check_box :terms
+                    \&nbsp; I accept these Terms & Conditions
+
+              
+                %p &nbsp;
+                = f.submit 'CLICK HERE TO FINISH', :class => 'btn btn-success center-block'

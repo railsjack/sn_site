@@ -1,0 +1,15 @@
+= simple_form_for(@sponsor, url: update_sponsor_fees_fields_fee_path(@sponsor.id), method: :post, html: {class: "form-horizontal"}) do |s|
+  .form-group
+    = s.label :employee_notice_fee, 'Employee Fee (USD)', class: 'col-md-5 control-label'
+    .col-md-4
+      = s.input :employee_notice_status, as: :radio_buttons, label: false, item_wrapper_class: 'radio-inline'
+    .col-md-3
+      = s.input :employee_notice_fee, label: false, class: 'form-control'
+
+  .form-group
+    = s.label :transfer_fee, 'Transfer Fee (USD)', class: 'col-md-5 control-label'
+    .col-md-4
+      = s.input :transfer_status, as: :radio_buttons, label: false, item_wrapper_class: 'radio-inline'
+    .col-md-3
+      = s.input :transfer_fee, label: false, class: 'form-control'
+  = s.button :submit, class: 'btn btn-success (USD)', value: 'Save'

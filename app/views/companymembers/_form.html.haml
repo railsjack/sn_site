@@ -1,0 +1,121 @@
+- if request.url.index("new") == nil
+  :javascript
+    $(function(){
+      $('#company_status').change(function(){
+        $('form').get(0).submit();
+      });
+    });
+:javascript
+  $(function(){
+    $('#user_company_attributes_time_zone').addClass('form-control');
+    $('#user_company_attributes_time_zone').select2();
+  });
+
+
+- resource = @company_member
+- resource_name = resource.class.to_s.downcase
+- resource.company || resource.build_company
+- submit_url = companymembers_path + "?query=serviceprovider&adminmode=true"
+- if params[:action] == 'edit' || params[:action] == 'update'
+  - submit_url = companymembers_path + "/#{params[:id]}?query=serviceprovider&adminmode=true"
+= simple_form_for(resource, :as => resource_name, :url => submit_url, 
+  html: { :role => 'form', :class => 'form-horizontal', autocomplete: 'off'}) do |f|
+  %input{type: 'password', style: 'display: none;'}
+  - unless f.object.errors.messages.empty?
+    #error_explanation
+      %ul
+        - f.object.errors.messages.each do |message|
+          %li= message[0].to_s.humanize + " " + message[1][0]
+  = f.fields_for :company, :html=>{class: "form-horizontal"} do |company_form|
+    /= simple_form_for(@company_member, :html=>{class: "form-horizontal"}) do |f|
+    .form-inputs
+      - if current_user.admin?
+        = company_form.input :status, :collection=>Company.statuses, class:'provider-status'
+      .row
+        .col-lg-6
+          .input-group{title: "When activated, this feature abbreviates a loved one's name as it is displayed in the notification email.  For example, when a follower receives an email, John Doe would appear as John D."}
+            %span.input-group-addon
+              %label Loved One Notification Masking
+            %span.input-group-addon
+              = company_form.input :notification_masking, label: false, input_html: {style: 'margin-top: 5px;'}
+        .col-lg-6
+          .input-group{title: "When activated, this feature abbreviates loved ones names as they are displayed in the app.  For example, when an employee logs in to the app, John Doe would appear as John D."}
+            %span.input-group-addon
+              %label Loved One App Masking
+            %span.input-group-addon
+              = company_form.input :lovedone_masking, label: false, input_html: {style: 'margin-top: 5px;'}
+      %br
+      = company_form.input :company_name, label: 'Company Name'
+      = company_form.input :business_name, label: 'Business Name'
+      = company_form.input :address
+      = company_form.input :state, collection: us_states
+      = company_form.input :county, collection: [], input_html:{'data-selected-item'=> company_form.object.county}, placeholder: 'County'
+      = company_form.input :city, placeholder: 'City'
+      = company_form.input :zip, placeholder: 'Zip code'
+      = company_form.input :time_zone
+      = company_form.input :telephone, placeholder: 'Telephone', class: '.mobile-phone-number'
+      = company_form.input :mobile_phone_number, label: 'Mobile Phone Number', placeholder: 'Mobile Phone Number', class: '.mobile-phone-number'
+      = company_form.input :contact_last_name, label: ' Contact Last Name'
+      = company_form.input :contact_first_name, label: 'Contact First Name'
+      .hidden
+        = company_form.input :latitude, placeholder: 'Latitude'
+        = company_form.input :longitude, placeholder: 'Longitude'
+      .form-group
+        = company_form.label :get_notification, 'Receive Notification:', class: 'col-lg-2 control-label'
+        .col-lg-10
+          = company_form.input :get_notification, as: :radio_buttons, label: false, item_wrapper_class: 'radio-inline'
+      .form-group
+        = company_form.label :contact_method, 'Contact Method:', class: 'col-lg-2 control-label'
+        .col-lg-10#contact-method{:style => "margin-top: 6px;", :title => "Select how the primary contact would like to be notified.  The selections are email, text or both."}
+          - Company::contact_types.each do |a_value|
+            = company_form.label 'aa' do
+              = company_form.check_box( :contact_method, { :multiple => true}, a_value, nil)
+              = a_value.humanize
+
+            &nbsp;&nbsp;&nbsp;
+          %label
+            &nbsp;
+            %input#check_both{type:'checkbox', value:'both'} &nbsp;Both
+      = f.input :email
+      - unless f.object.new_record?
+        = f.input :password, placeholder: '********'
+      - else
+        = f.input :password
+      .form-group
+        .col-md-6.col-md-offset-2
+          %span.text-danger (Minimum is 8 characters.)
+      = company_form.input :provider_type, label:'Provider Type', collection: Company::provider_types.compact.reject{|i| i[0].blank? }
+    .form-actions
+      %br
+      = f.button :submit, class:'btn btn-success', value: 'Save'
+      - if current_user.admin?
+        = link_to 'Back', companymembers_path, class: 'btn btn-success'
+      - else
+        = link_to 'Back', edit_companymember_path(current_user), class: 'btn btn-success'
+      - unless company_form.object.id==nil
+        %input{type:'hidden', id:'headtype', value:'true'}
+        -#- if current_user.admin?
+        -#  %a.btn.btn-success{"data-target" => "#employeeModal", "data-toggle" => "modal"} View Employees
+      - if params[:action] === 'edit' and current_user.admin?
+        = link_to 'Delete', companymember_path(f.object), method: :delete, data:{confirm: 'Are you sure to delete this company?'}, class: 'btn btn-danger'
+      -#- unless company_form.object.new_record?
+        -#- if current_user.admin?
+          #employeeModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "employeeModalLabel", :role => "dialog", :tabindex => "-1"}
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  %button.close{"data-dismiss" => "modal", :type => "button"}
+                    %span{"aria-hidden" => "true"} ×
+                    %span.sr-only Close
+                  %h4#employeeModalLabel.modal-title=raw "Employees for <strong>#{company_form.object.business_name}</strong>"
+                .modal-body
+                  %iframe{src: company_employees_path(company_form.object)+"?nohead=true", width: '100%', height: '500', frameborder: 0}
+                .modal-footer
+                  %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Close
+
+:javascript
+  $(function(){
+    var state_selector = '#user_company_attributes_state';
+    var county_selector = '#user_company_attributes_county';
+    fn_init_state_county(state_selector, county_selector);
+  });

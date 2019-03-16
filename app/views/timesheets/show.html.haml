@@ -1,0 +1,24 @@
+%p#notice= notice
+
+%p
+  %b Starttime:
+  = @timesheet.starttime
+%p
+  %b Endtime:
+  = @timesheet.endtime
+%p
+  %b Lovedone:
+  = @timesheet.lovedone_id
+%p
+  %b Employee:
+  = @timesheet.employee_id
+%p
+  %b Provider:
+  = @timesheet.provider_id
+%p
+  %b Company:
+  = @timesheet.company_id
+
+= link_to 'Edit', edit_timesheet_path(@timesheet)
+\|
+= link_to 'Back', timesheets_path

@@ -1,0 +1,34 @@
+:javascript
+	$(document).ready(function(){
+	  $('#employee_lovedone_employee_id').val("#{params[:emp_id]}");
+	  $('#employee_lovedone_employee_id').change();
+	});
+
+	$('#employee_lovedone_employee_id').select2();
+
+.col-md-8.col-md-offset-2
+	.row-fluid
+		.panel.panel-default
+			.panel-heading
+				%h3.panel-title.pull-left
+					Restrict Employee Access to Loved Ones
+				= link_to 'Back', edit_companymember_path(current_user), class: "btn pull-right btn-success", style: "margin-right: 10px;"
+				.clearfix
+			.panel-body
+				= simple_form_for(@employee_lovedone, html:{class: "form-horizontal"}) do |f|
+					.well
+						.select_field= f.input :employee_id,label: 'Select Employee:', collection: @employees
+					.row.padding
+						#tooltip_company.well.col-xs-6{title: "By selecting Loved Ones below, it will remove the employee’s access to all Loved Ones and grant them only access to those selected."}
+							%label Select Loved Ones:
+							%br
+							#all_lovedones.scroll.hidden
+								= f.input :lovedone_id,label: false, as: :check_boxes, collection: @lovedones
+							#employee_select.no-result
+								* Select Employee to display results here
+							#add_restriction_button.hidden= f.button :submit,'Add', class:'btn btn-success', id: 'restriction_submission'
+						.well.col-xs-6.min-height
+							%label Employee has Access to only these Loved Ones:
+							#restricted_lovedones.no-result.top-margin-scroll
+								* Select Employee to display results here
+			.panel-footer

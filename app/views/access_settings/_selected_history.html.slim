@@ -1,0 +1,158 @@
+table.table#selected_history_table
+  thead
+    tr.bg-success
+      th Date/Time
+      th User
+      th Action
+      th Audit
+  tbody
+    - @audits.each do |audit|
+      - audit_type = audit.auditable_type
+      - audit_action = audit.action
+      - audit_created = audit.created_at
+      - audit_changes = audit.audited_changes
+      - unless audit_type.eql?('User')
+        - audit_object = audit_type.constantize.with_deleted.find(audit.auditable_id)
+
+      tr
+        - if audit_action.eql?('update') and (audit_type.eql?('Employee') or audit_type.eql?('Lovedone'))
+          - checked_audit_changes = check_audit_changes(audit_changes)
+          - @f_audit_changes = checked_audit_changes.first
+          - @value_exist = checked_audit_changes.second
+          - if @value_exist
+            td= audit_created.strftime('%m-%d-%Y %I:%M %p')
+            - if audit.user.try(:company_member).try(:admin)
+              td= audit.try(:user).try(:company).try(:contact_name)
+            - else
+              td= audit.try(:user).try(:profile).try(:name)
+        - else
+          td= audit_created.strftime('%m-%d-%Y %I:%M %p')
+          - if audit.user.try(:company_member).try(:admin)
+            td= audit.try(:user).try(:company).try(:contact_name)
+          - else
+            td= audit.try(:user).try(:profile).try(:name)
+
+        / ----------------------------------------------------- CREATED ---------------------------------------------------------
+        - if audit_action.eql?('create')
+          - if audit_type.eql?('User')
+            td User Created
+            td= "Created by #{audit.id}"
+          - elsif audit_type.eql?('Scheduler')
+            td Schedule Created
+            td= content_tag(:b, "Employee: ", class: 'created-title-color') + '' + audit_object.employee.full_name + ', ' + content_tag(:b, "Loved One: ", class: 'created-title-color') + '' + audit_object.lovedone.full_name + ', ' + content_tag(:b, "Date/Time: ", class: 'created-title-color') + '' + audit_changes['start_time'].in_time_zone(Time.zone).strftime('%m-%d-%Y %I:%M %p') + ' - ' + audit_changes['end_time'].in_time_zone(Time.zone).strftime('%I:%M %p')
+          - elsif audit_type.eql?('Employee')
+            td Employee Created
+            td
+              - audit_changes.keys.each_with_index do |key, index|
+                - unless audit_changes[key].eql? ''
+                  - if key.eql? 'designation_id'
+                    = content_tag(:b, key.titleize, class: 'created-title-color') + ': ' + Designation.with_deleted.find(audit_changes[key]).name
+                  - else
+                    = content_tag(:b, key.titleize, class: 'created-title-color') + ': ' + audit_changes[key]
+                  - unless audit_changes.keys.count-1 <= index
+                    = ", "
+          - elsif audit_type.eql?('Lovedone')
+            td Loved One Created
+            td
+              - audit_changes.keys.each_with_index do |key, index|
+                - unless audit_changes[key].eql? ''
+                  = content_tag(:b, key.titleize, class: 'created-title-color') + ': '
+                  - if key.eql?('date_of_birth')
+                    = Date.strptime(audit_changes[key], '%m/%d/%Y').strftime('%m-%d-%Y')
+                  - elsif key.eql?('gender')
+                    - if audit_changes[key].eql? 'true'
+                      |Male
+                    - elsif audit_changes[key].eql? 'false'
+                      |Female
+                  - else
+                    = audit_changes[key]
+                  - unless audit_changes.keys.count-1 <= index
+                    = ", "
+          - elsif audit_type.eql?('Follower')
+            td Follower Created
+            td
+              - audit_changes.keys.each_with_index do |key, index|
+                - unless audit_changes[key].eql? ''
+                  - if key.eql? 'lovedone_id'
+                    = content_tag(:b, 'Loved One', class: 'created-title-color') + ': ' + Lovedone.with_deleted.find(audit_changes[key]).full_name
+                  - else
+                    = content_tag(:b, key.titleize, class: 'created-title-color') + ': ' + audit_changes[key]
+                  - unless audit_changes.keys.count-2 <= index
+                    = ", "
+
+        / ----------------------------------------------------- Updated ---------------------------------------------------------
+        - elsif audit_action.eql?('update') and audit_changes.present?
+          - if audit_type.eql?('User')
+            - if audit_changes.keys.include? 'last_sign_out_at' and audit_changes.keys.count < 5
+              td Sign Out
+              td
+                b= "Logout from #{audit.remote_address}"
+            - elsif audit_changes.keys.include? 'current_sign_in_at' and audit_changes.keys.count < 7
+              td Sign In
+              td
+                b= "Login from #{audit.remote_address}"
+          - elsif audit_type.eql?('Scheduler')
+            td Schedule Updated
+            td
+              = content_tag(:b, "Employee: ", class: 'updated-title-color') + '' + audit_object.employee.full_name + ', ' + content_tag(:b, "Loved One: ", class: 'updated-title-color') + '' + audit_object.lovedone.full_name + ', ' + content_tag(:b, "Date: ", class: 'updated-title-color') + '' + audit_object.start_time.strftime('%m-%d-%Y')
+              - audit_changes.keys.each do |key|
+                = ', '
+                = content_tag(:b, key.titleize, class: 'updated-title-color') + ' changed from ' + content_tag(:b, audit_changes[key].first.in_time_zone(Time.zone).strftime('%I:%M %p')) + ' to ' + content_tag(:b, audit_changes[key].second.in_time_zone(Time.zone).strftime('%I:%M %p'))
+          - elsif audit_type.eql?('Employee')
+            - if @value_exist
+              td Employee Updated
+              td
+                = content_tag(:b, "Name: ", class: 'updated-title-color') + '' + audit_object.full_name
+                - @f_audit_changes.keys.each do |key|
+                  = ', '
+                  - if key.eql? 'designation_id'
+                    = content_tag(:b, key.titleize, class: 'updated-title-color') + ' changed from ' + content_tag(:b, Designation.with_deleted.find(@f_audit_changes[key].first).name) + ' to ' + content_tag(:b, Designation.with_deleted.find(@f_audit_changes[key].second).name)
+                  - else
+                    = content_tag(:b, key.titleize, class: 'updated-title-color') + ' changed from ' + content_tag(:b, @f_audit_changes[key].first.present? ? @f_audit_changes[key].first : 'blank') + ' to ' + content_tag(:b, @f_audit_changes[key].second.present? ? @f_audit_changes[key].second : 'blank')
+          - elsif audit_type.eql?('Lovedone')
+            - if @value_exist
+              td Loved One Updated
+              td
+                = content_tag(:b, "Name: ", class: 'updated-title-color') + '' + audit_object.full_name + ', '
+                - @f_audit_changes.keys.each_with_index do |key, index|
+                  - unless @f_audit_changes[key].eql? ''
+                    = content_tag(:b, key.titleize, class: 'updated-title-color') + ' changed from '
+                    - if key.eql?('date_of_birth')
+                      = content_tag(:b, Date.strptime(@f_audit_changes[key].first, '%m/%d/%Y').strftime('%m-%d-%Y')) + ' to ' + content_tag(:b, Date.strptime(@f_audit_changes[key].second, '%m/%d/%Y').strftime('%m-%d-%Y'))
+                    - elsif key.eql?('gender')
+                      - if @f_audit_changes[key].first.eql? 'true'
+                        = content_tag(:b, "Male") + ' to ' + content_tag(:b, "Female")
+                      - elsif @f_audit_changes[key].first.eql? 'false'
+                        = content_tag(:b, "Female") + ' to ' + content_tag(:b, "Male")
+                    - else
+                      = content_tag(:b, @f_audit_changes[key].first.present? ? @f_audit_changes[key].first : 'blank') + ' to ' + content_tag(:b, @f_audit_changes[key].second.present? ? @f_audit_changes[key].second : 'blank')
+                    - unless @f_audit_changes.keys.count-1 <= index
+                      = ", "
+          - elsif audit_type.eql?('Follower')
+            td Follower Updated
+            td
+              = content_tag(:b, "Name: ", class: 'updated-title-color') + '' + audit_object.full_name + ', follower of ' + content_tag(:b, audit_object.lovedone.full_name)
+              - audit_changes.keys.each do |key|
+                = ', '
+                = content_tag(:b, key.titleize, class: 'updated-title-color') + ' changed from ' + content_tag(:b, audit_changes[key].first.present? ? audit_changes[key].first : 'blank') + ' to ' + content_tag(:b, audit_changes[key].second.present? ? audit_changes[key].second : 'blank')
+
+        / ----------------------------------------------------- DELETED ---------------------------------------------------------
+        - elsif audit_action.eql?('destroy')
+          - if audit_type.eql?('Scheduler')
+            td Schedule Deleted
+            td
+              = content_tag(:b, "Employee: ") + '' + audit_object.employee.full_name + ', ' + content_tag(:b, "Loved One: ") + '' + audit_object.lovedone.full_name + ', ' + content_tag(:b, "Date/Time: ") + '' + audit_object.start_time.strftime('%m-%d-%Y %I:%M %p') + ' - ' + audit_object.end_time.strftime('%I:%M %p')
+          - elsif audit_type.eql?('Employee')
+            td Employee Deleted
+            td
+              = content_tag(:b, "Name: ") + '' + audit_object.full_name
+          - elsif audit_type.eql?('Lovedone')
+            td Loved One Deleted
+            td
+              = content_tag(:b, "Name: ") + '' + audit_object.full_name
+          - elsif audit_type.eql?('Follower')
+            td Follower Deleted
+            td
+              = content_tag(:b, "Name: ") + '' +  audit_object.full_name + ', follower of ' + content_tag(:b, audit_object.lovedone.full_name)
+
+

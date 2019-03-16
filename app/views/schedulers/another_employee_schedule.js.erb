@@ -1,0 +1,64 @@
+$('#createPrecedingApptModal').modal('hide');
+$('#createFollowingApptModal').modal('hide');
+$('#createPrecedingFollowingApptModal').modal('hide');
+
+var html = '<label for="anotherEmployeeName">Employee</label>' +
+        '<select id="anotherEmployeeName" name="employeeName" class="form-control">' +
+        '<option value="not_selected"></option>' +
+        '<% if @available_emp.count.zero? %>' +
+                '<%- @all_emp.each do |emp| %>' +
+                    '<option value="<%= emp.id %>"> <%= emp.name %></option>' +
+                '<% end %>'+
+        '<% else %>'+
+                '<%- @available_emp.each do |array| %>' +
+                    '<option value="<%= array.id %>"> <%= array.name %></option>' +
+                '<% end %>'+
+        '<% end %>';
+$('#anotherEmployeeName').select2();
+$('#anotherEmployeeModal #anotherEmployeeContent').html(html);
+$('#anotherEmployeeName').select2();
+$('#anotherEmployeeModal').modal({ backdrop: 'static', keyboard: false, show: true });
+$('#createEmployeeModal').css('z-index', 1030);
+$('#createLovedoneModal').css('z-index', 1030);
+$('#anotherEmployeeSubmit').unbind('click');
+$('#anotherEmployeeSubmit').bind('click', function() {
+    employee = $('#anotherEmployeeName').val();
+    if(employee == "not_selected") {
+        alert("Please select Employee");
+        return false
+    }
+    lovedone = "<%= @lovedone %>";
+    type = "<%= @type %>";
+    if(type == 'employee'){
+        id = employee;
+        selected_id = lovedone;
+    }
+    else if(type == 'lovedone'){
+        id = lovedone;
+        selected_id = employee;
+    }
+    $.ajax({
+        url: '/schedulers/new_schedule',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            start_time: "<%= @param_s_time %>",
+            end_time: "<%= @param_e_time %>",
+            frequency: "<%= @frequency %>",
+            selected_id: selected_id,
+            id: id ,
+            employee_request: true,
+            prev_employee: "<%= @prev_employee %>",
+            type: "<%= @type %>",
+            loop_number: "<%= @loop_number %>",
+            key: "<%= @key %>"
+        },
+        success: function() {
+            $('#anotherEmployeeModal').modal('hide');
+            $('#createEmployeeModal').css('z-index', 1040);
+            $('#createLovedoneModal').css('z-index', 1040);
+            $('#calendar').fullCalendar('refetchEvents');
+        }
+    });
+
+});

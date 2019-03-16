@@ -1,0 +1,41 @@
+$('#preview_appointments').html("<%= escape_javascript render(partial: 'schedulers/transfer_preview_appointments', locals: {appointments: @available_appointments}) %>");
+
+$('#employee_transfer').on('click', function(){
+    sending_employee_appointments("<%=@start_date%>", "<%=@end_date%>", "<%=@available_appointments.uniq.pluck(:employee_id)%>")
+});
+
+$('#lovedone_follower_transfer').on('click', function(){
+    sending_lovedone_appointments("<%=@start_date%>", "<%=@end_date%>", "<%=@available_appointments.uniq.pluck(:lovedone_id)%>")
+});
+
+function sending_employee_appointments(start_date, end_date, ids){
+    $.ajax({
+        url: '/employee_send_appointments',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            start_date: start_date,
+            end_date: end_date,
+            employee_ids: ids
+        }
+    });
+}
+
+function sending_lovedone_appointments(start_date, end_date, ids){
+    $.ajax({
+        url: '/lovedone_send_appointments',
+        dataType: 'script',
+        type: 'GET',
+        data: {
+            start_date: start_date,
+            end_date: end_date,
+            lovedone_ids: ids
+        }
+    });
+}
+
+$('#myTable').DataTable({
+    searching: false,
+    paging: false,
+    info: false
+});

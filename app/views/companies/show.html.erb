@@ -1,0 +1,74 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Company name:</strong>
+  <%= @company.company_name %>
+</p>
+
+<p>
+  <strong>Business name:</strong>
+  <%= @company.business_name %>
+</p>
+
+<p>
+  <strong>Provider type:</strong>
+  <%= @company.provider_type %>
+</p>
+
+<p>
+  <strong>Telephone:</strong>
+  <%= @company.telephone %>
+</p>
+
+<p>
+  <strong>Mobile phone number:</strong>
+  <%= @company.mobile_phone_number %>
+</p>
+<p>
+  <strong>Get notification:</strong>
+  <%= @company.get_notification %>
+</p>
+
+<p>
+  <strong>User:</strong>
+  <%= @company.user_id %>
+</p>
+
+<p>
+  <strong>Address:</strong>
+  <%= @company.address %>
+</p>
+
+<p>
+  <strong>City:</strong>
+  <%= @company.city %>
+</p>
+
+
+<p>
+  <strong>State:</strong>
+  <%= @company.state %>
+</p>
+
+<p>
+  <strong>Zip:</strong>
+  <%= @company.zip %>
+</p>
+
+<p>
+  <strong>Contact last name:</strong>
+  <%= @company.contact_last_name %>
+</p>
+
+<p>
+  <strong>Contact first name:</strong>
+  <%= @company.contact_first_name %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @company.status %>
+</p>
+
+<%= link_to 'Edit', edit_company_path(@company) %> |
+<%= link_to 'Back', companies_path %>

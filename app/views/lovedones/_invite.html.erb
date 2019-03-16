@@ -1,0 +1,45 @@
+<%= form_tag users_path, :method => 'get', :id => "users_search" do %>
+  <p>
+    <%= text_field_tag :search, params[:search] %>
+    <%#= submit_tag "Search", :name => nil %>
+    <%= button_tag "Search", :name => nil %>
+  </p>
+
+  
+  <div id="users">
+    <%= hidden_field_tag :direction, params[:direction] %>
+    <%= hidden_field_tag :sort, params[:sort] %>
+    <table class="pretty">
+      <tr>
+        <th><%= sortable "name" %></th>
+        <th><%= sortable "first_name" %></th>
+        <th><%= sortable "last_name", "Last Name" %></th>
+        
+      </tr>
+        
+<%= simple_form_for(@follower) do |f| %>
+  <%= f.error_notification %>
+        
+      <% for user in @users %>
+        <tr>
+          <td><%= user.name %></td>
+            <td><%= user.profile.first_name %></td>
+            <td><%= user.profile.last_name %></td>
+            <td><%= f.check_box_tag "users_ids[]", user.id %></td>
+            <!--
+            <td class="price"><%#= number_to_currency(user.price) %></td>
+            <td><%#= user.released_at.strftime("%B %e, %Y") %></td>
+            -->
+        </tr>
+      <% end %>
+        <%= link_to 'Invite', new_lovedone_follower(@lovedone) %>    
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>        
+    </table>
+    <%= will_paginate @users %>
+  </div>
+<%#= link_to 'Invite', invite_lovedone_path(@lovedone) %>
+
+<% end %>

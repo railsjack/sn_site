@@ -1,0 +1,46 @@
+:javascript
+  $(function(){
+    $('.fixed-table-loading').hide();
+    $('.suggestion-search').keyup(function(e){
+      var key = e.target.value.toLowerCase();
+      if(key==""){
+        $('.table tr').show();
+      }
+      $('.table tr:gt(0)').each(function(){
+        if($(this).text().toLowerCase().indexOf(key)==-1){
+          $(this).hide();
+        }
+      });
+    });
+  });
+.container
+  .row
+    %h3.bg-warning.text-center Service Providers
+    .panel
+      .panel-heading
+        Search: 
+        %input{class:'suggestion-search'}
+        &nbsp;&nbsp;&nbsp;
+        %strong 
+          Current count of service providers:
+          = @companies.count
+        =link_to 'Add new provider', new_company_path, class: "btn btn-success pull-right"
+      .panel-body
+        .table-responsive
+          %table.table.table-striped.table-bordered.table-hover{"data-sort-name" => "business_name", "data-sort-order" => "asc", "data-toggle" => "table"}
+            %thead
+              %tr.bg-success
+                %th{"data-field" => "business_name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Business Name
+                %th{"data-field" => "city", "data-sortable" => "true", "data-sorter"=>"stringSorter"} City
+                %th{"data-field" => "count", "data-sortable" => "true", "data-sorter"=>"stringSorter"} County
+                %th{"data-field" => "state", "data-sortable" => "true", "data-sorter"=>"stringSorter"} State
+                %th{"data-field" => "contact", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Contact
+                %th{"data-field" => "phone", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Phone
+                %th{"data-field" => "date_time", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Date/Time
+                %th{"data-field" => "status", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Approved Status
+                %th{"data-field" => "actions"} Actions
+            %tbody
+              - @companies.each do |company|
+                - user = company.users.where(admin: true).first
+                %tr= render partial: "user_company", locals: { user: user, company: company}
+

@@ -1,0 +1,292 @@
+.well.col-md-5{style: 'min-height:356px;'}
+	%h4.text-center{style: 'color:green;'}
+		%b Results
+	%hr
+	%center
+		.three-quarters-loader.hidden
+
+	- if message != 'first-call'
+		- if results.present?
+			.text-center
+				%br
+				%b= "Employee: #{results.first.employee.name}"
+			.text-center
+				%b= "Period : #{start_date} to #{end_date}"
+			%br
+			- total_period_distance = 0
+			- total_period_travel_time = 0
+			.well
+				.text-center{id: 'total_distance'}
+				.text-center{id: 'total_time_driven'}
+			- colors = ['brown', 'RoyalBlue', 'green']
+			.table-scroll
+				- results.each_with_index do |result, index|
+					- if result.start_time.present? and result.end_time.present?
+						%table.table
+							%tr.info
+								%th{colspan: 5}
+									= "Shift # #{index+1}: #{result.start_time.strftime("%m/%d/%Y %H:%M:%S")} - #{result.end_time.strftime("%m/%d/%Y %H:%M:%S")}"
+									- timesheets = Timesheet.where( "starttime >= ? and endtime <= ? and employee_id = ? and company_id = ?",  result.start_time, result.end_time, result.employee_id, @company_id)
+
+							- prev_encounter_lat = prev_encounter_lng = prev_enounter_lovedone = daily_total_distance = daily_total_travel_time = admin_first_base_distance = admin_first_base_duration = 0
+							- employee = result.employee
+
+							%tr.success
+								%th Date
+								%th Leg #
+								%th Loved One
+								%th Distance (Miles)
+								%th Time (Minutes)
+							- total_timesheets = timesheets.count
+							- timesheets.each_with_index do |timesheet, timesheet_index|
+								- if timesheet.trip.present?
+									- lovedone = timesheet.lovedone
+									- trip = timesheet.trip
+									%tr
+										-# Base to First
+										- if timesheet_index == 0
+											- base_first = EmployeesHelper.base_distance(employee.base_latitude, employee.base_longitude, lovedone.latitude, lovedone.longitude) unless trip.travel_distance.present? and trip.travel_time.present?
+											- if base_first != nil
+												- if base_first[0]["status"] != "ZERO_RESULTS"
+													- base_first_distance, base_first_duration = ((base_first[0]["distance"]["value"])*0.000621371).round(2), ((base_first[0]["duration"]["value"])/60).round(2)
+													- admin_first_base_distance = last_base_distance = admin_last_base_distance = base_first_distance
+													- admin_first_base_duration = last_base_duration = admin_last_base_duration = base_first_duration
+													- trip.travel_distance, trip.travel_time  = base_first_distance, base_first_duration
+												- else
+													- trip.travel_distance, trip.travel_time  = 0, 0
+												- trip.base_to_first = true
+												- trip.save
+											- elsif trip.travel_distance.present? and trip.travel_time.present?
+												- admin_first_base_distance = last_base_distance = admin_last_base_distance = base_first_distance = trip.travel_distance
+												- admin_first_base_duration = last_base_duration = admin_last_base_duration = base_first_duration = trip.travel_time
+												- trip.base_to_first = true
+												- trip.save
+											- if trip.start_latitude.present? and trip.start_longitude.present?
+												-# Execute when encounter is done from the mobile application
+												%td= timesheet.starttime.strftime("%m/%d/%Y")
+												%td B - F
+												%td= trip.lovedone.name
+												%td
+													= base_first_distance.present? ? base_first_distance : 0
+													%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.first}", id: 'show_leg_map', data:{startlat: employee.base_latitude, startlng: employee.base_longitude, endlat: lovedone.latitude, endlng: lovedone.longitude, empstring:"Shift: #{index+1}/Leg: B - F/Loved One: #{lovedone.name}" , legcolor: colors.first}}
+												%td= base_first_duration.present? ? base_first_duration : 0
+												- daily_total_distance += base_first_distance.present? ? base_first_distance : 0
+												- daily_total_travel_time += base_first_duration.present? ? base_first_duration : 0
+											- else
+												-# Execute when encounter is done from send admin message module
+												%td= timesheet.starttime.strftime("%m/%d/%Y")
+												%td B - F
+												%td= trip.lovedone.name
+												%td
+													= "#{admin_first_base_distance.present? ? admin_first_base_distance : 0} Admin"
+													%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.first}", id: 'show_leg_map', data:{startlat: employee.base_latitude, startlng: employee.base_longitude, endlat: lovedone.latitude, endlng: lovedone.longitude, empstring:"Shift: #{index+1}/Leg: B - F/Loved One: #{lovedone.name}" , legcolor: colors.first}}
+												%td= "#{admin_first_base_duration.present? ? admin_first_base_duration : 0} Admin"
+												- daily_total_distance += admin_first_base_distance.present? ? admin_first_base_distance : 0
+												- daily_total_travel_time += admin_first_base_duration.present? ? admin_first_base_duration : 0
+											- prev_encounter_lat = lovedone.latitude
+											- prev_encounter_lng = lovedone.longitude
+
+											- if trip.end_latitude.present? and trip.end_longitude.present?
+												-# Saving coordinates for using in legs to calculate distance from previous location to the new one
+												- prev_encounter_lat, prev_encounter_lng = lovedone.latitude, lovedone.longitude
+
+											- if total_timesheets == 1
+												-# Executes when there is only one encounter for entire shift, it will create last to base
+												- if trip.end_latitude.present? and trip.end_longitude.present?
+													-# Execute when encounter is done from the mobile application
+													%tr
+														%td= timesheet.starttime.strftime("%m/%d/%Y")
+														%td L - B
+														%td ---
+														%td
+															= last_base_distance.present? ? last_base_distance : 0
+															%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.last}", id: 'show_leg_map', data:{startlat: lovedone.latitude, startlng: lovedone.longitude, endlat: employee.base_latitude, endlng: employee.base_longitude, empstring:"Shift: #{index+1}/Leg: L - B" , legcolor: colors.last}}
+														%td= last_base_duration.present? ? last_base_duration : 0
+														- daily_total_distance += last_base_distance.present? ? last_base_distance : 0
+														- daily_total_travel_time += last_base_duration.present? ? last_base_duration : 0
+
+														- trip.lb_travel_distance = last_base_distance.present? ? last_base_distance : 0
+														- trip.lb_travel_time = last_base_duration.present? ? last_base_duration : 0
+														- trip.save
+												- else
+													-# Execute when encounter is done from send admin message module
+													%tr
+														%td= timesheet.starttime.strftime("%m/%d/%Y")
+														%td L - B
+														%td ---
+														%td
+															= "#{admin_last_base_distance.present? ? admin_last_base_distance : 0} Admin"
+															%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.last}", id: 'show_leg_map', data:{startlat: lovedone.latitude, startlng: lovedone.longitude, endlat: employee.base_latitude, endlng: employee.base_longitude, empstring:"Shift: #{index+1}/Leg: L - B", legcolor: colors.last}}
+														%td= "#{admin_last_base_duration.present? ? admin_last_base_duration : 0} Admin"
+														- daily_total_distance += admin_last_base_distance.present? ? admin_last_base_distance : 0
+														- daily_total_travel_time += admin_last_base_duration.present? ? admin_last_base_duration : 0
+
+														- trip.lb_travel_distance = last_base_distance.present? ? last_base_distance : 0
+														- trip.lb_travel_time = last_base_duration.present? ? last_base_duration : 0
+														- trip.save
+											- prev_encounter_time, prev_enounter_lovedone = timesheet.endtime, lovedone.id
+											- next
+
+											-# Last to Base
+										- elsif timesheets.last == timesheet
+											- if trip.end_latitude.present? and trip.end_longitude.present?
+												-# Execute when encounter is done from mobile application, and it is the last encounter which is mapped with last to base
+												- prev_last = EmployeesHelper.base_distance(prev_encounter_lat, prev_encounter_lng, lovedone.latitude, lovedone.longitude) unless trip.travel_distance.present? and trip.travel_time.present?
+												- if prev_last != nil
+													- if prev_last[0]["status"] != "ZERO_RESULTS"
+														- prev_last_distance, prev_last_duration = ((prev_last[0]["distance"]["value"])*0.000621371).round(2), ((prev_last[0]["duration"]["value"])/60).round(2)
+														- trip.travel_distance, trip.travel_time  = prev_last_distance, prev_last_duration
+													- else
+														- trip.travel_distance, trip.travel_time  = 0, 0
+													- trip.save
+												- elsif trip.travel_distance.present? and trip.travel_time.present?
+													- prev_last_distance, prev_last_duration  = trip.travel_distance, trip.travel_time
+												%td= timesheet.starttime.strftime("%m/%d/%Y")
+												%td= timesheet_index
+												%td= trip.lovedone.name
+												%td
+													= prev_last_distance.present? ? prev_last_distance : 0
+													%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.second}", id: 'show_leg_map', data:{startlat: prev_encounter_lat, startlng: prev_encounter_lng, endlat: lovedone.latitude, endlng: lovedone.longitude, empstring:"Shift: #{index+1}/Leg: #{timesheet_index}/Loved One: #{lovedone.name}", legcolor: colors.second}}
+												%td= prev_last_duration.present? ? prev_last_duration : 0
+												- daily_total_distance += prev_last_distance.present? ? prev_last_distance : 0
+												- daily_total_travel_time += prev_last_duration.present? ? prev_last_duration : 0
+												%tr
+													- last_base = EmployeesHelper.base_distance(lovedone.latitude, lovedone.longitude, employee.base_latitude, employee.base_longitude) unless trip.lb_travel_distance.present? and trip.lb_travel_time.present?
+													- if last_base != nil
+														- if last_base[0]["status"] != "ZERO_RESULTS"
+															- last_base_distance, last_base_duration = ((last_base[0]["distance"]["value"])*0.000621371).round(2), ((last_base[0]["duration"]["value"])/60).round(2)
+															- trip.lb_travel_distance, trip.lb_travel_time = last_base_distance, last_base_duration
+														- else
+															- trip.lb_travel_distance, trip.lb_travel_time = 0, 0
+														- trip.save
+													- elsif trip.lb_travel_distance.present? and trip.lb_travel_time.present?
+														- last_base_distance, last_base_duration  = trip.lb_travel_distance, trip.lb_travel_time
+													%td= timesheet.starttime.strftime("%m/%d/%Y")
+													%td L - B
+													%td ---
+													%td
+														= last_base_distance.present? ? last_base_distance : 0
+														%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.last}", id: 'show_leg_map', data:{startlat: lovedone.latitude, startlng: lovedone.longitude, endlat: employee.base_latitude, endlng:  employee.base_longitude, empstring:"Shift: #{index+1}/Leg: L - B", legcolor: colors.last}}
+													%td= last_base_duration.present? ? last_base_duration : 0
+													- daily_total_distance += last_base_distance.present? ? last_base_distance : 0
+													- daily_total_travel_time += last_base_duration.present? ? last_base_duration : 0
+											- else
+												-# Execute when encounter is done from send admin message module, and it is the last encounter which is mapped with last to base
+												- prev_lovedone = Lovedone.find(prev_enounter_lovedone) if prev_enounter_lovedone != 0
+												- if prev_lovedone.present?
+													- admin_prev_last = EmployeesHelper.base_distance(prev_lovedone.latitude, prev_lovedone.longitude, lovedone.latitude, lovedone.longitude) unless trip.travel_distance.present? and trip.travel_time.present?
+													- if admin_prev_last != nil
+														- if admin_prev_last[0]["status"] != "ZERO_RESULTS"
+															- admin_prev_last_distance, admin_prev_last_duration = ((admin_prev_last[0]["distance"]["value"])*0.000621371).round(2), ((admin_prev_last[0]["duration"]["value"])/60).round(2)
+															- trip.travel_distance, trip.travel_time = admin_prev_last_distance, admin_prev_last_duration
+														- else
+															- trip.travel_distance, trip.travel_time = 0, 0
+														- trip.save
+													- elsif trip.travel_distance.present? and trip.travel_time.present?
+														- admin_prev_last_distance, admin_prev_last_duration = trip.travel_distance, trip.travel_time
+													%td= timesheet.starttime.strftime("%m/%d/%Y")
+													%td= timesheet_index
+													%td= timesheet.trip.lovedone.name
+													%td
+														= "#{admin_prev_last_distance.present? ? admin_prev_last_distance : 0} Admin"
+														%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.second}", id: 'show_leg_map', data:{startlat: prev_lovedone.latitude, startlng: prev_lovedone.longitude, endlat: lovedone.latitude, endlng: lovedone.longitude, empstring:"Shift: #{index+1}/Leg: #{timesheet_index}/Loved One: #{lovedone.name}" , legcolor: colors.second}}
+													%td= "#{admin_prev_last_duration.present? ? admin_prev_last_duration : 0} Admin"
+													- daily_total_distance += admin_prev_last_distance.present? ? admin_prev_last_distance : 0
+													- daily_total_travel_time += admin_prev_last_duration.present? ? admin_prev_last_duration : 0
+												%tr
+													- admin_last_base = EmployeesHelper.base_distance(lovedone.latitude, lovedone.longitude, employee.base_latitude, employee.base_longitude) unless trip.lb_travel_distance.present? and trip.lb_travel_time.present?
+													- if admin_last_base != nil
+														- if admin_last_base[0]["status"] != "ZERO_RESULTS"
+															- admin_last_base_distance, admin_last_base_duration = ((admin_last_base[0]["distance"]["value"])*0.000621371).round(2), ((admin_last_base[0]["duration"]["value"])/60).round(2)
+															- trip.lb_travel_distance, trip.lb_travel_time = admin_last_base_distance, admin_last_base_duration
+														- else
+															- trip.lb_travel_distance, trip.lb_travel_time = 0, 0
+														- trip.save
+													- elsif trip.lb_travel_distance.present? and trip.lb_travel_time.present?
+														- admin_last_base_distance, admin_last_base_duration = trip.lb_travel_distance, trip.lb_travel_time
+													%td= timesheet.starttime.strftime("%m/%d/%Y")
+													%td L - B
+													%td ---
+													%td
+														= "#{admin_last_base_distance.present? ? admin_last_base_distance : 0} Admin"
+														%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.last}", id: 'show_leg_map', data:{startlat: lovedone.latitude, startlng: lovedone.longitude, endlat: employee.base_latitude, endlng: employee.base_longitude, empstring:"Shift: #{index+1}/Leg: L - B" , legcolor: colors.last}}
+													%td= "#{admin_last_base_duration.present? ? admin_last_base_duration : 0} Admin"
+													- daily_total_distance += admin_last_base_distance.present? ? admin_last_base_distance : 0
+													- daily_total_travel_time += admin_last_base_duration.present? ? admin_last_base_duration : 0
+											-# Legs
+										- else
+											- if prev_encounter_lat != 0 and prev_encounter_lng != 0 and trip.start_latitude.present? and trip.start_longitude.present?
+												-# Execute when encounter is done from mobile application
+												- leg_calc = EmployeesHelper.base_distance(prev_encounter_lat, prev_encounter_lng, lovedone.latitude, lovedone.longitude) unless trip.travel_distance.present? and trip.travel_time.present?
+												- if leg_calc != nil
+													- if leg_calc[0]["status"] != "ZERO_RESULTS"
+														- leg_calc_distance, leg_calc_duration = ((leg_calc[0]["distance"]["value"])*0.000621371).round(2), ((leg_calc[0]["duration"]["value"])/60).round(2)
+														- trip.travel_distance, trip.travel_time = leg_calc_distance, leg_calc_duration
+													- else
+														- trip.travel_distance, trip.travel_time = 0, 0
+													- trip.save
+												- elsif trip.travel_distance.present? and trip.travel_time.present?
+													- leg_calc_distance, leg_calc_duration  = trip.travel_distance, trip.travel_time
+												%td= timesheet.starttime.strftime("%m/%d/%Y")
+												%td= timesheet_index
+												%td= trip.lovedone.name
+												%td
+													= leg_calc_distance.present? ? leg_calc_distance : 0
+													%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.second}", id: 'show_leg_map', data:{startlat: prev_encounter_lat, startlng: prev_encounter_lng, endlat: lovedone.latitude, endlng:  lovedone.longitude, empstring:"Shift: #{index+1}/Leg: #{timesheet_index}/Loved One: #{lovedone.name}" , legcolor: colors.second}}
+												%td= leg_calc_duration.present? ? leg_calc_duration : 0
+												- prev_encounter_lat, prev_encounter_lng = lovedone.latitude, lovedone.longitude
+												- prev_encounter_time, prev_encounter_lovedone = timesheet.endtime, lovedone.id
+												- daily_total_distance += leg_calc_distance.present? ? leg_calc_distance : 0
+												- daily_total_travel_time += leg_calc_duration.present? ? leg_calc_duration : 0
+											- else
+												-# Execute when encounter is done from send admin message module
+												- prev_lovedone = Lovedone.find(prev_enounter_lovedone) if prev_enounter_lovedone != 0
+												- if prev_lovedone.present?
+													- admin_leg = EmployeesHelper.base_distance(prev_lovedone.latitude, prev_lovedone.longitude, lovedone.latitude, lovedone.longitude) unless trip.travel_distance.present? and trip.travel_time.present?
+													- if admin_leg != nil
+														- if admin_leg[0]["status"] != "ZERO_RESULTS"
+															- admin_leg_distance, admin_leg_duration = ((admin_leg[0]["distance"]["value"])*0.000621371).round(2), ((admin_leg[0]["duration"]["value"])/60).round(2)
+															- trip.travel_distance, trip.travel_time = admin_leg_distance, admin_leg_duration
+														- else
+															- trip.travel_distance, trip.travel_time = 0, 0
+													- elsif trip.travel_distance.present? and trip.travel_time.present?
+														- admin_leg_distance, admin_leg_duration = trip.travel_distance, trip.travel_time
+													%td= timesheet.starttime.strftime("%m/%d/%Y")
+													%td= timesheet_index
+													%td= trip.lovedone.name
+													%td
+														= "#{admin_leg_distance.present? ? admin_leg_distance : 0} Admin"
+														%i{class: 'glyphicon glyphicon-map-marker pointer', style: "color: #{colors.second}", id: 'show_leg_map', data:{startlat: prev_lovedone.latitude, startlng: prev_lovedone.longitude, endlat: lovedone.latitude, endlng:  lovedone.longitude, empstring:"Shift: #{index+1}/Leg: #{timesheet_index}/Loved One: #{lovedone.name}", legcolor: colors.second}}
+													%td= "#{admin_leg_duration.present? ? admin_leg_duration : 0} Admin"
+													- daily_total_travel_time += admin_leg_duration.present? ? admin_leg_duration : 0
+													- daily_total_distance += admin_leg_distance.present? ? admin_leg_distance : 0
+													- prev_encounter_time, prev_enounter_lovedone = timesheet.endtime, lovedone.id
+							%tr.warning
+								%th{colspan: 2}
+								%th
+									%b Daily Totals:
+								%td
+									- total_period_distance += daily_total_distance
+									%b= "#{daily_total_distance.round(2)} Miles"
+								%td
+									- total_period_travel_time += ((daily_total_travel_time)/60)
+									%b= "#{(daily_total_travel_time/60).round(2)} Hours"
+
+				%div.hidden{id: 'total_period_distance'}= total_period_distance.round(2)
+				%div.hidden{id: 'total_period_travel_time'}= total_period_travel_time.round(2)
+
+				-#%i{class: 'glyphicon glyphicon-map-marker pointer', id: 'show_full_day_map', data:{presentdate: prev_date, empid: employee_id}}
+
+
+		- else
+			%h4.no-result.text-center * Selected employee has no results
+	- else
+		.no-result.text-center * Please Select Employee and Period
+
+:javascript
+	if(document.getElementById('total_period_distance') != null){
+		total_distance = document.getElementById('total_period_distance').innerHTML
+		total_travel_time = document.getElementById('total_period_travel_time').innerHTML
+		document.getElementById('total_distance').innerHTML = "Total mileage driven for this period: <b>"+ total_distance +" Miles</b>"
+		document.getElementById('total_time_driven').innerHTML ="Total travel time for this period: <b>"+ total_travel_time +" Hours</b>"
+	}

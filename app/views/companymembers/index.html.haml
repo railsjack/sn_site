@@ -1,0 +1,56 @@
+:javascript
+  $(function(){
+    $('.fixed-table-loading').hide();
+    $('.table th:last').remove();
+    $('.table th:last').get(0).colSpan = 2;
+    $('.suggestion-search').keyup(function(e){
+      var key = e.target.value.toLowerCase();
+      if(key==""){
+        $('.table tr').show();
+      }
+      $('.table tr:gt(0)').each(function(){
+        if($($(this).children().get(0)).text().toLowerCase().indexOf(key)==-1){
+          $(this).hide();
+        }
+      });
+    });
+  });
+
+.container
+  .row.relative
+    .table-responsive{style: "position: relative;"}
+    %div
+      %h3.text-center Service Providers
+      .well
+        %div{style: "position: absolute; right: 0;"}
+          = link_to 'Add New Provider', new_companymember_path, class: 'btn btn-success btn-sm pull-right', style: 'margin-right: 10px;'
+          = link_to 'Fee', sp_fees_path, class: 'btn btn-success btn-sm pull-right', style: "margin-right: 10px;"
+        %div
+          Search:
+          %input.suggestion-search{:placeholder => "Search...", :type => "text"}/
+          &nbsp;&nbsp;&nbsp; Count of Service Providers:
+          %span#companies= @companies.count
+      %table.table.table-striped.table-bordered.table-hover{"data-sort-name" => "company_name", "data-sort-order" => "asc", "data-toggle" => "table"}
+        %thead
+          %tr.bg-success
+            %th{"data-field" => "company_name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Company Name
+            %th{"data-field" => "biz_name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Business name
+            %th{"data-field" => "provider_type", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Provider type
+            %th{"data-field" => "mobile_number", "data-sortable" => "true", 'data-width'=>'120'} Mobile phone number
+            %th{"data-field" => "contact_last", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Contact last name
+            %th{"data-field" => "contact_first", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Contact first name
+            %th{"data-field" => "status", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Status
+            %th.text-center{"data-field" => "actions"} Actions
+            %th.text-center{"data-field" => "actions1"} Actions
+        %tbody
+          - @companies.each do |company|
+            %tr
+              %td= company.company_name
+              %td= company.business_name
+              %td= company.provider_type
+              %td= company.mobile_phone_number.gsub(/\)/,') ') unless company.mobile_phone_number.nil?
+              %td= company.contact_last_name
+              %td= company.contact_first_name
+              %td= company.status.titleize
+              %td= link_to 'Edit', edit_companymember_path(company.users.where(admin: true).first) unless company.users.where(admin: true).count.eql?(0)
+              %td= link_to 'Delete', companymember_path(company.users.where(admin: true).first), method: :delete, data: { confirm: 'Are you sure?' } unless company.users.where(admin: true).count.eql?(0)

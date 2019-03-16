@@ -1,0 +1,9 @@
+.row
+  .col-md-8.col-md-offset-2
+    .panel.panel-success
+      .panel-heading
+        %h3.panel-title Add new Designation
+      .panel-body
+        = render 'form'
+      .panel-footer
+        = link_to 'Back', company_designations_path , class: 'btn btn-success btn-md'

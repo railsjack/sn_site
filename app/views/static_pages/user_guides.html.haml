@@ -1,0 +1,20 @@
+.well.text-center
+	.row
+		=link_to 'Training Videos',  tutorials_training_videos_path, id: 'training_videos_button', class: 'btn btn-default'
+		=link_to 'User Guides', tutorials_user_guides_path, id: 'user_guides_button', class: 'btn btn-success'
+
+.well
+	#user_guides_page
+		%h4.text-center
+			%b User Guides
+			%hr
+		.container
+			.row-fluid
+				.col-md-5.pull-left
+					%h4
+						.ul
+							%li.margin_for_li_elements=link_to 'Mobile App Quick Start User Guide', '/user_guide/mobile_app_quick_start_guide.pdf', target: '_blank'
+							%li.margin_for_li_elements=link_to 'Mobile App User Guide', '/user_guide/user_guide_app.pdf', target: '_blank'
+							%li.margin_for_li_elements=link_to 'Android Phone Location Service User Guide', '/user_guide/user_guide_android_location_service.pdf', target: '_blank'
+							%li.margin_for_li_elements=link_to 'iPhone Location Service User Guide', '/user_guide/updated_user_guide_iphone_location_service.pdf', target: '_blank'
+							%li.margin_for_li_elements=link_to 'Service Provider Website Administration User Guide', '/user_guide/user_guide_sp.pdf', target: '_blank'

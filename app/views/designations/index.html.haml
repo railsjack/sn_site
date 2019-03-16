@@ -1,0 +1,24 @@
+.container
+  .row
+    .col-md-5.col-md-offset-1
+      .panel.panel-success
+        .panel-heading
+          %h3.panel-title Add New Designation
+        .panel-body
+          = render 'form'
+    .col-md-5
+      .panel.panel-success
+        .panel-heading
+          %h3.panel-title Designations List
+        .panel-body
+          %ul.list-group
+            - @all_designations.each do |designation|
+              %li.list-group-item.category-list
+                .row
+                  .col-md-3= designation.name
+                  .col-md-3.used-color= designation.color
+                  .col-md-4
+                    = link_to 'Delete', company_designation_path(@current_company, designation), method: :delete, class: 'btn btn-xs pull-right btn-danger', data: { confirm: 'Are you sure?' }
+                    = link_to 'Edit', edit_company_designation_path(@current_company, designation),  class: 'btn btn-xs pull-right btn-warning', style: "margin-right: 5px;"
+                .clearfix
+          .clearfix

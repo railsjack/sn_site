@@ -1,0 +1,33 @@
+%h1=@title
+%h3= "Report Period: #{@startdate} - #{@enddate}"
+%ul
+  %li
+  - @reports.each_with_index do |user,i|
+    - @urec = user[0]
+    - @daterang = user[1]
+    %h5= @urec[1]
+    - if @daterang.length > 0
+      %table{:width=>'100%', :border =>1}
+        %tr
+          %th Date
+          %th Visit #:
+          %th Loved One (Patient) Visited:
+          %th Arrival Time:
+          %th Departure Time:
+          %th Total Visit Time:   
+      - @daterang[1].each_with_index do |timesheet,j|  
+      - starttime = timesheet.starttime
+      - endtime = timesheet.endtime
+      - duration = endtime - starttime
+      - thours =  (duration/3600).to_i > 0 ? (duration/3600).to_i : 0
+      - tminute =  (duration/60).to_i > 0 ? (duration/60).to_i : 0
+      - tsecnds =  (duration).to_i > 0 ? (duration).to_i : 0
+      - lovedone_id = timesheet.lovedone_id
+        %table{:border => '1', :width =>'100%'}
+          %tr
+            %td=starttime.strftime('%d/%m/%Y') 
+            %td=j+1
+            %td=lovedone_name(lovedone_id)
+            %td=starttime.strftime('%H:%M:%S')
+            %td=endtime.strftime('%H:%M:%S')
+            %td=thours.to_s+':'+tminute.to_s+':'+tsecnds.to_s

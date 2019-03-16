@@ -1,0 +1,19 @@
+%h1 Providers
+= link_to 'New Provider', new_provider_path, class: 'btn btn-success pull-right'
+%table
+  %thead
+    %tr
+      %th Company
+      %th Loved One
+      %th{:colspan => "3"}
+  %tbody
+    - @providers.each do |provider|
+      %tr
+        %td= provider.company
+        %td= provider.lovedone
+        %td= link_to 'Show', provider
+        %td= link_to 'Edit', edit_provider_path(provider)
+        %td= link_to 'Delete', provider, method: :delete, data: { confirm: 'Are you sure?' }
+%br/
+
+

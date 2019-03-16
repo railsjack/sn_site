@@ -1,0 +1,51 @@
+%script{src: "https://maps.googleapis.com/maps/api/js?libraries=geometry,places&ext=.js&#{Rails.application.secrets.gmap_api_key}"}
+
+:css
+  p.map-info{ white-space: nowrap; }
+.container
+.row
+- if @employees.any?
+  %h3.text-center View Map
+  #map_canvas
+  #multi_markers
+  %div
+- else
+  %h3.text-center The encounter is over.  The map is no longer active.
+:javascript
+  var markers = #{raw @hash.to_json};
+  handler = Gmaps.build('Google');
+  handler.buildMap({ provider: { zoom: 15}, internal: {id: 'multi_markers'}}, 
+  function(){
+    markers = handler.addMarkers(markers, {visible: true});
+    handler.bounds.extendWith(markers);
+    handler.fitMapToBounds();
+    handler.map.serviceObject.setZoom(15);
+  });
+
+  function update()
+  { 
+    var employee_id = #{@employee.id};
+    var lovedone_id = #{@lovedone};
+    var url =  '/employees/'+ employee_id +'/track.json?l='+lovedone_id+'';
+    var original_zoom = handler.map.serviceObject.getZoom();
+    var original_center = handler.map.serviceObject.getCenter();
+    $.get(url, function(data) 
+    {
+      handler.removeMarkers(markers);
+      markers = data;
+      markers = handler.addMarkers(markers, {visible: true});
+      handler.bounds.extendWith(markers);
+      handler.fitMapToBounds();
+      handler.map.serviceObject.setZoom(original_zoom);
+      handler.map.serviceObject.setCenter(original_center);
+    });
+  }
+  var interval_id = window.setInterval('update()', 10*1000);
+  
+  function closeRefresh(){
+    window.clearInterval(interval_id);
+  }
+
+  $('#MyButton').click(function(){
+    closeRefresh();
+  });

@@ -1,0 +1,18 @@
+$.ajax({
+    url: '/schedulers/new_schedule',
+    dataType: 'script',
+    type: 'GET',
+    data: {
+        edit_id: "<%= @schedule.id %>",
+        start_time: "<%= @new_s_time %>",
+        end_time: "<%= @new_e_time %>",
+        frequency: 1,
+        selected_id: "<%= @lovedone %>",
+        id: "<%= @employee %>",
+        key: "<%= @schedule.key %>",
+        type: "employee"
+    },
+    success: function () {
+        $('#calendar').fullCalendar('refetchEvents');
+    }
+});

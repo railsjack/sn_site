@@ -1,0 +1,206 @@
+:javascript
+	var apiURL = '/api';
+	var company_id = "#{@company.id}";
+	var lovedones = {};
+	var provider_type = "#{@company.provider_type}";
+	var employee_id = "";
+	if(provider_type=='Home_Health'){
+		var button1 = 'Arrival';
+		var button2 = 'Departure';
+	}else{
+		var button1 = 'Pick Up';
+		var button2 = 'Drop Off';
+	}
+
+
+	var get_lovedones = function(){
+		$.get('/companies/'+company_id+'/lovedones', function(response){
+			var html = '';
+			var key = $('.suggestion-search').val();
+			response.lovedones.map(function(o){
+			var empname=o.first_name+' '+o.last_name;
+				lovedones[o.id+''] = o;
+				var style = "style='display: none;'";
+				var name = o.last_name + ", " + o.first_name;
+				if(key=="" || name.toLowerCase().indexOf(key.toLowerCase())>-1){ style = ""; }
+				html += "<tr "+style+">";
+				html += "<td>"+name+"</td>";
+				birth_date = new Date(o.date_of_birth)
+				var dd = birth_date.getDate();
+				var mm = birth_date.getMonth()+1; //January is 0!
+				var yyyy = birth_date.getFullYear();
+				if(dd<10){
+					dd='0'+dd
+				}
+				if(mm<10){
+					mm='0'+mm
+				}
+				reformatted_date = mm + '-' + dd + '-' + yyyy;
+				html += "<td>"+reformatted_date+"</td>";
+				html += "<td><a class='btn btn-success btn-sm' onclick='select_lovedone(this)' data-id='"+o.id+"' data-ename='"+empname+"'>Select</a></td>";
+			});
+			$('.lovedones').empty().html(html);
+		});
+	};
+
+
+	var get_active_lovedones = function(){
+		$.get('/companies/'+company_id+'/active_lovedones', function(response){
+			var html = '';
+			var button1_disabled, button2_disabled, button3_disabled;
+			response.active_lovedones.map(function(o){
+				var status = o.status;
+				var trip_id = o.trip_id;
+				var employee_id = o.employee_id;
+				var employee = o.employee;
+				var o = o.lovedone;
+				html += "<tr>";
+				html += "<td>"+o.last_name + ", " + o.first_name+"</td>";
+				html += "<td>"+o.date_of_birth+"</td>";
+				if(employee.company_id==company_id){
+					html += "<td>"+employee.first_name + " " + employee.last_name+"</td>";
+					button1_disabled='', button2_disabled='', button3_disabled='';
+					switch(status){
+						case 'active':
+							button2_disabled = 'disabled';
+						break;
+						case 'started':
+							button1_disabled = 'disabled';
+							button2_disabled = '';
+							button3_disabled = 'disabled';
+						break;
+					}
+				}else{
+					html += "<td>Third Party</td>";
+					button1_disabled='disabled', button2_disabled='disabled', button3_disabled='disabled';
+				}
+
+				html += "<td><a class='btn btn-success "+button1_disabled+" btn-xs' style='margin-right:3px;margin-top:4px;' \
+					onclick='pickup_lovedone(this, "+o.id+","+trip_id+","+employee_id+")'>"+button1+"</a>";
+				html += "<a class='btn btn-warning-custom "+button2_disabled+" btn-xs' style='margin-right:3px;margin-top:4px;' \
+					onclick='dropoff_lovedone(this, "+o.id+","+trip_id+","+employee_id+")' >"+button2+"</a>";
+				html += "<a class='btn btn-danger "+button3_disabled+" btn-xs' style='margin-right:3px;margin-top:4px;' \
+					onclick='remove_lovedone(this, "+trip_id+")'>Remove</a></td>";
+			});
+			$('.active_lovedones').empty().html(html);
+		});
+	};
+
+	var select_lovedone = function(lovedObj){
+
+		var lovedone_id=$(lovedObj).attr('data-id');
+
+		var empname=$(lovedObj).attr('data-ename');
+
+
+		if(employee_id==''){
+			alert('Please select an employee');
+			return;
+		}
+
+		if(!confirm('Please confirm you wish to activate '+empname+'.')) return;
+			var trip_data =
+				{ employee_id: employee_id,
+					lovedone_id: lovedone_id,
+					lovedone: lovedones[lovedone_id],
+					status: 'active',
+					latitude: 0,
+					longitude: 0
+				};
+
+			$.post(apiURL+"/trip/new", {operation_mode:'Handy', trip: trip_data}, function(trip){
+
+			});
+	};
+
+
+	var pickup_lovedone = function(o, lovedone_id, trip_id, employee_id){
+		var trip_data = {status: 'started'};
+		$(o).attr('disabled', true);
+
+		$.post(apiURL+"/trip/update/"+trip_id, {operation_mode:'Handy', lovedone_id: lovedone_id, employee_id:employee_id, trip: trip_data }, function(response){
+		 });
+
+
+	};
+
+	var dropoff_lovedone = function(o, lovedone_id, trip_id, employee_id){
+		var trip_data = {status: 'completed'};
+		$(o).attr('disabled', true);
+
+		$.post(apiURL+"/trip/update/"+trip_id, {operation_mode:'Handy', lovedone_id: lovedone_id, employee_id: employee_id, trip: trip_data, reqtype: 'dropoff'}, function(response){
+
+		 var empt=response.emp;
+		 if(empt=="notsame")
+		 {
+		 		alert("Sorry, you are not the current active provider"); 	return false;
+		 }
+
+		},'html');
+	};
+
+	var remove_lovedone = function(o, trip_id){
+		$(o).attr('disabled', true);
+		$.post(apiURL+"/trip/delete/"+trip_id, {operation_mode:'Handy'});
+	};
+
+
+	$(function(){
+		$('.suggestion-search').keyup(function(e){
+			var key = e.target.value.toLowerCase();
+			if(key==""){
+				$('.table.lovedones tr').show();
+			}
+
+			$('.table.lovedones tr').each(function(){
+				if($(this).text().toLowerCase().indexOf(key)==-1){
+					$(this).hide();
+				}
+			});
+
+		});
+
+		get_lovedones();
+		get_active_lovedones();
+		setInterval(function(){
+			get_lovedones();
+			get_active_lovedones();
+		}, 2000);
+
+		setInterval(function(){ employee_id = $('#selected_employee').val(); }, 500);
+	})
+
+.row
+	.col-md-5.col-md-offset-1
+		.panel.panel-success
+			.panel-heading
+				Loved Ones
+				-#=link_to "Detail list", lovedones_path, class: 'btn btn-xs btn-primary pull-right'
+			.panel-body.form-horizontal
+				.col-md-12.well
+					.col-md-4
+						%label.search-label Select an Employee:
+					.col-md-7
+						%select#selected_employee{style: "width: 100%;'", class: "form-control" }
+							%option
+							- @employees.each do |employee|
+								%option{value: employee.id}=employee.name
+				.col-md-12.well
+					.col-md-4
+						%label.control-label.search-label Search Loved Ones:
+					.col-md-7
+						%input.suggestion-search{placeholder: "Search...", type: "text", class: 'form-control'}/
+
+				.clearfix
+				.well.lovedone-scroll
+					%table.table.scrollable.lovedones{style: 'margin-top: 10px;'}
+		= link_to 'Back', lovedones_path, class: 'btn btn-success btn-md'
+		%br
+		%br
+
+	.col-md-6
+		.panel.panel-success
+			.panel-heading Active Loved Ones
+			.panel-body
+				.well
+					%table.table.active_lovedones{style: 'margin-top: 10px;'}

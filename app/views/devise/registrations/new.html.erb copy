@@ -1,0 +1,412 @@
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+<script>
+$(function(){
+  $( "#user_profile_attributes_date_of_birth" ).datepicker({"dateFormat":"yy/mm/dd"});
+});
+</script>
+<style>
+#regform textarea{margin-bottom: 0;}
+</style>
+<div class="row formreg section offset-header has-pattern box-new">
+	<div class="col-md-12">
+	<div class="container">
+	<div class="row">
+    <div id="regform" class="panel panel-default col-md-offset-3">
+			<% if params[:query] == "user" %>
+				<% if params[:query] == "user" %>
+					<% resource.profile || resource.build_profile %>
+				<% end %>    
+			  <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :role => 'form', :class => 'form-horizontal'}) do |f| %>
+					<% if params[:query] == "user" %>
+						<h3>Loved Ones</h3>
+					<% end %>  
+					<%= devise_error_messages! %>
+
+					<% if params[:query] == "user" %>
+					<%= f.fields_for :profile do |profile_form| %>
+						<h4>Step 1 - General Information</h4>
+						<p>This is the enrollment section for loved ones.  The information is typically entered for your loved one by a family member or guardian.</p>
+						<hr />
+
+						<div class="form-group">
+							<%= profile_form.label :last_name, 'Last Name:', class: 'col-md-3 control-label', for: 'inputSuccess'%>
+							<div class="col-md-7" title="Enter your loved one's Last Name.">
+								<%= profile_form.text_field :last_name, class: 'form-control', placeholder: 'Last Name', required: true %>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<%= profile_form.label :first_name, 'First Name:', class: 'col-md-3 control-label', for: 'inputSuccess'%>
+							<div class="col-md-7" title="Enter your loved one's First Name.">
+								<%= profile_form.text_field :first_name, class: 'form-control', placeholder: 'First Name', required: true %>
+							</div>
+						</div>
+
+						<div class="form-group has-success">
+							<label class="col-md-3 control-label" for="inputSuccess">Middle Initial:</label>
+							<div class="col-md-7" title="Enter your loved one's middle initial.">
+								<input type="text" id="inputSuccess" class="form-control" placeholder="Middle Initial" required=true>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<%= profile_form.label :nick_name, 'Nickname:', class: 'col-md-3 control-label', for: 'inputSuccess'%>
+							<div class="col-md-7" title="Enter your loved one's Nick Name.">
+								<%= profile_form.text_field :nick_name, class: 'form-control', placeholder: 'Nick Name', required: true %>
+							</div>
+						</div>
+
+						<p>&nbsp;</p>
+
+						<div class="form-group">
+							<%= profile_form.label :date_of_birth, 'Date of Birth:', class: 'col-md-3 control-label', for: 'inputSuccess'%>
+							<div class="col-md-7" title="Please enter your birthdate.">
+								<%= profile_form.text_field :date_of_birth, class: 'form-control', placeholder: 'Date of Birth', required: true %>
+							</div>
+						</div>    
+		        <div class="form-group">
+		        		<%= profile_form.label :gender, 'Maile/Female:', class: 'col-md-3 control-label', for: 'inputSuccess' %>
+								<div class="col-md-7" title="Enter your gender." style="margin-top: 6px;">
+		                <label>
+		                  Male <%= profile_form.radio_button :gender, true , :checked => true %>
+		                </label>
+		                <label style="margin-left: 20px;">
+		                  Female <%= profile_form.radio_button :gender, false %>
+		                </label>
+		            </div>            
+		        </div>
+						<p>&nbsp;</p>
+
+						<div class="form-group">
+							<%= profile_form.label :city, class: 'col-md-3 control-label', for: 'inputSuccess' %>
+							<div class="col-md-7" title="Enter the City where the primary contact currently resides. This information is also used to distinguish two people with the same name.">
+							<%= profile_form.text_field :city, class: 'form-control', placeholder: 'City:', required: true %>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<%= profile_form.label :county, class: 'col-md-3 control-label', for: 'inputSuccess' %>
+							<div class="col-md-7" title="Enter the County where the primary contact currently resides. This information is also used to distinguish two people with the same name.">
+							<%= profile_form.text_field :county, class: 'form-control', placeholder: 'County:', required: true %>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<%= profile_form.label :state,"State:", class: 'col-md-3 control-label' %>
+							<div  class="col-md-7" title="Enter the State where the primary contact currently resides.  This information is also used to distinguish two people with the same name.">
+								<%= profile_form.select :state, options_for_select(us_states, "CA"), {}, { :class => 'form-control' } %>
+							</div>
+						</div>
+					<% end %>
+					<% end %>
+
+			  <% end %>
+
+
+			  <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :role => 'form', :class => 'form-horizontal'}) do |f| %>
+
+					<% if params[:query] == "user" %>
+					<%= f.fields_for :profile do |profile_form| %>
+						<h4>Step 2 - Primary Contact Information</h4>
+						<p>Each loved one must have a primary contact.  The individual enrolling the loved one is typically the primary contact.  The primary contact may be changed at any time. Please enter the primary contact’s information below for this loved one. </p>
+						<hr />
+
+						<div class="form-group">
+							<%= profile_form.label :last_name, 'Last Name:', class: 'col-md-3 control-label', for: 'inputSuccess'%>
+							<div class="col-md-7" title="Enter your loved one's Last Name.">
+								<%= profile_form.text_field :last_name, class: 'form-control', placeholder: 'Last Name', required: true %>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<%= profile_form.label :first_name, 'First Name:', class: 'col-md-3 control-label', for: 'inputSuccess'%>
+							<div class="col-md-7" title="Enter your loved one's First Name.">
+								<%= profile_form.text_field :first_name, class: 'form-control', placeholder: 'First Name', required: true %>
+							</div>
+						</div>
+
+						
+
+						<div class="form-group">
+							<%= profile_form.label :phone_number, 'Mobile Phone Number', class: 'col-md-3 control-label', for: 'inputSuccess'%>
+							<div class="col-md-7" title="If the primary contact chooses to be notified by text message, this is the Phone Number where notifications will be sent.">
+								<%= profile_form.text_field :phone_number, class: 'form-control', placeholder: 'Phone Number', required: true %>
+							</div>
+						</div>    
+
+						<div class="form-group">
+							<%= profile_form.label :zip_code, 'Zip Code', class: 'col-md-3 control-label', for: 'inputSuccess' %>
+							<div class="col-md-7" title="Enter the Zip Code.">
+								<%= profile_form.text_field :zip, class: 'form-control', placeholder: 'Zip Code', required: true %>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<%= profile_form.label :contact_method, class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the Contact method." style="margin-top: 6px;">
+							<%#= profile_form.text_field :contact_method %>
+								  <% Profile::contact_types.each do |a_value| %>
+										<%= profile_form.check_box( :contact_method, { :multiple => true }, a_value, nil) %>
+										<%= profile_form.label a_value %>
+								  <% end %>
+	            </div>
+							</p>
+						</div>
+					<% end %>
+					<% end %>
+
+					<div class="form-group">
+						<% if params[:query] == "user" %>
+							<%= render "popups/user_terms_conditions" %>
+						<% end %>
+						<label><%= f.check_box :terms %></label> &nbsp; I accept these Terms & Conditions
+					</div>    
+
+					<%= f.submit 'Sign up', :class => 'btn btn-success btn-lg btn-block' %>
+
+				<% end %>
+			<% end %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<% if params[:query] == "serviceprovider" %>
+
+				<% if params[:query] == "serviceprovider" %>
+					<% resource.company || resource.build_company %>
+				<% end %>
+				 
+			  
+			  <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :role => 'form', :class => 'form-horizontal'}) do |f| %>
+
+				<% if params[:query] == "serviceprovider" %>
+					<hr />
+					<h3>Service Providers</h3>
+					<h4>Step 1 - General Information</h4>
+					<p>This is the enrollment section for providers rendering services to seniors, handicapped individuals and those with special needs. If the company has more than one location that wishes to participate in Safety Notice, each office MUST be entered separately.</p>
+					<hr />
+				<% end %>
+				
+				
+				<%= devise_error_messages! %>
+
+				
+				
+				<!--<%#= f.fields_for :profile do |profile_form| %>-->
+				
+				
+					<% if params[:query] == "serviceprovider" %>
+					<%= f.fields_for :company do |profile_form| %>
+						<div class="form-group">
+							<%= profile_form.label :company_name, "Company Name", class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter Company Name.">
+								<%= profile_form.text_field :company_name, class: 'form-control', placeholder: 'Company Name', required: true %>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<%= profile_form.label :business_name, "Business Name", class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter Business Name.">
+								<%= profile_form.text_field :business_name, class: 'form-control', placeholder: 'Business Name', required: true %>
+							</div>
+						</div>
+						<p>&nbsp;</p>
+						<div class="form-group">
+							<%= profile_form.label :address, 'Address', class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the physical Address of the Business.">
+								<%= profile_form.text_field :address, class: 'form-control', placeholder: 'Address', required: true %>
+							</div>
+						</div>
+						<div class="form-group">
+							<%= profile_form.label :city, class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the City where the Business is located.">
+								<%= profile_form.text_field :city, class: 'form-control', placeholder: 'City', required: true %>
+							</div>
+						</div>
+						<div class="form-group">
+							<%= profile_form.label :county, class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the County where the Business is located.">
+								<%= profile_form.text_field :city, class: 'form-control', placeholder: 'County', required: true %>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<%= profile_form.label :state, class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the State where the Business is located.">
+								<%= profile_form.select :state, options_for_select(us_states, "CA"), {}, { :class => 'form-control' } %>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<%= profile_form.label :zip, class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the Zip Code.">
+								<%= profile_form.text_field :zip, class: 'form-control', placeholder: 'Zip', required: true %>
+							</div>
+						</div>
+
+						<p>&nbsp;</p>
+						
+						<div class="form-group">
+							<%= profile_form.label :telephone, 'Telephone', class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the Phone Number for the Business.">
+								<%= profile_form.text_field :telephone, class: 'form-control', placeholder: 'Phone Number', required: true %>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<%= profile_form.label :email, 'Email Address', class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the email address for the Business.">
+								<%= profile_form.text_field :email, class: 'form-control', placeholder: 'Email Address', required: true %>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<%= profile_form.label :mobile_phone_number, 'Mobile Phone Number', class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="If the Business chooses to be notified about employee activity, this is the text message number where notifications will be sent.">
+								<%= profile_form.text_field :mobile_phone_number, class: 'form-control', placeholder: 'Mobile Phone Number', required: true %>
+							</div>
+						</div>
+						
+						<p>&nbsp;</p>
+
+						<div class="form-group">
+							<%= profile_form.label :contact_last_name, 'Contact Last Name', class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the Last Name of the main contact at the Business.">
+								<%= profile_form.text_field :contact_last_name, class: 'form-control', placeholder: 'Contact Last Name', required: true %>
+							</div>
+						</div>    
+						
+						<div class="form-group">
+							<%= profile_form.label :contact_first_name, 'Contact First Name', class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter the First Name of the main contact at the Business.">
+								<%= profile_form.text_field :contact_first_name, class: 'form-control', placeholder: 'Contact First Name', required: true %>
+							</div>
+						</div>        
+						<div class="form-group">
+							<%= profile_form.label :provider_type, "Provider Type", class: 'col-md-3 control-label' %>
+							<!--todo required filed with options Transport and Home_Health-->
+							<div class="col-md-7" title="Select the Provider Type for the Business">
+								<%= profile_form.select :provider_type, [["Transport","Transport"], ["Home Health","Home_Health"]], {}, { :class => 'form-control' } %>
+							</div>
+						</div>
+
+						<label style="margin-left: 35px;">Notification:  Would you like to be notified when your employees/contractors interact with a loved one?</label>
+						<div class="form-group">
+							<label class='col-md-3 control-label'></label>
+							<p> 
+								<%= profile_form.label :get_notification, "Yes", :value => "true"  %>
+								<%= profile_form.radio_button :get_notification, true %>
+								<%= profile_form.label :get_notification, "No", :value => "false" %>
+								<%= profile_form.radio_button :get_notification, false, :checked => true %>
+							</p>            
+						</div>
+											
+						<div class="form-group">
+							<%= profile_form.label :password, 'Password', class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter your password.">
+								<%= profile_form.password_field :password, class: 'form-control', placeholder: 'Password', required: true %>
+							</div>
+						</div>        
+						<div class="form-group">
+							<%= profile_form.label :password_confirmation, 'Password Confirmation', class: 'col-md-3 control-label' %>
+							<div class="col-md-7" title="Enter your password again.">
+								<%= profile_form.password_field :password_confirmation, class: 'form-control', placeholder: 'Password Confirmation', required: true %>
+							</div>
+						</div>        
+
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+
+						<h4>Step 2 - User Agreement</h4>
+						<p>Safety Notice users must agree to the license terms in order to participate in the service.</p>
+						<div class="form-group">
+							<%= render "popups/provider_terms_conditions" %>
+							<label><%= f.check_box :terms %></label> &nbsp; I accept these Terms & Conditions
+						</div>    
+					 <%= f.submit 'CLICK HERE TO FINISH', :class => 'btn btn-success btn-block' %>
+					 <p>&nbsp;</p>
+					<% end %>    
+					<% end %>
+
+
+
+					<% if params[:query] == "user" %>
+						<hr />
+						<h3>Loved Ones</h3>
+						<h4>Step 1 - General Information</h4>
+						<p>This is the enrollment section for providers rendering services to seniors, handicapped individuals and those with special needs. If the company has more than one location that wishes to participate in Safety Notice, each office MUST be entered separately.</p>
+						<hr />
+					<% end %>
+
+					<% if params[:query] == "user" %>
+
+					<% end %>
+			  <% end %>
+				<div class="row">
+					
+		</div>    
+		<% end %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		</div>
+	
+		</div>    
+	</div>
+	</div>
+</div>

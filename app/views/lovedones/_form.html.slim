@@ -1,0 +1,131 @@
+javascript:
+  $(function() {
+  	$('#lovedone_date_of_birth').datetimepicker({
+  		format: 'm/d/Y',
+  		timepicker: false,
+  		closeOnDateSelect: true,
+  		onChangeMonth: function(current_time, $input) {
+  			return $input.val(current_time.dateFormat('m/d/Y'));
+  		}
+  	});
+  	$("#lovedone_phone_number").inputmask("(999) 999-9999").blur(function(e) {
+    	if ($(e.target).val() === "(___) ___-____") {
+    		$(e.target).val("");
+    	}
+    });
+  });
+
+.row
+  = simple_form_for @lovedone, html: {class: 'form-horizontal lovedone-form'} do |f|
+    .well.col-md-10.col-md-offset-1
+      .pull-left style="font-size:25px;" Loved One Information
+      .pull-right
+        = f.button :submit, class: 'btn btn-danger btn-md', value: "Save", id: 'lovedone-submit', style: 'margin-right:5px;'
+        = link_to 'Back', lovedones_path, class: 'btn btn-success btn-md'
+    = f.error_notification
+    .col-md-5.col-md-offset-1
+      .panel.panel-success
+        .panel-heading
+          h3.panel-title Personal Data
+        .panel-body
+          .form-group
+            = f.label :first_name, 'First Name', class: 'col-md-3 control-label'
+            .col-md-7
+              = f.text_field :first_name, class: 'form-control'
+          .form-group
+            = f.label :middle_initial, 'Middle Intial', class: 'col-md-3 control-label'
+            .col-md-7
+              = f.text_field :middle_initial, class: 'form-control'
+          .form-group
+            = f.label :last_name, 'Last Name', class: 'col-md-3 control-label'
+            .col-md-7
+              = f.text_field :last_name, class: 'form-control'
+          .form-group
+            = f.label :gender, 'Gender:', class: 'col-md-3 control-label'
+            .col-md-7 style= "margin-top: 6px;" title= "Check the appropriate box for the loved one's gender.  This information is also used to distinguish two people with the same name."
+              = f.radio_button :gender, true
+              label &nbspMale
+              = f.radio_button :gender, false, style: 'margin-left: 20px;'
+              label &nbspFemale
+          .form-group
+            = f.label :date_of_birth, 'Date of Birth:', class: 'control-label col-md-3'
+            .col-md-7
+              .form-inline
+                = f.date_select :date_of_birth, {start_year: 1910, end_year: Time.now.year, order: [:month, :day, :year], :include_blank => true, :default => nil}, {class: 'form-control'}
+          .form-group
+            = f.label :phone_number, 'Phone Number:', class: 'col-md-3 control-label'
+            .col-md-7 title= ""
+              = f.text_field :phone_number, class: 'form-control'
+          .form-group
+            = f.label :street, 'Street:', class: 'col-md-3 control-label'
+            .col-md-7 title= ""
+              = f.text_field :street, class: 'form-control'
+          .form-group
+            = f.label :apt_unit, 'Apartment/Unit #:', class: 'col-md-3 control-label'
+            .col-md-7 title= ""
+              = f.text_field :apt_unit, class: 'form-control'
+          .form-group
+            = f.label :city, 'City:', class: 'col-md-3 control-label'
+            .col-md-7 title = ""
+              = f.text_field :city, class: 'form-control date-of-birth'
+          .form-group
+            = f.label :state, 'State:', class: 'col-md-3 control-label'
+            .col-md-7
+              = f.select :state, options_for_select(us_states, f.object.state), {}, { :class => 'form-control'}
+          .form-group
+            = f.label :county, 'County:', class: 'col-md-3 control-label'
+            .col-md-7 title= ""
+              = f.select :county, [], {}, { :class => 'form-control', 'data-selected-item'=> f.object.county}
+          .form-group
+            = f.label :zip_code, 'Zip Code:', class: 'col-md-3 control-label'
+            .col-md-7 title= ""
+              = f.text_field :zip_code, class: 'form-control'
+    .col-md-5
+      .panel.panel-success
+        .panel-heading
+          h3.panel-title Appointment Notification Settings
+        .panel-body
+          .form-group
+            = f.label :email, 'Email', class: 'col-md-3 control-label'
+            .col-md-7
+              = f.text_field :email, class: 'form-control'
+          .form-group
+            = f.label :setting, 'Setting', class: 'col-md-3 control-label'
+            .col-md-7
+              = f.input :setting, collection: Lovedone.settings.map{|k,v| [k.capitalize, k]}, label: false, include_blank: false
+        input type='hidden' id='headtype' value='true'
+        #companyModal.modal.fade aria-hidden= "true" aria-labelledby= "companyModalLabel" role= "dialog" tabindex= "-1"
+          .modal-dialog style= "width: 90%;"
+            .modal-content
+              .modal-header
+                button.close data-dismiss= "modal" type= "button"
+                  span aria-hidden= "true" ×
+                  span.sr-only Close
+                h4#companyModalLabel.modal-title=raw "companys for <strong>#{@lovedone.name}</strong>"
+              .modal-body
+                -#%iframe{src: lovedone_lovedonecompanies_path(@lovedone)+"?nohead=true", width: '100%', height: '500', frameborder: 0}
+              .modal-footer
+                button.btn.btn-default data-dismiss= "modal" type= "button"} Close
+
+
+javascript:
+  $(function(){
+    var state_selector = '#lovedone_state';
+    var county_selector = '#lovedone_county';
+    fn_init_state_county(state_selector, county_selector);
+  });
+  function checkform (form)
+  {
+  if (form.email.value == "") {
+    alert( "Please enter your email address." );
+    form.email.focus();
+    return false ;
+  }
+  return true ;
+  }
+coffee:
+  $ ->
+    new window.lovedone_validation()
+
+
+

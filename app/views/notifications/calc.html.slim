@@ -1,0 +1,17 @@
+.container
+  .row
+    .col-md-12
+      div
+        ul.nav.nav-tabs role="tablist"
+          li.active role="presentation"
+            a aria-controls="sponsors" data-toggle="tab" href="#sponsors" role="tab" Sponsor Invoice
+          li role="presentation"
+            a aria-controls="providers" data-toggle="tab" href="#providers" role="tab" Service Provider Invoice
+
+        .tab-content
+          #sponsors.tab-pane.active role="tabpanel"
+            = render partial: 'custom_billing_sponsor'
+
+          #providers.tab-pane role="tabpanel"
+            = render partial: 'monthly_billing_sp'
+

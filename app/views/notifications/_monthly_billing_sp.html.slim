@@ -1,0 +1,17 @@
+br
+.well.text-center
+  = form_for MonthlyBilling.new, url: monthly_sp_billing_notifications_path, method: :post, html: {class: 'form-inline'}, remote: true do |m|
+    = m.label :month, 'Select Month: '
+    = m.date_select :month, {order: [:month], include_blank: true, default: nil}, {class: 'form-control'}
+    = m.label :month, 'Select Year: ', style: 'margin-left: 20px;'
+    = m.date_select :year, {start_year: 2012, order: [:year], include_blank: true, default: nil}, {class: 'form-control'}
+    = m.submit 'Search', class: 'btn btn-primary', style: 'margin-left: 20px;'
+
+
+hr
+.well
+  #providers_billing_message.text-center style='color: red;'
+  .text-center
+    .three-quarters-loader.hidden
+  #providers_billing
+    = render partial: 'providers_billing', locals: {monthly_billing: nil}

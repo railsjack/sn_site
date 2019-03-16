@@ -1,0 +1,21 @@
+table.table.table-striped.table-bordered.table-hover#provider_billing_table
+  thead
+    tr.success
+      th Service Provider
+      th.text-center Base Fee
+      th.text-center Reach Out Fee
+      th.text-center Transfer Fee
+      th.text-center Employee Count
+      th.text-center Employee Fee
+      th.text-center Amount Due
+  tbody
+    - if monthly_billing.present?
+      - monthly_billing.each do |bill|
+        tr
+          td= bill.company.business_name
+          td.text-center= number_with_precision(bill.base_fee, precision: 2)
+          td.text-center= number_with_precision(bill.reach_out_fee, precision: 2)
+          td.text-center= number_with_precision(bill.transfer_fee, precision: 2)
+          td.text-center= bill.employees_count
+          td.text-center= number_with_precision(bill.employee_fee, precision: 2)
+          td.text-center= number_with_precision( bill.amount_due, precision: 2)

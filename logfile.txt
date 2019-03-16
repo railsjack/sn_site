@@ -1,0 +1,245 @@
+=> Booting Thin
+=> Rails 4.1.2.rc1 application starting in development on http://0.0.0.0:3000
+=> Run `rails server -h` for more startup options
+=> Notice: server is listening on all interfaces (0.0.0.0). Consider using 127.0.0.1 (--binding option)
+=> Ctrl-C to shutdown server
+Thin web server (v1.6.2 codename Doc Brown)
+Maximum connections set to 1024
+Listening on 0.0.0.0:3000, CTRL+C to stop
+
+
+Started GET "/" for 180.151.106.193 at 2014-07-18 14:23:14 +0000
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1mSELECT "schema_migrations".* FROM "schema_migrations"[0m
+Processing by VisitorsController#index as HTML
+  [1m[35mUser Load (0.5ms)[0m  SELECT  "users".* FROM "users"  WHERE "users"."id" = 5  ORDER BY "users"."id" ASC LIMIT 1
+  [1m[36mCompany Load (0.5ms)[0m  [1mSELECT  "companies".* FROM "companies"  WHERE "companies"."user_id" = ? LIMIT 1[0m  [["user_id", 5]]
+  Rendered visitors/index.html.erb within layouts/application (96.7ms)
+  Rendered layouts/_navigation_links.html.erb (4.6ms)
+  Rendered layouts/_navigation_sign.html.erb (1.1ms)
+  Rendered layouts/_navigation.html.erb (10.7ms)
+  Rendered layouts/_messages.html.erb (0.8ms)
+Completed 200 OK in 575ms (Views: 552.6ms | ActiveRecord: 1.8ms)
+
+
+Started GET "/" for 180.151.106.193 at 2014-07-18 14:23:43 +0000
+Processing by VisitorsController#index as HTML
+  [1m[35mUser Load (0.5ms)[0m  SELECT  "users".* FROM "users"  WHERE "users"."id" = 5  ORDER BY "users"."id" ASC LIMIT 1
+  [1m[36mCompany Load (0.1ms)[0m  [1mSELECT  "companies".* FROM "companies"  WHERE "companies"."user_id" = ? LIMIT 1[0m  [["user_id", 5]]
+  Rendered visitors/index.html.erb within layouts/application (3.6ms)
+  Rendered layouts/_navigation_links.html.erb (0.9ms)
+  Rendered layouts/_navigation_sign.html.erb (0.3ms)
+  Rendered layouts/_navigation.html.erb (3.4ms)
+  Rendered layouts/_messages.html.erb (0.1ms)
+Completed 200 OK in 46ms (Views: 44.0ms | ActiveRecord: 0.6ms)
+
+
+Started DELETE "/users/sign_out" for 180.151.106.193 at 2014-07-18 14:24:21 +0000
+Processing by Devise::SessionsController#destroy as HTML
+  Parameters: {"authenticity_token"=>"01SuWRoqBWASLnGUdNYhGNSL7BXqESoHZ5MmFPxSWu8="}
+  [1m[35mUser Load (0.4ms)[0m  SELECT  "users".* FROM "users"  WHERE "users"."id" = 5  ORDER BY "users"."id" ASC LIMIT 1
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.1ms)[0m  commit transaction
+Redirected to http://192.241.241.53:3000/
+Completed 302 Found in 20ms (ActiveRecord: 0.6ms)
+
+
+Started GET "/" for 180.151.106.193 at 2014-07-18 14:24:23 +0000
+Processing by VisitorsController#index as HTML
+  Rendered visitors/index.html.erb within layouts/application (5.7ms)
+  Rendered layouts/_navigation_links.html.erb (0.2ms)
+  Rendered layouts/_navigation_sign.html.erb (0.8ms)
+  Rendered layouts/_navigation.html.erb (3.1ms)
+  Rendered layouts/_messages.html.erb (0.2ms)
+Completed 200 OK in 45ms (Views: 44.3ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/users/sign_in" for 180.151.106.193 at 2014-07-18 14:24:53 +0000
+Processing by Devise::SessionsController#new as HTML
+  Rendered devise/sessions/new.html.erb within layouts/application (19.4ms)
+  Rendered layouts/_navigation_links.html.erb (0.4ms)
+  Rendered layouts/_navigation_sign.html.erb (0.8ms)
+  Rendered layouts/_navigation.html.erb (3.0ms)
+  Rendered layouts/_messages.html.erb (0.2ms)
+Completed 200 OK in 62ms (Views: 59.8ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/users/sign_in" for 180.151.106.193 at 2014-07-18 14:24:59 +0000
+Processing by Devise::SessionsController#new as HTML
+  Rendered devise/sessions/new.html.erb within layouts/application (3.7ms)
+  Rendered layouts/_navigation_links.html.erb (0.4ms)
+  Rendered layouts/_navigation_sign.html.erb (0.8ms)
+  Rendered layouts/_navigation.html.erb (3.2ms)
+  Rendered layouts/_messages.html.erb (0.1ms)
+Completed 200 OK in 46ms (Views: 43.3ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/users/sign_in" for 180.151.106.193 at 2014-07-18 14:25:25 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"utf8"=>"✓", "authenticity_token"=>"1vr7vbovWpSN1KcJInm1s0mb1rR4T+UfiR22BY+Q8Sk=", "user"=>{"email"=>"camel@camel.com", "password"=>"[FILTERED]", "remember_me"=>"0"}, "commit"=>"Sign in"}
+  [1m[36mUser Load (0.8ms)[0m  [1mSELECT  "users".* FROM "users"  WHERE "users"."email" = 'camel@camel.com'  ORDER BY "users"."id" ASC LIMIT 1[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.6ms)[0m  [1mUPDATE "users" SET "current_sign_in_at" = ?, "last_sign_in_at" = ?, "sign_in_count" = ?, "updated_at" = ? WHERE "users"."id" = 4[0m  [["current_sign_in_at", "2014-07-18 14:25:25.356263"], ["last_sign_in_at", "2014-07-16 02:36:10.763367"], ["sign_in_count", 3], ["updated_at", "2014-07-18 14:25:25.358460"]]
+  [1m[35m (8.2ms)[0m  commit transaction
+Redirected to http://192.241.241.53:3000/
+Completed 302 Found in 144ms (ActiveRecord: 9.8ms)
+
+
+Started GET "/" for 180.151.106.193 at 2014-07-18 14:25:29 +0000
+Processing by VisitorsController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1mSELECT  "users".* FROM "users"  WHERE "users"."id" = 4  ORDER BY "users"."id" ASC LIMIT 1[0m
+  [1m[35mCompany Load (0.1ms)[0m  SELECT  "companies".* FROM "companies"  WHERE "companies"."user_id" = ? LIMIT 1  [["user_id", 4]]
+  Rendered visitors/index.html.erb within layouts/application (3.1ms)
+  [1m[36mProfile Load (0.3ms)[0m  [1mSELECT  "profiles".* FROM "profiles"  WHERE "profiles"."user_id" = ? LIMIT 1[0m  [["user_id", 4]]
+  Rendered layouts/_navigation_links.html.erb (30.9ms)
+  Rendered layouts/_navigation_sign.html.erb (0.3ms)
+  Rendered layouts/_navigation.html.erb (33.5ms)
+  Rendered layouts/_messages.html.erb (0.2ms)
+Completed 200 OK in 73ms (Views: 70.2ms | ActiveRecord: 1.7ms)
+
+
+Started GET "/lovedones" for 180.151.106.193 at 2014-07-18 14:26:16 +0000
+Processing by LovedonesController#index as HTML
+  [1m[35mUser Load (0.4ms)[0m  SELECT  "users".* FROM "users"  WHERE "users"."id" = 4  ORDER BY "users"."id" ASC LIMIT 1
+  [1m[36mPrimaryContact Load (0.3ms)[0m  [1mSELECT "primary_contacts".* FROM "primary_contacts"  WHERE (user_id = 4)[0m
+  [1m[35mLovedone Load (0.3ms)[0m  SELECT  "lovedones".* FROM "lovedones"  WHERE "lovedones"."id" = ? LIMIT 1  [["id", 3]]
+  [1m[36mUser Load (0.5ms)[0m  [1mSELECT  "users".* FROM "users"  WHERE "users"."id" = ? LIMIT 1[0m  [["id", 4]]
+  [1m[35mProfile Load (0.1ms)[0m  SELECT  "profiles".* FROM "profiles"  WHERE "profiles"."user_id" = ? LIMIT 1  [["user_id", 4]]
+  [1m[36mFollower Load (0.3ms)[0m  [1mSELECT "followers".* FROM "followers"  WHERE (user_id = 4 AND request_status LIKE 'approved')[0m
+  [1m[35mFollower Load (0.2ms)[0m  SELECT "followers".* FROM "followers"  WHERE (user_id = 4 AND request_status LIKE 'invited')
+  Rendered lovedones/index.html.erb within layouts/application (37.1ms)
+  [1m[36mCACHE (0.0ms)[0m  [1mSELECT  "profiles".* FROM "profiles"  WHERE "profiles"."user_id" = ? LIMIT 1[0m  [["user_id", 4]]
+  Rendered layouts/_navigation_links.html.erb (2.8ms)
+  Rendered layouts/_navigation_sign.html.erb (1.0ms)
+  Rendered layouts/_navigation.html.erb (7.0ms)
+  Rendered layouts/_messages.html.erb (0.8ms)
+Completed 200 OK in 101ms (Views: 79.2ms | ActiveRecord: 3.3ms)
+
+
+Started GET "/lovedones/3/edit" for 180.151.106.193 at 2014-07-18 14:26:40 +0000
+Processing by LovedonesController#edit as HTML
+  Parameters: {"id"=>"3"}
+  [1m[35mUser Load (0.4ms)[0m  SELECT  "users".* FROM "users"  WHERE "users"."id" = 4  ORDER BY "users"."id" ASC LIMIT 1
+  [1m[36mLovedone Load (0.1ms)[0m  [1mSELECT  "lovedones".* FROM "lovedones"  WHERE "lovedones"."id" = ? LIMIT 1[0m  [["id", 3]]
+  Rendered lovedones/_form.html.erb (49.7ms)
+  [1m[35mPrimaryContact Load (0.4ms)[0m  SELECT  "primary_contacts".* FROM "primary_contacts"  WHERE "primary_contacts"."lovedone_id" = ? LIMIT 1  [["lovedone_id", 3]]
+  [1m[36mFollower Load (0.3ms)[0m  [1mSELECT "followers".* FROM "followers"  WHERE "followers"."lovedone_id" = ?[0m  [["lovedone_id", 3]]
+  [1m[35mProvider Load (0.3ms)[0m  SELECT "providers".* FROM "providers"  WHERE "providers"."lovedone_id" = ?  [["lovedone_id", 3]]
+  [1m[36mCompany Load (0.4ms)[0m  [1mSELECT  "companies".* FROM "companies"  WHERE "companies"."id" = ? LIMIT 1[0m  [["id", 2]]
+  [1m[35mEmployee Load (0.3ms)[0m  SELECT  "employees".* FROM "employees"  WHERE "employees"."lovedone_id" = ? LIMIT 1  [["lovedone_id", 3]]
+  Rendered lovedones/edit.html.erb within layouts/application (94.2ms)
+  [1m[36mProfile Load (0.2ms)[0m  [1mSELECT  "profiles".* FROM "profiles"  WHERE "profiles"."user_id" = ? LIMIT 1[0m  [["user_id", 4]]
+  Rendered layouts/_navigation_links.html.erb (2.2ms)
+  Rendered layouts/_navigation_sign.html.erb (0.3ms)
+  Rendered layouts/_navigation.html.erb (4.8ms)
+  Rendered layouts/_messages.html.erb (0.2ms)
+Completed 200 OK in 142ms (Views: 134.3ms | ActiveRecord: 3.4ms)
+
+
+Started GET "/lovedones/3/primary_contacts/3/edit" for 180.151.106.193 at 2014-07-18 14:26:49 +0000
+Processing by PrimaryContactsController#edit as HTML
+  Parameters: {"lovedone_id"=>"3", "id"=>"3"}
+  [1m[35mLovedone Load (0.2ms)[0m  SELECT  "lovedones".* FROM "lovedones"  WHERE "lovedones"."id" = ? LIMIT 1  [["id", 3]]
+  [1m[36mPrimaryContact Load (0.2ms)[0m  [1mSELECT  "primary_contacts".* FROM "primary_contacts"  WHERE "primary_contacts"."id" = ? LIMIT 1[0m  [["id", 3]]
+  [1m[35mUser Load (0.5ms)[0m  SELECT "users".* FROM "users" LEFT OUTER JOIN profiles ON profiles.user_id = users.id WHERE (profiles.id IS NOT null)
+  Rendered primary_contacts/_form.html.erb (16.4ms)
+  Rendered primary_contacts/edit.html.erb within layouts/application (18.4ms)
+  [1m[36mUser Load (0.4ms)[0m  [1mSELECT  "users".* FROM "users"  WHERE "users"."id" = 4  ORDER BY "users"."id" ASC LIMIT 1[0m
+  [1m[35mProfile Load (0.1ms)[0m  SELECT  "profiles".* FROM "profiles"  WHERE "profiles"."user_id" = ? LIMIT 1  [["user_id", 4]]
+  Rendered layouts/_navigation_links.html.erb (3.4ms)
+  Rendered layouts/_navigation_sign.html.erb (0.4ms)
+  Rendered layouts/_navigation.html.erb (5.9ms)
+  Rendered layouts/_messages.html.erb (0.2ms)
+Completed 200 OK in 64ms (Views: 59.6ms | ActiveRecord: 1.4ms)
+
+
+Started PATCH "/lovedones/3/primary_contacts/3" for 180.151.106.193 at 2014-07-18 14:27:00 +0000
+Processing by PrimaryContactsController#update as HTML
+  Parameters: {"utf8"=>"✓", "authenticity_token"=>"0mW9cM4FuI+3pFWYQC838kAhaMEjkFW8X0aGZ5HWHgg=", "primary_contact"=>{"user_id"=>"6"}, "commit"=>"Update Primary contact", "lovedone_id"=>"3", "id"=>"3"}
+  [1m[36mLovedone Load (0.2ms)[0m  [1mSELECT  "lovedones".* FROM "lovedones"  WHERE "lovedones"."id" = ? LIMIT 1[0m  [["id", 3]]
+  [1m[35mPrimaryContact Load (0.1ms)[0m  SELECT  "primary_contacts".* FROM "primary_contacts"  WHERE "primary_contacts"."id" = ? LIMIT 1  [["id", 3]]
+  [1m[36m (0.2ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  UPDATE "primary_contacts" SET "updated_at" = ?, "user_id" = ? WHERE "primary_contacts"."id" = 3  [["updated_at", "2014-07-18 14:27:00.813135"], ["user_id", 6]]
+  [1m[36m (4.4ms)[0m  [1mcommit transaction[0m
+Redirected to http://192.241.241.53:3000/lovedones
+Completed 302 Found in 12ms (ActiveRecord: 5.2ms)
+
+
+Started GET "/lovedones" for 180.151.106.193 at 2014-07-18 14:27:02 +0000
+Processing by LovedonesController#index as HTML
+  [1m[35mUser Load (0.8ms)[0m  SELECT  "users".* FROM "users"  WHERE "users"."id" = 4  ORDER BY "users"."id" ASC LIMIT 1
+  [1m[36mPrimaryContact Load (0.2ms)[0m  [1mSELECT "primary_contacts".* FROM "primary_contacts"  WHERE (user_id = 4)[0m
+  [1m[35mFollower Load (0.2ms)[0m  SELECT "followers".* FROM "followers"  WHERE (user_id = 4 AND request_status LIKE 'approved')
+  [1m[36mFollower Load (0.2ms)[0m  [1mSELECT "followers".* FROM "followers"  WHERE (user_id = 4 AND request_status LIKE 'invited')[0m
+  Rendered lovedones/index.html.erb within layouts/application (5.9ms)
+  [1m[35mProfile Load (0.2ms)[0m  SELECT  "profiles".* FROM "profiles"  WHERE "profiles"."user_id" = ? LIMIT 1  [["user_id", 4]]
+  Rendered layouts/_navigation_links.html.erb (2.0ms)
+  Rendered layouts/_navigation_sign.html.erb (0.4ms)
+  Rendered layouts/_navigation.html.erb (4.5ms)
+  Rendered layouts/_messages.html.erb (0.2ms)
+Completed 200 OK in 56ms (Views: 49.3ms | ActiveRecord: 1.6ms)
+
+
+Started GET "/" for 181.131.54.100 at 2014-07-18 16:21:52 +0000
+Processing by VisitorsController#index as HTML
+  Rendered visitors/index.html.erb within layouts/application (0.5ms)
+  Rendered layouts/_navigation_links.html.erb (0.2ms)
+  Rendered layouts/_navigation_sign.html.erb (0.7ms)
+  Rendered layouts/_navigation.html.erb (2.8ms)
+  Rendered layouts/_messages.html.erb (0.1ms)
+Completed 200 OK in 38ms (Views: 37.4ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/users/sign_in" for 181.131.54.100 at 2014-07-18 16:24:12 +0000
+Processing by Devise::SessionsController#new as HTML
+  Rendered devise/sessions/new.html.erb within layouts/application (4.3ms)
+  Rendered layouts/_navigation_links.html.erb (0.4ms)
+  Rendered layouts/_navigation_sign.html.erb (0.8ms)
+  Rendered layouts/_navigation.html.erb (3.3ms)
+  Rendered layouts/_messages.html.erb (0.1ms)
+Completed 200 OK in 48ms (Views: 45.4ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/users/sign_in" for 181.131.54.100 at 2014-07-18 16:24:27 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"utf8"=>"✓", "authenticity_token"=>"6VnO5OyldAjX3HQ4K2O11akLp/M1FzL+Za8+J4bKEec=", "user"=>{"email"=>"renem8313@gmail.com", "password"=>"[FILTERED]", "remember_me"=>"0"}, "commit"=>"Sign in"}
+  [1m[36mUser Load (0.6ms)[0m  [1mSELECT  "users".* FROM "users"  WHERE "users"."email" = 'renem8313@gmail.com'  ORDER BY "users"."id" ASC LIMIT 1[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.5ms)[0m  [1mUPDATE "users" SET "current_sign_in_at" = ?, "last_sign_in_at" = ?, "sign_in_count" = ?, "updated_at" = ? WHERE "users"."id" = 2[0m  [["current_sign_in_at", "2014-07-18 16:24:27.552857"], ["last_sign_in_at", "2014-07-15 18:48:20.457082"], ["sign_in_count", 9], ["updated_at", "2014-07-18 16:24:27.554231"]]
+  [1m[35m (6.0ms)[0m  commit transaction
+Redirected to http://192.241.241.53:3000/
+Completed 302 Found in 141ms (ActiveRecord: 7.3ms)
+
+
+Started GET "/" for 181.131.54.100 at 2014-07-18 16:24:27 +0000
+Processing by VisitorsController#index as HTML
+  [1m[36mUser Load (0.5ms)[0m  [1mSELECT  "users".* FROM "users"  WHERE "users"."id" = 2  ORDER BY "users"."id" ASC LIMIT 1[0m
+  [1m[35mCompany Load (0.1ms)[0m  SELECT  "companies".* FROM "companies"  WHERE "companies"."user_id" = ? LIMIT 1  [["user_id", 2]]
+  Rendered visitors/index.html.erb within layouts/application (3.3ms)
+  Rendered layouts/_navigation_links.html.erb (0.8ms)
+  Rendered layouts/_navigation_sign.html.erb (0.3ms)
+  Rendered layouts/_navigation.html.erb (3.2ms)
+  Rendered layouts/_messages.html.erb (0.2ms)
+Completed 200 OK in 45ms (Views: 43.8ms | ActiveRecord: 0.6ms)
+
+
+Started GET "/companies/1/track" for 181.131.54.100 at 2014-07-18 16:24:29 +0000
+Processing by EmployeesController#track as HTML
+  Parameters: {"company_id"=>"1"}
+  [1m[36mUser Load (0.5ms)[0m  [1mSELECT  "users".* FROM "users"  WHERE "users"."id" = 2  ORDER BY "users"."id" ASC LIMIT 1[0m
+  [1m[35mCompany Load (0.2ms)[0m  SELECT  "companies".* FROM "companies"  WHERE "companies"."id" = ? LIMIT 1  [["id", 1]]
+  [1m[36mEmployee Load (0.3ms)[0m  [1mSELECT "employees".* FROM "employees"  WHERE "employees"."company_id" = ? AND (updated_at >= '2014-07-18 16:19:29.711578')[0m  [["company_id", 1]]
+@hash
+  Rendered employees/track.html.erb within layouts/application (1.1ms)
+  [1m[35mCompany Load (0.3ms)[0m  SELECT  "companies".* FROM "companies"  WHERE "companies"."user_id" = ? LIMIT 1  [["user_id", 2]]
+  Rendered layouts/_navigation_links.html.erb (2.6ms)
+  Rendered layouts/_navigation_sign.html.erb (0.4ms)
+  Rendered layouts/_navigation.html.erb (5.3ms)
+  Rendered layouts/_messages.html.erb (0.2ms)
+Completed 200 OK in 59ms (Views: 47.7ms | ActiveRecord: 1.2ms)
+
+
+Started GET "/" for 181.131.54.100 at 2014-07-18 21:58:31 +0000
+Processing by VisitorsController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1mSELECT  "users".* FROM "users"  WHERE "users"."id" = 2  ORDER BY "users"."id" ASC LIMIT 1[0m
+  [1m[35mCompany Load (0.1ms)[0m  SELECT  "companies".* FROM "companies"  WHERE "companies"."user_id" = ? LIMIT 1  [["user_id", 2]]
+  Rendered visitors/index.html.erb within layouts/application (3.3ms)

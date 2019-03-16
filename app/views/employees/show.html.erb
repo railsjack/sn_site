@@ -1,0 +1,55 @@
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">Employee</h3>
+      </div>
+      <div class="panel-body">
+          
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Latitude:</strong>
+  <%= @employee.latitude %>
+</p>
+
+<p>
+  <strong>Longitude:</strong>
+  <%= @employee.longitude %>
+</p>
+
+<p>
+  <strong>Company:</strong>
+  <%= @employee.company.company_name %>
+</p>
+
+          
+<p>
+  <strong>Loved One:</strong>
+  <%= @employee.lovedone.first_name + " #{@employee.lovedone.last_name}" if @employee.lovedone%>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @employee.name %>
+</p>
+
+<p>
+  <strong>Username:</strong>
+  <%= @employee.username %>
+</p>
+
+<p>
+  <strong>Password:</strong>
+  <%= @employee.password %>
+</p>
+
+</div>
+     <div class="panel-footer">
+        <%= link_to 'Edit', edit_company_employee_path(@employee.company, @employee) , class: 'btn btn-success btn-md'%> |
+        <%= link_to 'Back', company_employees_path , class: 'btn btn-success btn-md'%>         
+    </div>        
+    </div>
+    </div>    
+</div>          
+          

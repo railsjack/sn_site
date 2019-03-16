@@ -1,0 +1,327 @@
+$('#data_upload_preview').html("<%= escape_javascript render(partial: 'data_upload_preview') %>");
+
+$('.data-upload-cancel-button').click(function(){
+    data_upload_hidden_class();
+});
+
+$('.data_upload_button').click(function(){
+    alert($('.timesheet_ids_array').data('timesheet_ids'));
+});
+
+$('.data-upload-close-button').click(function(){
+    data_upload_hidden_class();
+});
+
+$('.du_encounter_based').click(function(){
+    timesheet_id = $(this).closest("tr").find("td.timesheet_id.hidden").html();
+    checkbox_value = $(this).is(':checked');
+    $.ajax({
+        url: '/data_uploads/update_encounter_based',
+        dataType: 'script',
+        type: 'POST',
+        data: {
+            timesheet_id: timesheet_id,
+            encounter_based: checkbox_value
+        }
+    });
+});
+
+$('#abbrevTimeOption1').click(function(){
+    $('#abbrevTimeModal').modal('hide');
+});
+
+$('.du_timepicker').datetimepicker({
+    datepicker:false,
+    format:'H:i',
+    step: 15
+});
+
+function data_upload_hidden_class(){
+    $('#abbrevTimeModal #abbrevTimeContent').removeClass('hidden');
+    $('#abbrevTimeOption1').removeClass('hidden');
+    $('#abbrevTimeOption2').removeClass('hidden');
+    $('#abbrevTimeSave').addClass('hidden');
+    $('#abbrevTimeOption2Content').addClass('hidden');
+
+    $('#endEncounterModal #endEncounterContent').removeClass('hidden');
+    $('#endEncounterOption1').removeClass('hidden');
+    $('#endEncounterOption2').removeClass('hidden');
+    $('#endEncounterSave').addClass('hidden');
+    $('#endEncounterOption2Content').addClass('hidden');
+
+    $('#openEncounterModal #openEncounterContent').removeClass('hidden');
+    $('#openEncounterOption1').removeClass('hidden');
+    $('#openEncounterSave').addClass('hidden');
+    $('#openEncounterOption1Content').addClass('hidden');
+}
+
+$('#abbrevTimeOption2').click(function(){
+    $('#abbrevTimeModal #abbrevTimeContent').addClass('hidden');
+    $('#abbrevTimeOption1').addClass('hidden');
+    $('#abbrevTimeOption2').addClass('hidden');
+    $('#abbrevTimeSave').removeClass('hidden');
+    $('#abbrevTimeOption2Content').removeClass('hidden');
+});
+
+$('#abbrevTimeSave').click(function(){
+    start_time = $('#abbrev_start_time').val();
+    end_time = $('#abbrev_end_time').val();
+    timesheet = $('#abbrev_timesheet_id').val();
+    shift_start_time = $('#abbrev_shift_start_time').val();
+    shift_end_time = $('#abbrev_shift_end_time').val();
+    shift = $('#abbrev_shift_id').val();
+    $.ajax({
+        url: '/data_uploads/update_upload_alert_time',
+        dataType: 'script',
+        type: 'POST',
+        data: {
+            timesheet_id: timesheet,
+//            shift_id: shift,
+//            shift_start_time: shift_start_time,
+//            shift_end_time: shift_end_time,
+            start_time: start_time,
+            end_time: end_time,
+            selected_sd: "<%= @alert_sd %>",
+            selected_ed: "<%= @alert_ed %>",
+            pr_f2f:"<%= @pr_f2f %>",
+            pr_dtb:"<%= @pr_dtb %>",
+            pr_dmb:"<%= @pr_dmb %>",
+            alert_type: 'abbreviated_time',
+            comp_type: "<%= @type %>"
+        }
+    });
+});
+
+$('#endEncounterOption1').click(function(){
+    $.ajax({
+        url: '/data_uploads/update_upload_alert_time',
+        dataType: 'script',
+        type: 'POST',
+        data: {
+            timesheet_id: timesheet,
+            selected_sd: "<%= @alert_sd %>",
+            selected_ed: "<%= @alert_ed %>",
+            pr_f2f:"<%= @pr_f2f %>",
+            pr_dtb:"<%= @pr_dtb %>",
+            pr_dmb:"<%= @pr_dmb %>",
+            alert_type: 'end_encounter_1',
+            comp_type: "<%= @type %>"
+        }
+    });
+});
+
+$('#endEncounterOption2').click(function(){
+    $('#endEncounterModal #endEncounterContent').addClass('hidden');
+    $('#endEncounterOption1').addClass('hidden');
+    $('#endEncounterOption2').addClass('hidden');
+    $('#endEncounterSave').removeClass('hidden');
+    $('#endEncounterOption2Content').removeClass('hidden');
+});
+
+$('#endEncounterSave').click(function(){
+    start_time = $('#end_enc_start_time').val();
+    end_time = $('#end_enc_end_time').val();
+    timesheet = $('#end_enc_timesheet_id').val();
+    shift_start_time = $('#end_enc_shift_start_time').val();
+    shift_end_time = $('#end_enc_shift_end_time').val();
+    shift = $('#end_enc_shift_id').val();
+    $.ajax({
+        url: '/data_uploads/update_upload_alert_time',
+        dataType: 'script',
+        type: 'POST',
+        data: {
+            timesheet_id: timesheet,
+//            shift_id: shift,
+//            shift_start_time: shift_start_time,
+//            shift_end_time: shift_end_time,
+            start_time: start_time,
+            end_time: end_time,
+            selected_sd: "<%= @alert_sd %>",
+            selected_ed: "<%= @alert_ed %>",
+            pr_f2f:"<%= @pr_f2f %>",
+            pr_dtb:"<%= @pr_dtb %>",
+            pr_dmb:"<%= @pr_dmb %>",
+            alert_type: 'end_encounter_2',
+            comp_type: "<%= @type %>"
+        }
+    });
+});
+
+$('#openEncounterOption1').click(function(){
+    $('#openEncounterModal #openEncounterContent').addClass('hidden');
+    $('#openEncounterOption1').addClass('hidden');
+    $('#openEncounterSave').removeClass('hidden');
+    $('#openEncounterOption1Content').removeClass('hidden');
+});
+
+$('#openEncounterSave').click(function(){
+    start_time = $('#open_enc_start_time').val();
+    end_time = $('#open_enc_end_time').val();
+    timesheet = $('#open_enc_timesheet_id').val();
+    $.ajax({
+        url: '/data_uploads/update_upload_alert_time',
+        dataType: 'script',
+        type: 'POST',
+        data: {
+            timesheet_id: timesheet,
+            start_time: start_time,
+            end_time: end_time,
+            selected_sd: "<%= @alert_sd %>",
+            selected_ed: "<%= @alert_ed %>",
+            pr_f2f:"<%= @pr_f2f %>",
+            pr_dtb:"<%= @pr_dtb %>",
+            pr_dmb:"<%= @pr_dmb %>",
+            alert_type: 'open_encounter',
+            comp_type: "<%= @type %>"
+        }
+    });
+});
+
+
+
+$('.end_encounter_alert').click(function(){
+    timesheet = $(this).closest("tr").find("td.timesheet_id.hidden").html();
+//    shift = $(this).closest("tr").find("td.shift_id.hidden").html();
+//    shift_start_time = $(this).closest("tr").find("td.shift_start_time.hidden").html();
+//    shift_end_time = $(this).closest("tr").find("td.shift_end_time.hidden").html();
+    distance_alert_time = $(this).closest("tr").find("td.hidden.distance_alert_time").html();
+    if ($(this).closest("tr").find("td.pr_lovedone_name").html() == undefined) {
+        lovedone_name = $(this).closest("tr").find("td.bl_lovedone_name").html();
+    }
+    else{
+        lovedone_name = $(this).closest("tr").find("td.pr_lovedone_name").html();
+    }
+
+    if ($(this).closest("tr").find("td.pr_employee_name").html() == undefined){
+        employee_name = $(this).closest("tr").find("td.bl_employee_name").html();
+    }
+    else {
+        employee_name = $(this).closest("tr").find("td.pr_employee_name").html();
+    }
+    date = $(this).closest("tr").find("td.data_upload_date").html();
+    start_time = $(this).closest("tr").find("td.start_time").html();
+    end_time = $(this).closest("tr").find("td.end_time").html();
+    total_time = $(this).closest("tr").find("td.total_time").html();
+    $('#endEncounterModal #endEncounterContent').html('' +
+        '<table class="table">' +
+            '<tr class="success">' +
+                '<th>Date</th><th>Employee</th><th>Loved One</th><th>Start Time</th><th>End Time</th><th>Total Time</th>' +
+            '</tr>' +
+            '<tr>' +
+                '<td>'+date+'</td><td>'+employee_name+'</td><td>'+lovedone_name+'</td><td>'+start_time+'</td><td>'+end_time+'</td><td>'+total_time+'</td>' +
+            '</tr>' +
+        '</table>' +
+        '<br>'+
+        'A departure reminder was sent to the employee on this encounter.' +
+        ' This means the departure button was not clicked on the mobile app before the employee left the loved one’s zone.' +
+        ' Furthermore, the employee did not respond to the departure reminder’s distance alert or the time alert notices.' +
+        ' This situation may have created an artificially long encounter.'+
+        '<br><br><p> The time stamp of the departure reminder’s distance alert was <b style="color:red">'+distance_alert_time+'</b>.' +
+        ' To automatically use this time as the end time for the encounter, select <b style="color:green">Option 1</b>.</p>'+
+        '<p> To manually enter a time for the encounter’s end, select <b style="color:green">Option 2</b>.</p>'
+    );
+    $('#endEncounterModal').modal({ backdrop: 'static', keyboard: false, show: true });
+
+    $('#end_enc_start_time').val(start_time.replace(/\s+/g, ''));
+    $('#end_enc_end_time').val(end_time.replace(/\s+/g, ''));
+    $('#end_enc_timesheet_id').val(timesheet);
+//    $('#end_enc_shift_id').val(shift);
+//    $('#end_enc_shift_start_time').val(shift_start_time.replace(/\s+/g, ''));
+//    $('#end_enc_shift_end_time').val(shift_end_time.replace(/\s+/g, ''));
+});
+
+$('.abbreviated_time_alert').on('click', function(){
+    timesheet = $(this).closest("tr").find("td.timesheet_id.hidden").html();
+//    shift = $(this).closest("tr").find("td.shift_id.hidden").html();
+//    shift_start_time = $(this).closest("tr").find("td.shift_start_time.hidden").html();
+//    shift_end_time = $(this).closest("tr").find("td.shift_end_time.hidden").html();
+    if ($(this).closest("tr").find("td.pr_lovedone_name").html() == undefined) {
+        lovedone_name = $(this).closest("tr").find("td.bl_lovedone_name").html();
+    }
+    else{
+        lovedone_name = $(this).closest("tr").find("td.pr_lovedone_name").html();
+    }
+
+    if ($(this).closest("tr").find("td.pr_employee_name").html() == undefined){
+        employee_name = $(this).closest("tr").find("td.bl_employee_name").html();
+    }
+    else {
+        employee_name = $(this).closest("tr").find("td.pr_employee_name").html();
+    }
+    date = $(this).closest("tr").find("td.data_upload_date").html();
+    start_time = $(this).closest("tr").find("td.start_time").html();
+    end_time = $(this).closest("tr").find("td.end_time").html();
+    total_time = $(this).closest("tr").find("td.total_time").html();
+    $('#abbrevTimeModal #abbrevTimeContent').html('' +
+            '<table class="table">' +
+                '<tr class="success">' +
+                    '<th>Date</th><th>Employee</th><th>Loved One</th><th>Start Time</th><th>End Time</th><th>Total Time</th>' +
+                '</tr>' +
+                '<tr>' +
+                    '<td>'+date+'</td><td>'+employee_name+'</td><td>'+lovedone_name+'</td><td>'+start_time+'</td><td>'+end_time+'</td><td>'+total_time+'</td>' +
+                '</tr>' +
+            '</table>' +
+            '<br>'+
+            'The time between the employee clicking the mobile app’s arrival button and departure ' +
+            'button was <b style="color:red">'+total_time+' minutes</b>.  This frequently happens when an employee ' +
+            'forgets to use the mobile app at an encounter and then tries to “make up” for it once he/she realizes the mistake. ' +
+            'This typically results in the employee clicking the arrival and departure buttons in a short ' +
+            'time span to get the encounter “on the books.”' +
+            '<br><br><p> If this encounter’s time is accurate, select <b style="color:green">Option 1</b> and the time will not be modified. </p>' +
+            '<p> To manually enter a beginning and ending time for the encounter, select <b style="color:green">Option 2</b>.</p>'
+    );
+    $('#abbrevTimeModal').modal({ backdrop: 'static', keyboard: false, show: true });
+
+    $('#abbrev_start_time').val(start_time.replace(/\s+/g, ''));
+    $('#abbrev_end_time').val(end_time.replace(/\s+/g, ''));
+    $('#abbrev_timesheet_id').val(timesheet);
+//    $('#abbrev_shift_start_time').val(shift_start_time.replace(/\s+/g, ''));
+//    $('#abbrev_shift_end_time').val(shift_end_time.replace(/\s+/g, ''));
+//    $('#abbrev_shift_id').val(shift);
+});
+
+$('.open_encounter_alert').on('click', function(){
+    timesheet = $(this).closest("tr").find("td.timesheet_id.hidden").html();
+//    shift = $(this).closest("tr").find("td.shift_id.hidden").html();
+//    shift_start_time = $(this).closest("tr").find("td.shift_start_time.hidden").html();
+//    shift_end_time = $(this).closest("tr").find("td.shift_end_time.hidden").html();
+    if ($(this).closest("tr").find("td.pr_lovedone_name").html() == undefined) {
+        lovedone_name = $(this).closest("tr").find("td.bl_lovedone_name").html();
+    }
+    else{
+        lovedone_name = $(this).closest("tr").find("td.pr_lovedone_name").html();
+    }
+
+    if ($(this).closest("tr").find("td.pr_employee_name").html() == undefined){
+        employee_name = $(this).closest("tr").find("td.bl_employee_name").html();
+    }
+    else {
+        employee_name = $(this).closest("tr").find("td.pr_employee_name").html();
+    }
+    date = $(this).closest("tr").find("td.data_upload_date").html();
+    start_time = $(this).closest("tr").find("td.start_time").html();
+    end_time = $(this).closest("tr").find("td.end_time").html();
+    total_time = $(this).closest("tr").find("td.total_time").html();
+    $('#openEncounterModal #openEncounterContent').html('' +
+            '<table class="table">' +
+            '<tr class="success">' +
+            '<th>Date</th><th>Employee</th><th>Loved One</th><th>Start Time</th><th>End Time</th><th>Total Time</th>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>'+date+'</td><td>'+employee_name+'</td><td>'+lovedone_name+'</td><td>'+start_time+'</td><td>--</td><td>--</td>' +
+            '</tr>' +
+            '</table>' +
+            '<br>'+
+            'The Departure button was not selected to end this encounter. ' +
+            //'<p> If this encounter’s time is accurate, select <b style="color:green">Option 1</b> and the time will not be modified. </p>' +
+            'To manually enter a beginning and ending time for the encounter, select <b style="color:green">Option 1</b>.</p>'
+    );
+    $('#openEncounterModal').modal({ backdrop: 'static', keyboard: false, show: true });
+
+    $('#open_enc_start_time').val(start_time.replace(/\s+/g, ''));
+    $('#open_enc_timesheet_id').val(timesheet);
+    $('#open_enc_end_time').val(end_time.replace(/\s+/g, ''));
+//    $('#abbrev_shift_start_time').val(shift_start_time.replace(/\s+/g, ''));
+//    $('#abbrev_shift_end_time').val(shift_end_time.replace(/\s+/g, ''));
+//    $('#abbrev_shift_id').val(shift);
+});

@@ -1,0 +1,78 @@
+- resource = @user
+- resource_name = @user.class.to_s.downcase
+.col-md-12
+  .container
+    .row
+      .container
+        .row{:style => "margin-top: 45px;"}
+          #edit-form.panel.panel-default.col-md-offset-2.col-md-8
+            = form_for(resource, :as => resource_name, :url => user_update_path(resource), :html => { :method => :put, :role => 'form', :class => 'form-horizontal'}) do |f|
+              %h3
+                Edit Primary Contact
+              %hr/
+              - if @user.profile
+                = f.fields_for :profile do |profile_form|
+                  .form-group
+                    = profile_form.label :first_name1, 'Loved One', class: 'col-md-3 control-label'
+                    .col-md-7
+                      .form-control=f.object.lovedones.first.name
+                  .form-group
+                    = profile_form.label :first_name, 'First Name', class: 'col-md-3 control-label'
+                    .col-md-7
+                      = profile_form.text_field :first_name, class: 'form-control'
+                  .form-group.hidden
+                    = profile_form.label :middle_initial, 'Middle intial', class: 'col-md-3 control-label'
+                    .col-md-7
+                      = profile_form.text_field :middle_initial, class: 'form-control'
+                  .form-group
+                    = profile_form.label :last_name, 'Last Name', class: 'col-md-3 control-label'
+                    .col-md-7
+                      = profile_form.text_field :last_name, class: 'form-control'
+                  .form-group
+                    = profile_form.label :email, 'Email', class: 'col-md-3 control-label'
+                    .col-md-7
+                      = f.text_field :email, class: 'form-control'
+                  .form-group.hidden
+                    = profile_form.label :gender, 'Gender:', class: 'col-md-3 control-label'
+                    .col-md-7{:style => "margin-top: 6px;", :title => "Check the appropriate box for the loved one's gender.  This information is also used to distinguish two people with the same name."}
+                      %label
+                        Male #{profile_form.radio_button :gender, true}
+                      %label{:style => "margin-left: 20px;"}
+                        Female #{profile_form.radio_button :gender, false}
+                  .form-group
+                    = profile_form.label :phone_number, 'Mobile Phone Number', class: 'col-md-3 control-label'
+                    .col-md-7= profile_form.text_field :phone_number, class: 'form-control', value: profile_form.object.phone_number.gsub(/\)/,') ')
+                  .form-group
+                    = profile_form.label :state, 'State', class: 'col-md-3 control-label'
+                    .col-md-7
+                      = profile_form.select :state, options_for_select(us_states, :selected => @user.profile.state), {}, { :class => 'form-control' }
+                  .form-group
+                    = profile_form.label :county, 'County', class: 'col-md-3 control-label'
+                    .col-md-7
+                      = profile_form.select :county, [], {}, { :class => 'form-control' , required: true, 'data-selected-item'=> profile_form.object.county}
+                  .form-group
+                    = profile_form.label :city, 'City', class: 'col-md-3 control-label'
+                    .col-md-7= profile_form.text_field :city, class: 'form-control'
+                  .form-group.hidden
+                    = profile_form.label :zip, 'Zip Code', class: 'col-md-3 control-label'
+                    .col-md-7= profile_form.text_field :zip, class: 'form-control'
+                  %fieldset
+                    .form-group
+                      = profile_form.label :contact_method, 'Contact Method', class: 'col-md-3 control-label'
+                      .col-md-7
+                        - Profile::contact_types.each do |a_value|
+                          %p
+                            = profile_form.check_box( :contact_method, { :multiple => true }, a_value, nil)
+                            = profile_form.label a_value
+              = f.submit 'Update', :class => 'btn btn-success pull-right'
+              /= link_to "Back", :back, :class=>"btn btn-default"
+              = link_to "Back", admin_primary_contacts_path, :class=>"btn btn-default"
+              %p &nbsp;
+              .clearfix
+
+:javascript
+  $(function(){
+    var state_selector = '#user_profile_attributes_state';
+    var county_selector = '#user_profile_attributes_county';
+    fn_init_state_county(state_selector, county_selector);
+  });

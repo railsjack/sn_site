@@ -1,0 +1,11 @@
+li= link_to 'Employees', company_employees_path(current_user.company)
+li= link_to 'Loved Ones', lovedones_path
+li= link_to 'Users', access_settings_path if current_user.admin
+li= link_to 'Scheduler', schedulers_path
+li= link_to 'My Company', edit_companymember_path(current_user)
+li= link_to 'Track', controller: "employees", action: "track_locations", company_id: current_user.company
+li= link_to 'Reports', controller: "employees", action: "rep_by_emp", company_id: current_user.company
+li= link_to 'Data Import', employees_data_imports_path
+li= link_to 'Data Export', data_uploads_path
+li= link_to 'LifePatient', life_patient_registration_path
+li= link_to 'Help', tutorials_training_videos_path

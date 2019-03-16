@@ -1,0 +1,150 @@
+%script{src: "#{Rails.application.secrets.gmap_api_path}"}
+
+:css
+  p.map-info{ white-space: nowrap; }
+  .map-icon{
+    float: left;
+    width: 19%;
+    height: 35px;
+    line-height: 25px;
+    background-color: #a0dc78;
+    margin-left: 5px;
+    font-size: 12pt;
+    font-weight: bold;
+    padding: 5px;
+    font-style: italic;
+  }
+  .map-icon-img{
+    display: inline;
+    height: 25px;
+    margin-right: 10px;
+  }
+
+
+.container
+.row  
+%h3.text-center View Map
+#map_canvas
+#multi_markers
+%div
+  %ul.map-ions 
+//#{ debug(@tuserp) }
+    
+:javascript
+  function get_icon(count){
+    var icon_url = 'https://thydzik.com/thydzikGoogleMap/markerlink.php?text=%TEXT%&color=f76357';
+    return icon_url.replace(/%TEXT%/gi, count);
+  }
+  var markers = #{raw @hash.to_json};
+
+  var default_pos = {lat: 27.9962987, lng: -82.4542};
+  var default_zipcode = "#{@default_zipcode}";
+
+  if(!markers.length>0)
+  {
+
+    handler = Gmaps.build('Google');
+
+      handler.buildMap({ provider: {}, internal: {id: 'multi_markers'}}, function(){
+        markers = handler.addMarkers([
+          {
+            "lat": default_pos.lat,
+            "lng": default_pos.lng,
+            "infowindow": ""
+          }
+        ]);
+        handler.bounds.extendWith(markers);
+        handler.fitMapToBounds();
+        handler.map.serviceObject.setZoom(10);
+      });
+
+     }else {
+
+
+        handler = Gmaps.build('Google');
+        var geocoder = new google.maps.Geocoder();
+
+        var latlng = new google.maps.LatLng(default_pos.lat, default_pos.lng);
+
+        handler.buildMap({ provider: { zoom: 15, latlng: default_pos}, internal: {id: 'multi_markers'}}, 
+        function(){
+          if(markers.length>0){
+            put_mapicons(markers);
+            markers = handler.addMarkers(markers, {visible: true});
+            var count = 1;
+            markers.map(function(marker){
+              marker.serviceObject.setIcon(get_icon(count++));
+            });
+            handler.bounds.extendWith(markers);
+            //handler.fitMapToBounds();
+            handler.map.serviceObject.setZoom(10);
+            handler.map.serviceObject.setCenter(default_pos);
+
+            $.get("http://maps.googleapis.com/maps/api/geocode/json?address="+default_zipcode, function(res){
+              default_pos = res.results[0].geometry.location;
+              handler.map.serviceObject.setZoom(10);
+              handler.map.serviceObject.setCenter(default_pos);
+            },"json");
+
+            //JSON.load(open("http://maps.googleapis.com/maps/api/geocode/json?address=75074")) do |f|
+
+          }
+        });
+     }
+
+  function put_mapicons(markers){
+    var html = '', count = 1;
+    markers.map(function(marker){
+      var name = marker.empname;
+      var icon_img = get_icon(count++);
+      html += "<li class='map-icon'><img src='"+icon_img+"' class='map-icon-img'>&nbsp;"+name+"</li>";
+    });
+    $('ul.map-ions').html(html);
+  }
+
+  function update()
+  { 
+    var campany_id = #{@company.id};
+    var url =  '/companies/'+ campany_id +'/track.json';
+    var original_zoom = handler.map.serviceObject.getZoom();
+    var original_center = handler.map.serviceObject.getCenter();
+    $.get(url, function(data) 
+    {
+      handler.removeMarkers(markers);
+      markers = data;
+      put_mapicons(markers);
+      if(markers.length>0){
+        markers = handler.addMarkers(markers, {visible: true});
+        var count = 1;
+        markers.map(function(marker){
+          marker.serviceObject.setIcon(get_icon(count++));
+        });
+        handler.bounds.extendWith(markers);
+        //handler.fitMapToBounds();
+        handler.map.serviceObject.setZoom(original_zoom);
+        handler.map.serviceObject.setCenter(original_center);
+      }
+    });
+  }
+  var interval_id = window.setInterval('update()', 10*1000);
+  
+  function closeRefresh(){
+    window.clearInterval(interval_id);
+  }
+
+  $('#MyButton').click(function(){
+    closeRefresh();
+  });
+
+
+  /*
+    var geocoder = new google.maps.Geocoder()
+    var latlng = new google.maps.LatLng(27.9962987, 129.5615, 150.644);
+    if (geocoder) { 
+      geocoder.geocode({'latLng': latlng}, function(results, status) { 
+        if (status == google.maps.GeocoderStatus.OK) { 
+          console.log(results[0].formatted_address);
+        } 
+      }); 
+    }
+  */

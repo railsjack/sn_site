@@ -1,0 +1,8 @@
+.nested-fields
+	.fields
+		.inline.field.optional.select.type-select
+			.form-group
+				= f.label :email, 'Notification Email', class: 'col-md-3 control-label'
+				.col-md-7
+					= f.text_field :email, label: false, class: 'form-control'
+				= link_to_remove_association 'Remove' , f

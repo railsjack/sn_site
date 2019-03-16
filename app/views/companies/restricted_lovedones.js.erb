@@ -1,0 +1,11 @@
+$("#restricted_lovedones").html("<%= escape_javascript render(partial: 'companies/restricted_lovedones', locals: {object: @employee}) %>");
+
+<% @employee.company.lovedones.each do |lovedone| %>
+    $('#employee_lovedone_lovedone_id_<%=lovedone.id%>').parent().parent().show();
+<% end %>
+<% if @employee.assigned_lovedones %>
+  <% @employee.assigned_lovedones.each do |lovedone| %>
+      $('#employee_lovedone_lovedone_id_<%=lovedone.id%>').parent().parent().hide();
+  <% end %>
+<% end %>
+

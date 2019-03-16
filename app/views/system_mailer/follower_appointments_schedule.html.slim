@@ -1,0 +1,28 @@
+- Time.zone = @follower.lovedone.company.time_zone
+
+p= "Hello #{@follower.first_name.strip}!"
+
+p= "#{@follower.lovedone.company.business_name} has set up its visitation schedule for #{@follower.lovedone.full_name} between #{DateTime.parse(@start_date).strftime('%m-%d-%y')} and #{DateTime.parse(@end_date).strftime('%m-%d-%y')}.  Below is a summary of when one of our home health caregivers will visit #{@follower.lovedone.first_name.strip}:"
+
+table width='100%'
+  thead
+    tr.bg-success
+      th style="text-align: center;border-width: 1px; border-style: solid;" Date
+      th style="text-align: center;border-width: 1px; border-style: solid;" Day
+      th style="text-align: center;border-width: 1px; border-style: solid;" Time
+      th style="text-align: center;border-width: 1px; border-style: solid;" Caregiver
+      th style="text-align: center;border-width: 1px; border-style: solid;" Caregiver Phone
+  tbody
+    - Scheduler.where("DATE_FORMAT(start_time, '%Y-%m-%d')>=? and DATE_FORMAT(end_time, '%Y-%m-%d')<=? and lovedone_id=?", @start_date, @end_date, @follower.lovedone.id).order('start_time ASC').each do |appt|
+      tr
+        td style="text-align: center;border-width: 1px; border-style: solid;"= appt.start_time.strftime('%m-%d-%y')
+        td style="text-align: center;border-width: 1px; border-style: solid;"= appt.start_time.strftime('%A')
+        td style="text-align: center;border-width: 1px; border-style: solid;"= "#{appt.start_time.strftime('%H:%M')} - #{appt.end_time.strftime('%H:%M')}"
+        td style="text-align: center;border-width: 1px; border-style: solid;"= appt.employee.full_name
+        td style="text-align: center;border-width: 1px; border-style: solid;"= appt.employee.try(:phone_number)
+
+p= "#{@follower.first_name.strip}, if you feel #{@follower.lovedone.first_name.strip} may have a conflict with any of the above-referenced times, please contact the caregiver directly to reschedule."
+
+p We do our very best to be punctual.  However, conditions may arise where our caregiver could be a few minutes late.  Your understanding in this instance is certainly appreciated.
+
+p Thank you!

@@ -1,0 +1,12 @@
+$('#providers_billing_message').html(' ');
+$('.three-quarters-loader').removeClass('hidden');
+
+setTimeout(function(){
+    <% unless @providers_monthly_billing.present?  %>
+        $('#providers_billing_message').html('No invoice has been found for this month');
+    <% end %>
+    $('.three-quarters-loader').addClass('hidden');
+    $('#providers_billing').html("<%= j render partial: 'providers_billing', locals: {monthly_billing: @providers_monthly_billing} %>");
+    new window.Notifications();
+}, 1000);
+

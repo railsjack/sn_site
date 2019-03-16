@@ -1,0 +1,135 @@
+:css
+  td{
+    height: 20px !important;
+    line-height: 10px !important;
+  }
+  a{
+    color: black!important;
+  }
+  a:visited, a:hover{
+    background: none;
+  }
+  .well{
+    background-color: white;
+    padding-top: 10px;
+    padding-bottom: 0;
+  }
+  .table .date{ width: 10% }
+  .table .number{ width: 8% }
+  .table .transported{ width: 30% }
+  .table .picked{ width: 13% }
+  .table .dropped{ width: 13% }
+  .table .total{ width: 13% }
+
+  .col-lg-10{
+    white-space: nowrap;
+    margin-bottom: 18px;
+    height: 15px;
+  }
+  .col-lg-2.control-label{
+    line-height: 33px !important;
+  }
+  .timesheet_starttime label, .notification_updated_at label{
+    line-height: 20px;
+  }
+  .simple_form.form-inline{
+    margin-bottom: 20px;
+  }
+
+.employees
+  %h3.text-center.heading
+    =@title
+    %br
+    =link_to rep_by_lovedone_url do
+      %input{type: 'checkbox', checked: false, name: 'check1'}
+      By Loved One
+    = "/"
+    =link_to rep_by_emp_url do
+      %input{type: 'checkbox', checked: true, name: 'check1'}
+      By Employee
+
+  .container
+    .row.text-center
+      = simple_form_for(@timesheet, url: rep_by_emp_url, html:{class:'form-inline', method: 'get'})  do |f|
+        = f.input :starttime, label: 'From:', as: :date, default: @from
+        = f.input :endtime, label: 'To:', as: :date, default: @to
+        = f.submit "Generate Report", class: 'btn btn-primary'
+      .clear
+    - seconds_2 = 0
+    - @reports.each do |report|
+      .well
+        %h4=report[:emp_name]
+        - count = report[:date_timesheets].count - 1
+        - seconds_1 = 0
+        - report[:date_timesheets].each_with_index do |date_timesheet, n|
+          %table.table{style: 'margin-bottom: 0;'}
+            %thead
+              %tr
+                - if @company.provider_type == 'Transport'
+                  %th.date Date
+                  %th
+                  -#%th.number Trip #
+                  %th.transported Loved One Transported
+                  %th.picked Pick Up Time
+                  %th.dropped Drop Off Time
+                  %th.total Total Trip Time
+                - elsif @company.provider_type == 'Home_Health'
+                  %th.date Date
+                  %th
+                  -#%th.number Trip #
+                  %th.transported Loved One (Patient) Visited
+                  %th.picked Arrival Time
+                  %th.dropped Departure Time
+                  %th.total Total Visit Time
+            %tbody
+              - date_timesheet.each do |key, timesheets|
+                - seconds = 0
+                - timesheets.each do |timesheet|
+                  - second = timesheet.endtime.to_i - timesheet.starttime.to_i
+                  - second = 60 if second>0 and second<60
+                  - seconds = seconds + second
+                  %tr
+                    %td=timesheet[:starttime].strftime('%m/%d/%Y')
+                    %td
+                    -#%td=timesheet.trip_id
+                    %td="#{timesheet.lovedone_last_name}, #{timesheet.lovedone_first_name}"
+                    %td=timesheet.starttime.present? ? timesheet.starttime.strftime('%R') : ''
+                    %td=timesheet.endtime.present? ? timesheet.endtime.strftime('%R') : ''
+                    %td.text-center
+                      =Time.at(second).gmtime.strftime('%R')
+                %tr
+                  %td.text-right.no-border{colspan: 10} &nbsp;
+                %tr
+                  %td.text-right.no-border{colspan: 5} Total Daily Time
+                  %td.text-center.no-border=Time.at(seconds).gmtime.strftime('%R')
+                %tr
+                  %td.text-right.no-border{colspan: 10} &nbsp;
+                - seconds_1 = seconds_1 + seconds
+                - if n==count
+                  %tr
+                    %td.text-right.no-border{colspan: 5}
+                      %strong 
+                        - if @company.provider_type == 'Transport'
+                          Total Driver Trip Time This Period
+                        - elsif @company.provider_type == 'Home_Health'
+                          Total Caregiver Visit Time This Period
+                    %td.text-center.no-border
+                      %strong=Time.at(seconds_1).gmtime.strftime('%R')
+        - seconds_2 = seconds_2 + seconds_1
+    - if seconds_2>0
+      %table.table
+        %tr
+          %td.text-right
+            %strong 
+              - if @company.provider_type == 'Transport'
+                TOTAL TRIP TIME FOR THIS REPORT
+              - elsif @company.provider_type == 'Home_Health'
+                TOTAL VISIT TIME FOR THIS REPORT
+          %td.text-center
+            %strong=Time.at(seconds_2).gmtime.strftime('%R')
+    - else
+      %table.table
+        %tr
+          %td.text-center
+            - if !@init_page
+              %strong No Result

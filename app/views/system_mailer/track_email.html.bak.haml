@@ -1,0 +1,62 @@
+- track_link = link_to 'link', url_for(:only_path => false, controller: "employees", action: "track_employee", id: @employee.id)
+
+- if @which_message == 0
+  - if @employee.company.provider_type == "Transport"
+    - if @employee.service_status == "PickUp"
+      %p
+        SAFETY NOTICE: Hello! #{@employee.company.business_name} has just picked up #{@lovedone.first_name} #{@lovedone.last_name}. 
+    - elsif @employee.service_status == "DropOff"
+      %p
+        SAFETY NOTICE: #{@employee.company.business_name} is pleased to inform you #{@lovedone.first_name} #{@lovedone.last_name} has been successufully transported to the desination.  Thank you!  
+  - elsif @employee.company.provider_type == "Home_Health"
+    - if @employee.service_status == "Arrival"
+      %p
+        SAFETY NOTICE: Hello. #{@employee.company.business_name} has arrived to provide services to #{@lovedone.first_name} #{@lovedone.last_name}.
+    - elsif @employee.service_status == "Departure"
+      %p
+        SAFETY NOTICE: #{@employee.company.business_name} is pleased to inform you they have completed the visit with #{@lovedone.first_name} #{@lovedone.last_name}.  Thank you!  
+- elsif @which_message == 1
+  - if @employee.company.provider_type == "Transport"
+    - if @employee.service_status == "PickUp"
+      %p
+        SAFETY NOTICE: Hi! #{@employee.company.business_name} is now picking up #{@lovedone.first_name} #{@lovedone.last_name}.  
+    - elsif @employee.service_status == "DropOff"
+      %p
+        SAFETY NOTICE: #{@lovedone.first_name} #{@lovedone.last_name} has been successfully transported to the destination by #{@employee.company.business_name}.  Enjoy your day!
+  - elsif @employee.company.provider_type == "Home_Health"
+    - if @employee.service_status == "Arrival"
+      %p
+        SAFETY NOTICE: Hi. #{@employee.company.business_name} is now granting assistance to #{@lovedone.first_name} #{@lovedone.last_name}.
+    - elsif @employee.service_status == "Departure"
+      %p
+        SAFETY NOTICE: #{@lovedone.first_name} #{@lovedone.last_name}'s visitation by #{@employee.company.business_name} has been successfully completed.  Enjoy your day!
+- elsif @which_message == 2
+  - if @employee.company.provider_type == "Transport"
+    - if @employee.service_status == "PickUp"
+      %p
+        SAFETY NOTICE: Hello! #{@employee.company.business_name} is now transporting #{@lovedone.first_name} #{@lovedone.last_name}.   
+    - elsif @employee.service_status == "DropOff"
+      %p
+        SAFETY NOTICE: #{@employee.company.business_name} is happy to inform you #{@lovedone.first_name} #{@lovedone.last_name} has been successfully transported. Thank you!
+  - elsif @employee.company.provider_type == "Home_Health"
+    - if @employee.service_status == "Arrival"
+      %p
+        SAFETY NOTICE: Hello. #{@employee.company.business_name} has arrived to render services to #{@lovedone.first_name} #{@lovedone.last_name}.  
+    - elsif @employee.service_status == "Departure"
+      %p
+        SAFETY NOTICE: #{@employee.company.business_name} is happy to inform you they have successfully interacted with #{@lovedone.first_name} #{@lovedone.last_name}. Thank you!
+%br
+
+- if @which_message == 0
+  - unless @sponser.nil?
+    %p
+      This notification has been sponsored by
+      = succeed "." do
+        %strong= @sponser.name
+
+- if @which_message == 1 || @which_message == 2
+  - unless @sponser.nil?
+    %p
+      This message is proudly sponsored by
+      = succeed "." do
+        %strong= @sponser.name

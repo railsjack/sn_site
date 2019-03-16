@@ -1,0 +1,67 @@
+- oid = providers.object_id
+
+:css
+	.fixed-table-loading, .no-records-found{
+		display: none !important;
+	}
+:javascript
+	$(function(){
+		$('.o-#{oid} .fixed-table-loading').hide();
+		$('.o-#{oid} .search-text-remove').click(function(){
+			$('.o-#{oid} .suggestion-search')
+				.val('')
+				.trigger('keyup');
+		});
+		$('.o-#{oid} .suggestion-search').unbind().keyup(function(e){
+			var key = e.target.value.toLowerCase();
+			
+			$('.o-#{oid} .table tr').show();
+			$('.o-#{oid} .table tbody tr').each(function(){
+				if($(this).text().toLowerCase().indexOf(key)==-1){
+					$(this).hide();
+				}
+			});
+		});
+
+		$('.o-#{oid} table.featured-svc-providers').bootstrapTable({
+			sorter:{
+					0: function(){}
+				}
+		});
+	});
+
+.table-responsive{style: "position: relative;"}
+	%div{style:"margin: 10px 0;"}
+		.form-group.has-error.has-feedback.relative{style: "padding:0 15px; width: 200px;"}
+			%input.suggestion-search{:placeholder => "Search...", :type => "text", style: "border: solid 1px #aaa; padding: 5px; border-radius: 3px; width: 200px;" }/
+			%span.search-text-remove.glyphicon.glyphicon-remove{style: "position: absolute; right: -8px; top: 8px; cursor: pointer;"}
+%table.table-hover.featured-svc-providers.table-condensed.table-striped{"data-sort-name" => "business_name", "data-sort-order" => "asc", "data-toggle" => "table1"}
+	%thead
+		%tr
+			%th{"data-field" => "business_name", "data-sortable" => "true", "data-sorter"=>"stringSorter"} Business Name
+			%th{"data-field" => "city", "data-sortable" => "true", "data-sorter"=>"stringSorter"} City
+			%th{"data-field" => "county", "data-sortable" => "true", "data-sorter"=>"stringSorter"} County
+			%th{"data-field" => "state", "data-sortable" => "true", "data-sorter"=>"stringSorter"} State
+			%th *
+	%tbody
+		- unless providers.nil?
+			- providers.each do |company|
+				%tr
+					- if company.featured
+						%td
+							%strong= company.business_name
+						%td
+							%strong= company.city
+						%td
+							%strong= company.county
+						%td
+							%strong= company.state
+						
+					- else
+						%td= company.business_name
+						%td= company.city
+						%td= company.county
+						%td= company.state
+					%td{width: 50}
+						%a{href: 'javascript:;', 'data-id'=> company.id, |
+							class: 'select', 'data-company-name'=>company.company_name, 'data-business-name'=>company.business_name, 'data-city-name'=>company.city, 'data-state-name'=>company.state, 'data-address'=>company.address} select

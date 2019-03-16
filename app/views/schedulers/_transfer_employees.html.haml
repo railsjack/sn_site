@@ -1,0 +1,9 @@
+- if ids.present?
+	%select{id: 'transfer_employee', class: 'form-control'}
+		%option{value: 'none'}
+		%option{value: 0} All
+		- Employee.where(id: ids).order('last_name ASC').each do |emp|
+			%option{value: emp.id}= emp.name
+- else
+	%select{id: 'transfer_employee', class: 'form-control'}
+		%option{value: 'none'} No Employee

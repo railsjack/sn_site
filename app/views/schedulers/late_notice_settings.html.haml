@@ -1,0 +1,76 @@
+:javascript
+  $(document).ready(function() {
+  	$(".tel").inputmask("(999) 999-9999").blur(function(e) {
+  	if ($(e.target).val() === "(___) ___-____") {
+  	  $(e.target).val("");
+  	}
+  });
+
+  $('input:checkbox[value=email]').click(function() {
+    email_check_verify(this)
+  });
+
+  $('input:checkbox[value=text]').click(function() {
+    tel_check_verify(this)
+  });
+
+  email_check_verify($('input:checkbox[value=email]'));
+  tel_check_verify($('input:checkbox[value=text]'));
+  });
+
+  function email_check_verify(object){
+  	var $this = $(object);
+  	if ($this.is(':checked')) {
+  	  document.getElementById("company_late_notice_notification_attributes_email").readOnly = false;
+  	} else {
+  	  document.getElementById("company_late_notice_notification_attributes_email").readOnly = true;
+  	}
+  }
+
+  function tel_check_verify(object){
+    var $this = $(object);
+    if ($this.is(':checked')) {
+      document.getElementById("company_late_notice_notification_attributes_phone_number").readOnly = false;
+    } else {
+      document.getElementById("company_late_notice_notification_attributes_phone_number").readOnly = true;
+    }
+  }
+
+.well
+  %h4.text-center
+    %label Late Notice Settings
+
+= simple_form_for(@company, url: update_late_notice_settings_schedulers_path, method: :post, html: {class: "form-horizontal"}) do |c|
+  = c.fields_for :late_notice_notification do |f|
+    .col-md-6.col-md-offset-3
+      .well
+        .form-group
+          = f.label :system_status, 'System Status:', class: 'col-lg-4 control-label'
+          .col-lg-6
+            = f.radio_button :system_status, true, checked: true, value: true
+            = f.label :system_status, 'On', class: 'status-alignment'
+
+            = f.radio_button :system_status, false, value: false
+            = f.label :system_status, 'Off'
+        .form-group
+          = f.label :time_threshold, 'Tardiness Acceptance (Minutes)', class: 'col-lg-4 control-label'
+          .col-lg-6
+            = f.input :time_threshold, label: false, input_html: {min: '0'}
+        .form-group
+          = f.label :contact_method, "Contact Method:", class: 'col-lg-4 control-label'
+          .col-lg-10
+          - LateNoticeNotification::contact_types.each do |type|
+            %span.arrival-margin
+            = f.check_box( :contact_method, {multiple: true}, type, '')
+            = type.humanize
+        .form-group.notification-email
+          = f.label :email, 'Email:', class: 'col-lg-4 control-label'
+          .col-lg-6
+            = f.input :email, label: false, readonly: true
+        .form-group.notification-phone-number
+          = f.label :phone_number, 'Phone Number:', class: 'col-lg-4 control-label'
+          .col-lg-6
+            = f.input :phone_number, label: false, readonly: true
+
+        = f.button :submit, class: 'btn btn-success', value: 'Save'
+        = link_to 'Back', schedulers_path, class: 'btn btn-success'

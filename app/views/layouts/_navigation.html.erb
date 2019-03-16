@@ -1,0 +1,141 @@
+<%# navigation styled for Bootstrap 3.0 %>
+<!--<nav class="navbar navbar-inverse navbar-fixed-top">-->
+
+<style>
+    /*New Changes Menu*/
+    body {
+        padding-top: 73px;
+    }
+    .logo-img {
+        border-top: solid 3px #fff;
+    }
+    .sticky-menu{
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    .sticky-menu li{
+        float: left;
+    }
+
+
+    .sticky-menu li {
+        margin-left: 10px;
+        height: 30px;
+    }
+
+    .sticky-menu li a{
+        display: table-cell;
+        height: 95px;
+        vertical-align: middle;
+        color: #666;
+        font-size: 11pt;
+        border-top: solid 3px #fff;
+    }
+
+    .sticky-header a{
+        -webkit-transition: none;
+        -moz-transition: none;
+        -ms-transition: none;
+        -o-transition: none;
+    }
+
+    .sticky-menu li a:hover{
+        background: transparent !important;
+        border-top: solid 3px #a0ce4e;
+        color: #a0ce4e !important;
+    }
+    .navbar {
+        height: 95px;
+    }
+    .logo-img{
+        float: left;
+        margin-left: 0px;
+    }
+    .logo-img:hover{
+        background-color: transparent;
+        border-top: solid 3px #a0ce4e;
+    }
+    .navbar-default {
+        background-color: #fff;
+    }
+    @media screen and (max-width:992px) {
+        .sticky-menu li a {
+            font-size: 10pt;
+        }
+    }
+    @media screen and (max-width:767px) {
+        .navbar-header {
+            float: right;
+        }
+        .logo-img {
+            float: left;
+        }
+        #nav.mainNav {
+            width: 100%;
+            background: #fff;
+            border: 1px solid #e7e7e7;
+            border-top: 0px;
+            float: none;
+            position: absolute;
+            left: 0px;
+            top: 100%;
+            box-shadow: 3px 3px 5px #ccc;
+            padding: 0;
+        }
+        .sticky-menu li {
+            margin-left: 0px;
+            height: auto;
+            float: none;
+        }
+
+        .sticky-menu li a {
+            display: block;
+            height: auto;
+            vertical-align: middle;
+            color: #666;
+            font-size: 11pt;
+            border-top: solid 1px #fff;
+            border-botom: 1px solid #e7e7e7;
+            padding: 5px 10px;
+        }
+        .sticky-menu li a:hover {
+            border-top: solid 1px #a0ce4e;
+        }
+        .navbar.navbar-default.navbar-fixed-top {
+
+        }
+        .sticky-header {
+            position: relative;
+        }
+    }
+    /*New Changes Menu END*/
+</style>
+
+
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="sticky-header clearfix">
+      <div>
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+    <a href="<%= Rails.application.secrets.host_name %>" class="logo-img"><img src="/safety1.png" class="logo-img"></a>
+    <div id="nav" class="collapse navbar-collapse mainNav clearfix">
+
+      <ul class="nav navbar-nav sticky-menu">
+        <%= render 'layouts/navigation_links' %>
+      </ul>
+      <ul class="nav navbar-nav sticky-menu navbar-right">
+        <%= render 'layouts/navigation_sign' %>
+      </ul>
+    </div>
+  </div>
+  </div>
+  </div>
+</nav>

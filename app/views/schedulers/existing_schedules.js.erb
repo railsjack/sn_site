@@ -1,0 +1,38 @@
+<% if @existing_schedules < 2 %>
+    $("#createExistingModal #existingContent").html("<h4><b style='color:red'>Conflict Date: <%= @s_datetime.strftime("%m-%d-%Y") %></b><br><br>The appointment on the date referenced above cannot be created.  There is <b style='color:red'><%= @existing_schedules %></b> appointment that already exists for <b><%= @existing_name %></b> in your selected time.</h4>");
+<% else %>
+    $("#createExistingModal #existingContent").html("<h4>There are <b style='color:red'><%= @existing_schedules %></b> overlapping appointments that exist in your selected time.</h4>");
+<% end %>
+$('#createEmployeeModal').css('z-index', 1030);
+$('#createLovedoneModal').css('z-index', 1030);
+$('#createExistingModal').modal({show: true });
+
+$('#existingSubmitButton').unbind('click');
+$('#existingSubmitButton').bind('click', function() {
+    $('#createExistingModal').modal('hide');
+    $("#createExistingModal #existingContent").html('');
+    $('#createLovedoneModal').css('z-index', 1040);
+    $('#createEmployeeModal').css('z-index', 1040);
+    <% if @frequency_type == '1' or @stop_request %>
+        $('#createEmployeeModal').modal('hide');
+        $('#createLovedoneModal').modal('hide');
+        $('#calendar').fullCalendar('refetchEvents');
+    <% else %>
+        $.ajax({
+            url: '/schedulers/new_schedule',
+            dataType: 'script',
+            type: 'GET',
+            data: {
+                start_time: "<%= @p_start_time.strftime("%m/%d/%Y %H:%M") %>",
+                end_time: "<%= @p_end_time.strftime("%m/%d/%Y %H:%M") %>",
+                frequency: "<%= @frequency_type %>",
+                selected_id: "<%= @selected_id %>",
+                id: "<%= @id %>",
+                type: "<%= @type %>",
+                loop_number: "<%= @loop_number %>",
+                key: "<%= @key %>"
+            }
+        });
+    <% end %>
+//    check_frequency();
+});

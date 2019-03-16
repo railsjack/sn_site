@@ -1,0 +1,115 @@
+.well
+  h4.text-center
+    b Data Export Module
+    .pull-right
+      /= link_to 'Add Encounter', new_appointment_data_uploads_path, class: 'btn btn-success', style: 'margin-right: 10px;margin-left: -100px;'
+      button id= 'new_appointment' class= 'btn btn-success' style= 'margin-right: 10px;margin-left: -100px;' Add Encounter
+      = link_to 'Settings', settings_data_uploads_path, class: 'btn btn-success'
+.well.col-sm-5.col-md-offset-0.data-upload-well-height
+  h4.green-color.text-center
+    b Selection Criteria
+  hr
+  .form-group
+    label class= 'col-md-4 control-label' Start Date
+    .col-md-7
+      input type="text" class= "form-control" id = "du_start_date"
+    br
+    br
+  .form-group
+    label class= 'col-md-4 control-label' End Date
+    .col-md-7
+      input type="text" class= "form-control" id = "du_end_date"
+    br
+    br
+
+  h4
+    .label.label-default Payroll Export Selection
+  .col-md-10.col-md-offset-0
+    input type='checkbox' id='pr_face_to_face'
+      label for='pr_face_to_face' class='control-label' &nbsp Direct Employee Time with Loved One
+  .col-md-10.col-md-offset-0
+    input type='checkbox' id='pr_drive'
+      label for='pr_drive' class= 'control-label' &nbsp Drive Time
+  .col-md-10.col-md-offset-1
+    input type='checkbox' id='pr_base_first_last' disabled=true
+      label for='pr_base_first_last' class= 'control-label' &nbsp Include B-F and L-B
+  .col-md-10.col-md-offset-2
+    input type='radio' id='pr_drive_time_based' name='pr_drive' disabled=true
+      label for='pr_drive_time_based' class= 'control-label' &nbsp Time-Based Compensation
+  .col-md-10.col-md-offset-2
+    input type='radio' id='pr_drive_mileage_based' name='pr_drive' disabled=true
+      label for='pr_drive_mileage_based' class= 'control-label' &nbsp Mileage-Based Compensation
+  hr
+  .text-right
+    input type='button' id='payroll_upload_preview' class='btn btn-success' value='Payroll Preview'
+
+  h4
+    .label.label-default Billing Export Selection
+  .col-md-10.col-md-offset-0
+    input type='checkbox' id='bl_face_to_face'
+      label for='bl_face_to_face' class= 'control-label' &nbsp Direct Loved One Time with Employee
+  hr
+  .pull-right
+    input type='button' id='billing_upload_preview' class='btn btn-success' value='Billing Preview'
+
+.well.data-upload-well-height.col-sm-7.col-md-offset-0
+  h4.green-color.text-center
+    b Results
+  hr
+    #data_upload_preview
+      h4.text-warning.text-center Please enter selection criteria.
+
+#newEncounterModal.modal.fade aria-hidden="true" aria-labelledby="myModalLabel1" role="dialog" tabindex="-1"
+  .data-upload-modal-dialog
+    .modal-content
+      .modal-header
+        button.new_appt_cancel_button.close aria-hidden="true" data-dismiss="modal" type="button"  x
+        h4 style="color:green"  Add Encounter
+      .modal-body
+        .well
+          center
+            .new_appointment_fields
+              .form-group
+                label class= 'col-md-4 control-label' Employee:
+                .col-md-7
+                  select class= "form-control" id= "new_appt_employee"
+                    option value="none" Select Employee
+                    - Employee.where(company_id: current_user.company.id).order('last_name ASC').each do |emp|
+                      option value=emp.id
+                        = emp.name
+                br
+                br
+              .form-group
+                label class= 'col-md-4 control-label' Loved One:
+                .col-md-7
+                  select class= "form-control" id= "new_appt_lovedone"
+                    option value="none" Select Loved One
+                    - Lovedone.where(company_id: current_user.company.id).order('last_name ASC').each do |lovedone|
+                      option value=lovedone.id
+                        = lovedone.name
+                br
+                br
+
+              .form-group
+                label class= 'col-md-4 control-label' Date:
+                .col-md-7
+                  input type="text" class= "form-control" id= "new_appt_date"
+                br
+                br
+              .form-group
+                label class= 'col-md-4 control-label' Start Time:
+                .col-md-7
+                  input type="text" class= "form-control" id= "new_appt_start_datetime"
+                br
+                br
+              .form-group
+                label class= 'col-md-4 control-label' End Time:
+                .col-md-7
+                  input type="text" class= "form-control" id= "new_appt_end_datetime"
+                br
+                br
+
+      .modal-footer
+        button.new_appt_cancel_button.btn.btn-danger aria-hidden="true" data-dismiss="modal"  Cancel
+        button.btn.btn-success.pull-left#new_appt_add_button Save
+

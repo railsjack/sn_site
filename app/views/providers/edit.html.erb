@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">Editing provider</h3>
+      </div>
+      <div class="panel-body">
+<%= render 'form' %>
+
+      </div>
+     <div class="panel-footer">
+        <td><%= link_to 'Show', lovedone_provider_url(@provider.lovedone, @provider) , class: 'btn btn-success btn-md' %> </td>|
+        <td><%= link_to 'Back', lovedone_providers_path, class: 'btn btn-success btn-md' %></td>
+    <td><span class="pull-right">
+        <%= link_to 'Delete', lovedone_provider_url(@provider.lovedone, @provider) , method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger btn-md' %>
+    </span></td>
+    </div>    
+    </div>
+    </div>    
+</div>

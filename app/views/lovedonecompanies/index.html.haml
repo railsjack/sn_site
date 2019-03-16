@@ -1,0 +1,45 @@
+.row
+	%h3.text-center
+		Companies for
+		=@lovedone.name
+	.col-md-12
+		%table.table.table-hover
+			%thead
+				%tr
+					%th Name
+					%th Business name
+					%th Provider type
+					%th Telephone
+					%th Mobile phone number
+					%th Get notification
+					%th Address
+					%th City
+					%th State
+					%th Zip
+					%th Contact last name
+					%th Contact first name
+					%th Status
+					%th Actions
+			%tbody
+				- @companies.each do |company|
+					%tr{ class: (@providers.include?(company.id)? 'bg-success' : '') }
+						%td= company.company_name
+						%td= company.business_name
+						%td= company.provider_type
+						%td= company.telephone
+						%td= company.mobile_phone_number
+						%td= company.get_notification
+						%td= company.address
+						%td= company.city
+						%td= company.state
+						%td= company.zip
+						%td= company.contact_last_name
+						%td= company.contact_first_name
+						%td= company.status
+						%td.text-right
+							- if @providers.include?(company.id)
+								=link_to 'Unassign', lovedone_lovedonecompany_path(@lovedone, company), method: :delete, data:  {confirm: 'Are you sure?'}, class: 'btn btn-sm btn-danger'
+							-else
+								= simple_form_for(@provider, url: lovedone_lovedonecompanies_path(@lovedone), html: {class: 'form-horizontal'})  do |f|
+									= f.input :company, as: :hidden, input_html: {value: company.id}
+									= f.submit 'Assign', class: 'btn btn-success btn-sm pull-right'

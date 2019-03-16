@@ -1,0 +1,17 @@
+.row
+  .col-md-8.col-md-offset-2
+    .panel.panel-success
+      .panel-heading
+        %h3.panel-title Sponsor
+      .panel-body
+        %p#notice= notice
+        %p
+          %strong Name:
+          = @sponsor.name
+        %p
+          %strong Address:
+          = @sponsor.address
+      .panel-footer
+        = link_to 'Edit', edit_sponsor_path(@sponsor) , class: 'btn btn-success btn-md'
+        |
+        \#{link_to 'Back', sponsors_path , class: 'btn btn-success btn-md'}

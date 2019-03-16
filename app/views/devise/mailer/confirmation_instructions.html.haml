@@ -1,0 +1,11 @@
+%h3
+	Welcome (#{@email})!
+- if !$lovedone.nil?
+	%p
+		To complete the Safety Notice enrollment process for 
+		#{$lovedone.first_name} #{$lovedone.last_name}, you must click on the link below:
+- else
+	%p
+		To complete the Safety Notice enrollment process, you must click on the link below:
+
+%p= link_to 'Confirm Safety Notice Account', confirmation_url(@resource, confirmation_token: @token, host: Rails.application.secrets.domain_name)

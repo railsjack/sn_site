@@ -1,0 +1,173 @@
+.well
+  h4.text-center
+    b Users
+    .pull-right
+      button id= 'new_user' class= 'btn btn-success' Add User
+      button id= 'selected_history' class= 'btn btn-success' style='margin-left:5px;' History
+.well
+  #company_members
+    = render partial: 'company_members'
+
+
+#newMemberModal.modal.fade aria-hidden="true" aria-labelledby="myModalLabel1" role="dialog" tabindex="-1"
+  .member-modal-dialog
+    .modal-content
+      .modal-header
+        button.new_member_cancel_button.close aria-hidden="true" data-dismiss="modal" type="button"  x
+        h4 style="color:green"  Add User
+      .modal-body
+        center
+          .well
+            .form-horizontal
+              .form-group
+                label for='new_member_first_name' class='col-md-4 control-label' First Name
+                .col-md-5
+                  input type="text" id="new_member_first_name" class="form-control"
+              .form-group
+                label for='new_member_last_name' class='col-md-4 control-label' Last Name
+                .col-md-5
+                  input type="text" id="new_member_last_name" class="form-control"
+              .form-group
+                label for='new_member_email' class='col-md-4 control-label' Email
+                .col-md-5
+                  input type="text" id="new_member_email" class="form-control"
+              .form-group
+                label for='new_member_password' class='col-md-4 control-label' Password
+                .col-md-5
+                  input type="password" id="new_member_password" class="form-control"
+              .form-group
+                .text-danger * Minimum is 8 characters
+              .form-group
+                label for='new_member_password_confirm' class='col-md-4 control-label' Password Confirmation
+                .col-md-5
+                  input type="password" id="new_member_password_confirm" class="form-control"
+      .modal-footer
+        button.new_member_cancel_button.btn.btn-danger aria-hidden="true" data-dismiss="modal"  Cancel
+        button.btn.btn-success.pull-left#new_member_button Save
+
+#editMemberModal.modal.fade aria-hidden="true" aria-labelledby="myModalLabel1" role="dialog" tabindex="-1"
+  .member-modal-dialog
+    .modal-content
+      .modal-header
+        button.new_member_cancel_button.close aria-hidden="true" data-dismiss="modal" type="button"  x
+        h4 style="color:green"  Edit User
+      .modal-body
+        center
+          .well
+            .form-horizontal
+              .form-group
+                label for='edit_member_first_name' class='col-md-4 control-label' First Name
+                .col-md-5
+                  input type="text" id="edit_member_first_name" class="form-control"
+              .form-group
+                label for='edit_member_last_name' class='col-md-4 control-label' Last Name
+                .col-md-5
+                  input type="text" id="edit_member_last_name" class="form-control"
+              .form-group
+                label for='edit_member_email' class='col-md-4 control-label' Email
+                .col-md-5
+                  input type="text" id="edit_member_email" class="form-control"
+              .form-group
+                label for='edit_existing_password' class='col-md-4 control-label' Existing Password
+                .col-md-5
+                  input type="text" id="edit_existing_password" class="form-control" readonly="readonly"
+              .form-group
+                label for='edit_member_password' class='col-md-4 control-label' Password
+                .col-md-5
+                  input type="password" id="edit_member_password" class="form-control"
+              .form-group
+                .text-danger * Minimum is 8 characters
+              .form-group
+                label for='edit_member_password_confirm' class='col-md-4 control-label' Password Confirmation
+                .col-md-5
+                  input type="password" id="edit_member_password_confirm" class="form-control"
+              input type='hidden' id="user_id"
+      .modal-footer
+        button.new_member_cancel_button.btn.btn-danger aria-hidden="true" data-dismiss="modal"  Cancel
+        button.btn.btn-success.pull-left#edit_member_button Save
+
+#memberAccessModal.modal.fade aria-hidden="true" aria-labelledby="myModalLabel1" role="dialog" tabindex="-1"
+  .member-modal-dialog
+    = simple_form_for(@access_setting, remote: true, url: update_access_access_settings_path, html: {class: 'form-horizontal'}) do |f|
+      .modal-content
+        .modal-header
+          button.new_member_cancel_button.close aria-hidden="true" data-dismiss="modal" type="button"  x
+          #member_selected
+        .modal-body
+          center
+            .well style='width:50%'
+              .form-horizontal
+                .form-group
+                  = f.label :tab, 'Modify Access', class: 'col-md-5 control-label'
+                  .col-md-7.text-justify#check_boxes
+                    = f.input :tab, as: :check_boxes, label: false, collection: Tab.all, class: 'form-control'
+              = f.input :user, as: :hidden
+
+        .modal-footer
+          button.new_member_cancel_button.btn.btn-danger aria-hidden="true" data-dismiss="modal"  Cancel
+          = f.button :submit, 'Save', class: 'btn btn-success pull-left'
+
+#memberHistoryModal.modal.fade aria-hidden="true" aria-labelledby="myModalLabel1" role="dialog" tabindex="-1"
+  .member-modal-dialog
+    .modal-content
+      .modal-header
+        button.new_member_cancel_button.close aria-hidden="true" data-dismiss="modal" type="button"  x
+        #member_selected
+      .modal-body
+        .well
+          .form-horizontal
+            .form-group
+              label for='history_start_date' class='col-md-4 control-label' Start Date
+              .col-md-4
+                input type="text" id="history_start_date" class="form-control"
+            .form-group
+              label for='history_end_date' class='col-md-4 control-label' End Date
+              .col-md-4
+                input type="text" id="history_end_date" class="form-control"
+            .form-group
+              label for='history_end_date' class='col-md-4 control-label'
+              .col-md-3
+                input type="button" id="history_generate_btn" class="form-control btn btn-success" value="Generate"
+
+            input type='hidden' id="user_id"
+          #memberHistoryContent
+      .modal-footer
+        button.btn.btn-danger aria-hidden="true" data-dismiss="modal" Cancel
+        button.btn.btn-success.pull-left aria-hidden="true" data-dismiss="modal" OK
+
+#selectedHistoryModal.modal.fade aria-hidden="true" aria-labelledby="myModalLabel1" role="dialog" tabindex="-1"
+  .member-modal-dialog
+    .modal-content
+      .modal-header
+        button.new_member_cancel_button.close aria-hidden="true" data-dismiss="modal" type="button"  x
+        h4 style="color:green"  History
+      .modal-body
+        .well
+          .form-horizontal
+            .form-group
+              label for='selected_history_start_date' class='col-md-4 control-label' Start Date
+              .col-md-3
+                input type="text" id="selected_history_start_date" class="form-control"
+            .form-group
+              label for='selected_history_end_date' class='col-md-4 control-label' End Date
+              .col-md-3
+                input type="text" id="selected_history_end_date" class="form-control"
+            .form-group
+              label for='selected_history_type' class='col-md-4 control-label' Filter By
+              .col-md-3
+                select id="selected_history_type" class="form-control"
+                  option value='0' selected='selected' All
+                  option value='1' Employee
+                  option value='2' Loved One
+                  option value='3' Follower
+                  option value='4' Schedule
+                  option value='5' System Access
+            .form-group
+              label for='selected_history_generate_btn' class='col-md-4 control-label'
+              .col-md-3
+                input type="button" id="selected_history_generate_btn" class="form-control btn btn-success" value="Generate"
+          #selectedHistoryContent
+      .modal-footer
+        button.btn.btn-danger aria-hidden="true" data-dismiss="modal" Cancel
+        button.btn.btn-success.pull-left aria-hidden="true" data-dismiss="modal" OK
+

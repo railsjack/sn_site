@@ -1,0 +1,50 @@
+br
+- if @view_mode != 'sponsor_detail'
+  .well.text-center
+    = simple_form_for(@notification, url: calc_post_notifications_path, html: {class: 'form-inline'}) do |f|
+      = f.input :created_at, label: 'From:', as: :date, default: @default_date1
+      = f.input :updated_at, label: 'To:', as: :date, default: @default_date2
+      = f.input :sponsor_id, as: :hidden
+      = f.submit "Search", class: 'btn btn-primary', style: 'margin-left: 20px;'
+  hr
+  .well
+    table.table.table-bordered#sponsor_billing_table
+      thead
+        tr.bg-success
+          th Sponsored Company
+          th Message count
+          th Fee
+          th Amount (Message Count x Fee)
+          th Actions
+      tbody
+        - if !@invoices.nil?
+          - @invoices.each do |index, invoice|
+            - sponsor = Sponsor.find(invoice[:sponsor_id])
+            - @fee = sponsor.messagefee
+            - amount = invoice[:message_count] * @fee
+            - currnet_date = Time.now.strftime("%m/%d/%Y %H:%M")
+            - next if sponsor.nil?
+            tr
+              td=sponsor.name
+              td= link_to invoice[:message_count], calc_notification_betweenx_notifications_path(@from, @to, invoice[:sponsor_id])+"?nohead=true", target: 'invoice_detail_frame'
+              td=sponsor.messagefee
+              td=amount
+              td
+                = simple_form_for(@invoice, html: {target: 'invoice_frame'}) do |invoice_form|
+                  = invoice_form.hidden_field :sponsor_id, value: invoice[:sponsor_id]
+                  = invoice_form.hidden_field :amount, value: amount
+                  = invoice_form.hidden_field :title, value: "Safety Notice Invoice Due for"
+                  = invoice_form.hidden_field :start_date, :value => @from
+                  = invoice_form.hidden_field :end_date, :value => @to
+                  = invoice_form.hidden_field :message_count, :value => invoice[:message_count]
+                  = invoice_form.hidden_field :ids, :value => invoice[:ids][1..10000]
+                  = invoice_form.submit 'Send Invoice', class: 'btn btn-success btn-sm'
+
+    iframe name= 'invoice_detail_frame' width='100%' frameborder=0
+
+  - if @view_mode == 'sponsor_detail'
+    div#sms_dialog style= "display: none;"
+      h3 Details for Invoices
+      = render 'list'
+
+  iframe name='invoice_frame' width=1 height=1 frameborder=0

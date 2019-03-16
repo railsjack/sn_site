@@ -1,0 +1,28 @@
+var time_error ="<%= @time_error %>";
+var existing_trip ="<%= @existing_trip %>";
+
+if (time_error == 'true') {
+    alert('The End Time preceds the Start Time. Please select an End Time that is later than the Start Time.');
+}
+else if(existing_trip == 'true'){
+    alert('Appointment already exist on the selected time.');
+}
+else{
+    employee = $('#new_appt_employee').val();
+    lovedone = $('#new_appt_lovedone').val();
+    date = $('#new_appt_date').val();
+    start_time = $('#new_appt_start_datetime').val();
+    end_time = $('#new_appt_end_datetime').val();
+
+    $('#new_appt_employee').select2("val", ' ');
+    $('#new_appt_lovedone').select2("val", ' ');
+    $('#new_appt_date').val('');
+    $('#new_appt_start_datetime').val('');
+    $('#new_appt_end_datetime').val('');
+    $('#newEncounterModal').modal('hide');
+
+//    $('#du_start_date').val('<%= @date %>');
+//    $('#du_end_date').val('<%= @date %>');
+//    $('#pr_face_to_face').attr('checked', true);
+    $('#payroll_upload_preview').trigger('click');
+}

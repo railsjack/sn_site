@@ -1,0 +1,3 @@
+$('#transfer_employees_dropdown').html("<%= escape_javascript render(partial: 'schedulers/transfer_employees', locals: {ids: @available_employees}) %>");
+
+$('#transfer_employee').select2();

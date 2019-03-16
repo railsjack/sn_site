@@ -1,0 +1,109 @@
+$('#company_members').html("<%= escape_javascript render(partial: 'company_members') %>");
+
+$('#company_members_table').DataTable({
+    columns: [
+        {
+            width: "4%"
+        }, {
+            "width": "7%"
+        }, {
+            "width": "7%"
+        }, {
+            "width": "5%"
+        }, {
+            "width": "5%"
+        }, {
+            "width": "5%"
+        }, {
+            "width": "5%"
+        }, {
+            "width": "12%"
+        }, {
+            "width": "5%"
+        }, null, null, null
+    ],
+    columnDefs: [
+        {
+            targets: 6,
+            orderable: false
+        }, {
+            targets: 7,
+            orderable: false
+        }, {
+            targets: 8,
+            orderable: false
+        }
+    ],
+    sScrollX: "100%",
+    sScrollXInner: "110%",
+    searching: false,
+    paging: false,
+    info: false
+});
+
+$('.member_access').on('click', function() {
+    var access_array, user;
+    $('#member_selected').html('<h4 style="color:green">' + $(this).closest("tr").find("td.first_name").html() + ' ' + $(this).closest("tr").find("td.last_name").html() + '</h4>');
+    user = parseInt($(this).closest("tr").find("td.hidden.user_id").html());
+    access_array = $(this).closest("tr").find("td.hidden.access").html().trim();
+    access_array = access_array.split(',');
+    $(".access_setting_tab .checkbox input").prop("checked", false);
+    $(".access_setting_tab .checkbox input").each(function() {
+        if (_.contains(access_array, $(this).val())) {
+            return $(this).prop('checked', true);
+        }
+    });
+    $('#access_setting_user').val(user);
+    return $('#memberAccessModal').modal('show');
+});
+
+$('.edit_member').on('click', function() {
+    var user;
+    user = $(this).closest("tr").find("td.hidden.user_id").html();
+    return $.ajax({
+        url: '/access_settings/edit_member',
+        dataType: 'script',
+        type: 'POST',
+        data: {
+            user_id: parseInt(user)
+        }
+    });
+});
+
+$('.delete_member').on('click', function() {
+    var member, user;
+    if (confirm('Are you sure you want to delete Member?')) {
+        member = $(this).closest("tr").find("td.hidden.member_id").html();
+        user = $(this).closest("tr").find("td.hidden.user_id").html();
+        return $.ajax({
+            url: '/access_settings/delete_member',
+            dataType: 'script',
+            type: 'POST',
+            data: {
+                member_id: parseInt(member),
+                user_id: parseInt(user)
+            }
+        });
+    }
+});
+
+$('.member_history').on('click', function() {
+    var user;
+    user = $(this).closest("tr").find("td.hidden.user_id").html();
+    $('#memberHistoryModal #member_selected').html('<h4 style="color:green">' + $(this).closest("tr").find("td.first_name").html() + ' ' + $(this).closest("tr").find("td.last_name").html() + '</h4>');
+    $('#memberHistoryModal #user_id').val(parseInt(user));
+    $('#memberHistoryModal #history_start_date').val('');
+    $('#memberHistoryModal #history_end_date').val('');
+    $('#memberHistoryModal #memberHistoryContent').html('');
+
+    $('#memberHistoryModal').modal('show');
+
+//        return $.ajax({
+//            url: '/access_settings/member_history',
+//            dataType: 'script',
+//            type: 'POST',
+//            data: {
+//                user_id: parseInt(user)
+//            }
+//        });
+});
