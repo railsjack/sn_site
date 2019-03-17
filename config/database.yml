@@ -1,0 +1,22 @@
+default: &default
+  adapter: mysql2
+  username: root
+  password: 
+  host: localhost
+
+
+development:
+  <<: *default
+  host: us-cdbr-iron-east-03.cleardb.net
+  database: heroku_a705a439839aa4e
+  username: b67efa840a37f0
+  password: ec9ab5da
+
+test:
+  <<: *default
+  database: safetynotice_test
+
+production:
+  <<: *default
+  database: safetynotice_prod
+
