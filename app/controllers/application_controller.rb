@@ -25,7 +25,9 @@ class ApplicationController < ActionController::Base
   def set_time_zone
     I18n.locale = I18n.default_locale #request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
     if current_user and (current_user.role == 'serviceprovider' or current_user.role == 'employee')
-      Time.zone = current_user && current_user.company.time_zone ? current_user.company.time_zone : 'UTC'
+      time_zone = (current_user && current_user.company.time_zone ? current_user.company.time_zone : 'UTC')
+      time_zone = "UTC" if time_zone.empty?
+      Time.zone = time_zone
     end
   end
 
