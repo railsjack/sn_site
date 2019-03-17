@@ -1,7 +1,12 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 #source 'http://ruby.taobao.org'
 #ruby '2.1.0'
-gem 'rails', '4.1.2.rc1'
+#gem 'rails', '4.2.8'
+
+#https://stackoverflow.com/questions/32457657/rails-4-gemloaderror-specified-mysql2-for-database-adapter-but-the-gem-i
+gem 'rails', '~> 4.2.4', git: "https://github.com/rails/rails.git", branch: '4-2-stable'
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw] #-> Rails 4.1+
+
 gem 'mysql2'
 gem 'sass-rails', '~> 4.0.3'
 gem 'uglifier', '>= 1.3.0'
@@ -61,7 +66,8 @@ gem 'lob'
 
 group :development do
   gem 'better_errors', '~> 1.1.0'
-  gem 'binding_of_caller', :platforms=>[:mri_21]
+  #gem 'binding_of_caller', :platforms=>[:mri_21]
+  gem 'binding_of_caller'
   gem 'guard-bundler'
   gem 'guard-rails'
   gem 'guard-rspec'

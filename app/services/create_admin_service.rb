@@ -4,7 +4,9 @@ class CreateAdminService
         user.profile = Profile.create
         user.password = Rails.application.secrets.admin_password
         user.password_confirmation = Rails.application.secrets.admin_password
-        user.confirm!
+        #user.confirm!
+        #https://stackoverflow.com/questions/38693705/nomethoderror-undefined-method-confirm-for-user
+        user.confirm
         user.admin!
       end
   end

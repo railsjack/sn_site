@@ -1,0 +1,25 @@
+# Rename this file to local_env.yml
+# Add account settings and API keys here.
+# This file should be listed in .gitignore to keep your settings secret!
+# Each entry gets set as a local environment variable.
+# This file overrides ENV variables in the Unix shell.
+# For example, setting:
+# GMAIL_USERNAME: 'Your_Gmail_Username'
+# makes 'Your_Gmail_Username' available as ENV["GMAIL_USERNAME"]
+
+development: &default
+  ADMIN_NAME: 'admin'
+  ADMIN_PASSWORD: 'fofjrj123'
+  ADMIN_EMAIL: 'admin@safetynotice.com'
+  GMAIL_USERNAME: 'contact@safetynotice.com'
+  GMAIL_PASSWORD: 'safety99'
+  DOMAIN_NAME: 'safetynotice.com'
+  SECRET_KEY_BASE: '1f3e2027b20600855e4f55f558aca09cff610ffdab678a6a406e951f210eaaa7dce3d8e5e791f4c9055e1b51f2740769f870efdb0e52011b937f0be9500f0e09'
+  TWILIO_SID: 'ACb95dc788a8b93cc6e5dfd19f80b497ef'
+  TWILIO_TOKEN: '3791f1d6e8bc5d9f1f4a1e2deaa540e4'
+  TWILIO_FROM_NUMBER: '+17274752068'
+  #HOST_NAME: '172.16.1.86:3000'
+  HOST_NAME: 'safetynotice.com:3002'
+
+production:
+  <<: *default
