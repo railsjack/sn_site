@@ -20,6 +20,7 @@ development: &default
   TWILIO_FROM_NUMBER: '+17274752068'
   #HOST_NAME: '172.16.1.86:3000'
   HOST_NAME: 'safetynotice.com:3002'
+  LOB_TEST_KEY: test_ba58119c0083754f87fd61f6bda7aaa8e63
 
 production:
   <<: *default

@@ -1,6 +1,6 @@
 class LobService
   # require 'lob'
-  @lob = Lob.load(api_key: Rails.application.secrets.lob_test_key)
+  @lob = Lob::Client.new(api_key: Rails.application.secrets.lob_test_key)
   # @lob = Lob.load(api_key: Rails.application.secrets.lob_live_key)
 
   def self.create_letter(person, document, provider, start_date, end_date)
