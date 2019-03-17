@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 #source 'http://ruby.taobao.org'
-#ruby '2.1.0'
+ruby '2.6.0'
 #gem 'rails', '4.2.8'
 
 #https://stackoverflow.com/questions/32457657/rails-4-gemloaderror-specified-mysql2-for-database-adapter-but-the-gem-i
