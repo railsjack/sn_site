@@ -23,4 +23,6 @@ production:
   username: b06e19137c0322
   password: c5f2be4c
 
+  # mysql -h us-cdbr-iron-east-03.cleardb.net -u b06e19137c0322 -p heroku_6f99e1591d4f1a3
+
   # mysql2://b06e19137c0322:c5f2be4c@us-cdbr-iron-east-03.cleardb.net/heroku_6f99e1591d4f1a3?reconnect=true

@@ -66,7 +66,7 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_out_path_for(resource_or_scope)
-    return root_url if root_url.contains?('heroku')
+    return root_url if root_url.include?('heroku')
     Rails.env.production? ? 'http://safetynotice.com/' : root_path
   end
 
