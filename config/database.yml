@@ -19,8 +19,8 @@ production:
   database: safetynotice_prod
 
   host: us-cdbr-iron-east-03.cleardb.net
-  database: heroku_a705a439839aa4e
-  username: b67efa840a37f0
-  password: ec9ab5da
+  database: heroku_6f99e1591d4f1a3
+  username: b06e19137c0322
+  password: c5f2be4c
 
-  # mysql -h us-cdbr-iron-east-03.cleardb.net -u b67efa840a37f0 -pec9ab5da heroku_a705a439839aa4e
+  # mysql2://b06e19137c0322:c5f2be4c@us-cdbr-iron-east-03.cleardb.net/heroku_6f99e1591d4f1a3?reconnect=true
