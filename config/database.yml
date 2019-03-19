@@ -22,3 +22,5 @@ production:
   database: heroku_a705a439839aa4e
   username: b67efa840a37f0
   password: ec9ab5da
+
+  # mysql -h us-cdbr-iron-east-03.cleardb.net -u b67efa840a37f0 -pec9ab5da heroku_a705a439839aa4e
