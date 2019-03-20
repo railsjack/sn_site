@@ -9,11 +9,10 @@ development:
   <<: *default
   database: safetynotice_dev
 
-  host: us-cdbr-iron-east-03.cleardb.net
-  database: heroku_6f99e1591d4f1a3
-  username: b06e19137c0322
-  password: c5f2be4c
-
+  #host: us-cdbr-iron-east-03.cleardb.net
+  #database: heroku_6f99e1591d4f1a3
+  #username: b06e19137c0322
+  #password: c5f2be4c
 test:
   <<: *default
   database: safetynotice_test

@@ -92,14 +92,26 @@ class TripService
               end
               body = "Early Arrival Notice - Employee: #{employee.first_name} #{employee.last_name}; Loved One: #{first_last_name}; Distance Away: #{distance.round(2)} miles"
               to_number = to_number.gsub(/\D/, "")
-              if to_number.size == 10
-                to_number = '+1' + to_number
+              puts '-------------------to_number--------------------'
+              puts to_number
+              if to_number.size == 10 || to_number.size == 13
+                to_number = (to_number.size == 10 ? '+1' : '+') + to_number
+                
 
-                @client.messages.create(
-                    :from => Rails.application.secrets.twilio_from_number,
-                    :to => to_number,
-                    :body => body
-                )
+                puts '----------------------------------------------'
+                puts account_sid, auth_token
+
+                begin
+                  message = @client.messages.create(
+                      :from => Rails.application.secrets.twilio_from_number,
+                      :to => to_number,
+                      :body => body
+                  )
+                  puts message.inspect.to_s
+                rescue Twilio::REST::TwilioError => e
+                  puts e.message
+                end
+
               end
             end
           end
