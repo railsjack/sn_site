@@ -32,6 +32,7 @@
                       = result['destination_addresses'].first
                   %a{href: "https://maps.google.com?daddr=#{latitude},#{longitude}", target: "_blank"}
                     %i.glyphicon.glyphicon-map-marker
+                  = active_trip.current_address
                 - else
                   %label Administrative
           - else

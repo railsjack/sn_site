@@ -176,6 +176,9 @@ class Employee < ActiveRecord::Base
     self.attributes.except('created_at', 'updated_at', 'id', 'distance')
   end
 
+  def get_address
+  end
+
   private
 
   def before_save_data
